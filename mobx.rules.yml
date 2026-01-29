@@ -1,0 +1,467 @@
+framework:
+  name: mobx-store-rules
+  version: 1.2.0
+  language: TypeScript
+  purpose: >
+    Establecer un marco basado en reglas para implementar Stores con MobX usando:
+      - Una interfaz + namespace como contrato único.
+      - Un store mock altamente funcional con datos quemados.
+      - Un store “live” esquelético que arroja error en métodos no implementados.
+    *Nota:* Stores puramente de UI (toggles, menús, sidebars, modales, etc.)
+    NO están obligados a seguir la arquitectura de interfaz/mock/live.
+    Además, estandariza los contratos de red bajo HAL-UC (ver hal.rules.yml) para endpoints
+    de recursos y colecciones, y exige que los mocks sigan esa forma.
+  dependencies:
+    hal_rules: "hal.rules >= 0.1.0"
+
+  scope:
+    - mobx
+    - typescript
+    - arquitectura de stores
+    - stores funcionales (negocio)
+    - stores puramente de UI (simple toggle stores)
+    - contratos HTTP HAL-UC para resources/collections
+
+  non_goals:
+    - Implementaciones reales del store “live”
+    - Gestión de DI/IoC avanzada
+
+conventions:
+  directory_layout:
+    contract: "src/stores/<feature>/<Feature>Store.contract.ts"
+    mock:     "src/stores/<feature>/<Feature>Store.mock.ts"
+    live:     "src/stores/<feature>/<Feature>Store.live.ts"
+    index:    "src/stores/<feature>/index.ts"
+  naming:
+    interface: "I<Feature>Store"
+    namespace: "I<Feature>Store"
+    mock_class: "<Feature>StoreMock"
+    live_class: "<Feature>StoreLive"
+    factory: "create<Feature>Store"
+    ui_store_simple: "<Feature>UIStore"
+  mobx:
+    make_auto_observable: "makeAutoObservable(this, {}, { autoBind: true })"
+    forbid_inheritance: true
+    mutation_style: "acciones claras; evitar efectos colaterales implícitos"
+  typescript:
+    target: "ES2020+"
+    strict: true
+    moduleResolution: "NodeNext"
+  http:
+    content_type: "application/hal+json"
+    expand_param: "expand"       # Debe coincidir con hal.rules.yml
+    collection_meta:
+      total: "hc:total"
+      offset: "hc:offset"
+      limit: "hc:limit"
+  typing:
+    hal_types_file: "src/hal/types.ts"
+  endpoints:
+    resource:
+      method: "GET"
+      path_example: "/<entidad-plural>/{id}"
+      response_type: "HalResource<<Entidad>>"
+    collection:
+      method: "GET"
+      path_example: "/<entidad-plural>?offset=0&limit=10&expand=<rels>"
+      response_type: "HalCollection<<Entidad>>"
+  design_principles:
+    - "Un único contrato (interface + namespace) por store funcional."
+    - "CERO herencia entre stores (evita problemas con makeAutoObservable)."
+    - "Mock con datos de ejemplo completos y realistas."
+    - "Live = esqueleto; todo método arroja Error('Not implemented')."
+    - "Interfaces contienen ONLY tipos, contratos, constantes y enumeraciones."
+    - "Los stores puramente de UI no necesitan interfaz/mock/live."
+    - "Los stores funcionales que consumen red deben usar HAL-UC y exponer puertos tipados."
+
+rules:
+  - id: R1-interface-as-single-source-of-truth
+    intent: "El contrato define API, tipos, constantes y enums."
+    rationale: "Evita divergencias entre mock y live."
+    applies_to: ["stores funcionales"]
+    checklist:
+      - "La interfaz exporta métodos síncronos/async y propiedades observables previstas."
+      - "Declarar tipos anidados y DTOs dentro del namespace homónimo."
+      - "Incluir constantes y enums en el namespace, no en clases."
+      - "Prohibido incluir datos de prueba."
+    validation:
+      - "No usar datos quemados en *.contract.ts."
+
+  - id: R2-no-inheritance
+    intent: "Evitar herencia que interfiere con MobX."
+    rationale: "Herencia + makeAutoObservable puede romper auto-binding/observables."
+    applies_to: ["todos los stores"]
+    forbid:
+      - "extends"
+      - "mixins de clase"
+
+  - id: R3-mock-is-first-class
+    intent: "Mock debe permitir prototipos altamente funcionales."
+    rationale: "Permite probar UI/flows antes de integrar servicios."
+    applies_to: ["stores funcionales"]
+
+  - id: R4-live-is-skeleton
+    intent: "Live NO implementa lógica por defecto."
+    rationale: "El desarrollador decide la integración en el momento oportuno."
+    applies_to: ["stores funcionales"]
+
+  - id: R5-factory-selection
+    intent: "Poder alternar entre mock y live por configuración."
+    applies_to: ["stores funcionales"]
+
+  - id: R6-mobx-initialization
+    intent: "Inicialización consistente y segura."
+    applies_to: ["todos los stores"]
+
+  - id: R7-error-handling
+    intent: "Errores explícitos en live."
+    applies_to: ["stores funcionales"]
+
+  - id: R8-ui-stores-simple
+    category: special_case
+    intent: >
+      Los stores puramente de UI (sin lógica de negocio):
+      - abrir/cerrar menú,
+      - colapsar sidebar,
+      - abrir modal,
+      - manejar un toggle de panel,
+      - cambiar tema oscuro/claro,
+      NO deben seguir la arquitectura interfaz/mock/live.
+    rationale: >
+      No requieren mocks realistas ni interfaces complejas; son simples estados de
+      UI inmediatos.
+    applies_to: ["stores de UI"]
+    rules:
+      - "Pueden ser clases simples con makeAutoObservable."
+      - "No necesitan interfaces ni namespaces."
+      - "No requieren store mock ni store live."
+      - "No deben manejar datos de negocio."
+      - "Un archivo único por store es suficiente (e.g., SidebarUIStore.ts)."
+    example: |
+      // File: src/stores/ui/SidebarUIStore.ts
+      import { makeAutoObservable } from "mobx";
+      export class SidebarUIStore {
+        isOpen = false;
+        constructor() {
+          makeAutoObservable(this, {}, { autoBind: true });
+        }
+        toggle() { this.isOpen = !this.isOpen; }
+        open() { this.isOpen = true; }
+        close() { this.isOpen = false; }
+      }
+
+  - id: R10-hal-endpoint-contracts
+    intent: "Unificar contratos de red (resource/collection) bajo HAL-UC."
+    applies_to: ["stores funcionales"]
+    requires:
+      - "Definir tipos compartidos HalLink/HalDoc/HalResource<T>/HalCollection<T>."
+      - "Puertos (Ports) del store tipan respuestas con HalResource<T> / HalCollection<T>."
+      - "Mocks devuelven payloads válidos HAL-UC."
+    notes:
+      - "Stores puramente de UI quedan excluidos (R8)."
+
+  - id: R11-hal-mock-shape
+    intent: "Los mocks de red usan exactamente la forma HAL-UC."
+    checklist:
+      - "_links.self.href presente en raíz."
+      - "_embedded único en raíz; arrays deduplicados por _id."
+      - "Colecciones incluyen hc:total, hc:offset, hc:limit y _embedded.<principal>."
+      - "Respetar expand (sin param -> defaults; con param -> solo rels pedidas)."
+
+  - id: R12-hal-parser-guidance
+    intent: "Normalizar parsing a índices por entidad."
+    guidelines:
+      - "Indexar _embedded.<rel> a Map<string, Entidad> por _id."
+      - "Resolver FKs (p.ej., cliente.ciudadId -> ciudadesById.get(...))."
+      - "Tolerar ausencia de rels cuando expand no los solicita."
+      - "No admitir _embedded anidado (fallar en desarrollo)."
+
+  - id: R13-hal-expand-behavior
+    intent: "Comportamiento consistente del parámetro expand en clientes."
+    guidelines:
+      - "Puertos aceptan { expand?: string[] } y serializan ?expand=a,b."
+      - "El store no asume expansión implícita: verifica presencia en _embedded."
+      - "Selectores devuelven undefined si la FK no puede resolverse."
+
+  - id: R14-hal-validation-in-tests
+    intent: "Pruebas mínimas de conformidad HAL-UC."
+    tests_minimum:
+      - "Resource: _links.self existe; _embedded (si existe) sin duplicados."
+      - "Collection: meta presente, _embedded.principal es array; deduplicación OK."
+      - "expand: respetado (incluir solo rels pedidas)."
+
+templates:
+  contract_ts: |
+    // File: src/stores/<feature>/<Feature>Store.contract.ts
+    export interface I<Feature>Store {
+      // Observables esperados
+      readonly status: I<Feature>Store.Status;
+      items: I<Feature>Store.Item[];
+
+      // Acciones / Efectos
+      loadAll(): Promise<void>;
+      add(item: I<Feature>Store.NewItem): void;
+      removeById(id: string): void;
+      reset(): void;
+    }
+
+    // Merging: interfaz + namespace (consts, enums, tipos, nunca datos)
+    export namespace I<Feature>Store {
+      export enum Status {
+        Idle = "idle",
+        Loading = "loading",
+        Ready = "ready",
+        Error = "error",
+      }
+
+      export type ID = string;
+
+      export interface Item {
+        id: ID;
+        name: string;
+        description?: string;
+        createdAt: Date;
+      }
+
+      export interface NewItem {
+        name: string;
+        description?: string;
+      }
+
+      // Constantes útiles para UI / validaciones
+      export const LIMITS = {
+        nameMaxLen: 64,
+        descriptionMaxLen: 256,
+      } as const;
+
+      // Puertos/abstracciones externas (opcional)
+      export interface Ports {
+        now(): Date;
+        uid(): string;
+      }
+
+      // Puertos HTTP (HAL-UC) — opcional por feature
+      export interface HttpPorts<TItem = Item> {
+        getById(id: ID, opts?: { expand?: string[] }): Promise<import("@/hal/types").HalResource<TItem>>;
+        list(params: { offset?: number; limit?: number; expand?: string[] }): Promise<import("@/hal/types").HalCollection<TItem>>;
+      }
+    }
+
+  mock_ts: |
+    // File: src/stores/<feature>/<Feature>Store.mock.ts
+    import { makeAutoObservable } from "mobx";
+    import type { I<Feature>Store } from "./<Feature>Store.contract";
+    import type { HalCollection, HalResource } from "@/hal/types";
+
+    export class <Feature>StoreMock implements I<Feature>Store {
+      status: I<Feature>Store.Status = I<Feature>Store.Status.Idle;
+      items: I<Feature>Store.Item[] = [];
+
+      // Flags de simulación
+      private simulateLatencyMs = 200;
+      private failNextLoad = false;
+
+      constructor(private ports: I<Feature>Store.Ports) {
+        makeAutoObservable(this, {}, { autoBind: true });
+        // Datos “quemados” realistas
+        this.items = [
+          {
+            id: "itm_001",
+            name: "Ejemplo A",
+            description: "Elemento de prueba A",
+            createdAt: new Date("2025-01-01T10:00:00Z"),
+          },
+          {
+            id: "itm_002",
+            name: "Ejemplo B",
+            createdAt: new Date("2025-02-02T12:00:00Z"),
+          },
+        ];
+      }
+
+      async loadAll(): Promise<void> {
+        this.status = I<Feature>Store.Status.Loading;
+        await new Promise(r => setTimeout(r, this.simulateLatencyMs));
+        if (this.failNextLoad) {
+          this.failNextLoad = false;
+          this.status = I<Feature>Store.Status.Error;
+          return;
+        }
+        this.status = I<Feature>Store.Status.Ready;
+      }
+
+      add(input: I<Feature>Store.NewItem): void {
+        if (input.name.length > I<Feature>Store.LIMITS.nameMaxLen) {
+          throw new Error("name too long");
+        }
+        this.items.push({
+          id: this.ports.uid(),
+          name: input.name,
+          description: input.description,
+          createdAt: this.ports.now(),
+        });
+      }
+
+      removeById(id: string): void {
+        this.items = this.items.filter(i => i.id !== id);
+      }
+
+      reset(): void {
+        this.status = I<Feature>Store.Status.Idle;
+        this.items = [];
+      }
+
+      // Ejemplos HAL-UC (para tests de consumo)
+      __mockGetById(id: string): HalResource<I<Feature>Store.Item> {
+        const item = this.items.find(x => x.id === id) ?? {
+          id, name: "Nuevo", createdAt: this.ports.now()
+        };
+        return {
+          _links: { self: { href: `/items/${id}` } },
+          _embedded: {},
+          ...item,
+        };
+      }
+
+      __mockList(): HalCollection<I<Feature>Store.Item> {
+        return {
+          _links: { self: { href: "/items?offset=0&limit=10" } },
+          "hc:total": this.items.length,
+          "hc:offset": 0,
+          "hc:limit": 10,
+          _embedded: {
+            items: this.items.map(x => ({ ...x })),
+          },
+        };
+      }
+
+      // Helpers para tests/demos
+      __setLatency(ms: number) { this.simulateLatencyMs = ms; }
+      __failNextLoad() { this.failNextLoad = true; }
+    }
+
+  live_ts: |
+    // File: src/stores/<feature>/<Feature>Store.live.ts
+    import { makeAutoObservable } from "mobx";
+    import type { I<Feature>Store } from "./<Feature>Store.contract";
+
+    function notImplemented(method: string): never {
+      throw new Error(`Not implemented: I<Feature>Store.${method}`);
+    }
+
+    export class <Feature>StoreLive implements I<Feature>Store {
+      status: I<Feature>Store.Status = I<Feature>Store.Status.Idle;
+      items: I<Feature>Store.Item[] = [];
+
+      constructor(private ports: I<Feature>Store.Ports & Partial<I<Feature>Store.HttpPorts>) {
+        makeAutoObservable(this, {}, { autoBind: true });
+      }
+
+      async loadAll(): Promise<void> { notImplemented("loadAll"); }
+      add(): void { notImplemented("add"); }
+      removeById(): void { notImplemented("removeById"); }
+      reset(): void { notImplemented("reset"); }
+    }
+
+  factory_ts: |
+    // File: src/stores/<feature>/index.ts
+    import type { I<Feature>Store } from "./<Feature>Store.contract";
+    import { <Feature>StoreMock } from "./<Feature>Store.mock";
+    import { <Feature>StoreLive } from "./<Feature>Store.live";
+
+    const STORE_MODE = (process.env.STORE_MODE ?? "mock").toLowerCase();
+
+    const defaultPorts: I<Feature>Store.Ports = {
+      now: () => new Date(),
+      uid: () => Math.random().toString(36).slice(2),
+    };
+
+    export type { I<Feature>Store };
+
+    export function create<Feature>Store(
+      mode = STORE_MODE,
+      ports: I<Feature>Store.Ports = defaultPorts
+    ): I<Feature>Store {
+      if (mode === "live") return new <Feature>StoreLive(ports);
+      return new <Feature>StoreMock(ports);
+    }
+
+  hal_types_ts: |
+    // File: src/hal/types.ts
+    export type HalLink = { href: string };
+    export type HalLinks = { self: HalLink } & Record<string, HalLink | any>;
+
+    export interface HalDoc {
+      _links: HalLinks;
+      _embedded?: Record<string, any[]>;
+    }
+
+    // HalResource mezcla el documento HAL con la entidad T (vía intersección)
+    export type HalResource<T> = T & HalDoc;
+
+    export interface HalCollection<T> extends HalDoc {
+      "hc:total": number;
+      "hc:offset": number;
+      "hc:limit": number;
+      _embedded: {
+        // principal plural (p.ej., "clientes")
+        [principalPlural: string]: (T & { _links?: HalLinks })[];
+      } & Record<string, any[]>;
+    }
+
+    export function indexById<T extends { _id?: string; id?: string }>(arr: T[] = []) {
+      const map = new Map<string, T>();
+      for (const x of arr) {
+        const key = (x as any)._id ?? (x as any).id;
+        if (key && !map.has(key)) map.set(String(key), x);
+      }
+      return map;
+    }
+
+validations:
+  lint:
+    - name: forbid-store-inheritance
+      pattern: "class\\s+\\w+\\s+extends\\s+\\w+"
+      files: "src/stores/**/*.ts"
+      message: "Prohibida la herencia en stores (R2-no-inheritance)."
+    - name: forbid-contract-in-ui
+      pattern: "export\\s+interface\\s+I\\w+Store"
+      files: "src/stores/ui/**/*.ts"
+      message: "Los stores puramente de UI no deben definir interfaces de contrato."
+    - name: forbid-mock-live-in-ui
+      pattern: "(StoreMock|StoreLive)"
+      files: "src/stores/ui/**/*.ts"
+      message: "Los stores de UI no usan Mock/Live: deben ser stores simples."
+  contract_checks:
+    - "El archivo *.contract.ts no debe contener literales de datos de ejemplo."
+    - "Si hay puertos HTTP, deben tiparse con HalResource<T> / HalCollection<T> (R10)."
+  live_checks:
+    - "Cada método del live debe llamar a notImplemented(<method>)."
+  mock_checks:
+    - "Mock inicializa estado con fixtures."
+    - "Mocks de red (si los hay) siguen HAL-UC (R11)."
+  hal_checks:
+    - "Resource: _links.self.href existe; _embedded (si existe) sin duplicados."
+    - "Collection: hc:total/offset/limit presentes; _embedded.<principal> es array."
+    - "expand: si se usa, incluir solo rels solicitadas (R13)."
+
+workflow:
+  steps:
+    - "Crear contrato (interface + namespace) → solo para stores funcionales."
+    - "Crear mock con datos realistas → solo para stores funcionales."
+    - "Crear live esquelético → solo para stores funcionales."
+    - "Stores UI: crear un store simple (1 archivo)."
+    - "Exponer factory para stores funcionales."
+    - "Añadir pruebas mínimas."
+    - "Para stores con HTTP: definir puertos tipados HAL-UC y agregar parsers/indexadores."
+
+extensibility:
+  rule_packs:
+    - id: async-effects
+    - id: persistence
+
+notes:
+  - "Este framework distingue entre stores funcionales y stores puramente de UI."
+  - "Los stores de UI son mucho más simples y NO usan interfaz/mock/live."
+  - "Los stores funcionales que consumen red deben adherirse a HAL-UC (hal.rules.yml)."
+  - "A futuro se pueden agregar rule-packs para UI y para persistencia/rehidratación."

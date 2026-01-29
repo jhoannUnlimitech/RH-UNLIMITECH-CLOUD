@@ -1,0 +1,64 @@
+phases:
+  - id: install-mobx
+    description: Agregar dependencias de MobX para habilitar el estado observable.
+    actions:
+      - type: install_dependencies
+        command: npm install mobx mobx-react-lite
+        summary: Incorporar mobx y mobx-react-lite al proyecto.
+
+  - id: scaffold-app-ui-store
+    description: Crear el AppUIStore y provider dentro de src/stores/ui/ siguiendo las convenciones del proyecto.
+    actions:
+      - type: add_file
+        path: src/stores/ui/AppUIStore.ts
+        summary: Definir AppUIStore con makeAutoObservable, helpers para viewport y acciones toggle para sidebar/tema.
+      - type: add_file
+        path: src/stores/ui/AppUIProvider.tsx
+        summary: Crear AppUIProvider que expone el store vía contexto, hidrata el tema y sincroniza el resize con autorun.
+
+  - id: integrate-app-ui-store
+    description: Consumir useAppUIStore desde el shell de la aplicación y eliminar dependencias del SidebarProvider antiguo.
+    actions:
+      - type: update_file
+        path: src/main.tsx
+        summary: Envolver <App /> con AppUIProvider y retirar ThemeProvider.
+      - type: update_file
+        path: src/layout/AppLayout.tsx
+        summary: Convertir el layout raíz en observer y usar offsets derivados del store.
+      - type: update_file
+        path: src/layout/AppSidebar.tsx
+        summary: Escuchar el store para expansión/móvil, manejar hover y cerrar el sidebar móvil desde MobX.
+      - type: update_file
+        path: src/layout/AppHeader.tsx
+        summary: Reemplazar los toggles de sidebar por acciones del store compartido.
+      - type: update_file
+        path: src/layout/Backdrop.tsx
+        summary: Mostrar u ocultar el backdrop según store.isMobileOpen.
+
+  - id: wire-theme-toggles
+    description: Conectar los toggles de tema al store y retirar referencias a ThemeContext.
+    actions:
+      - type: update_file
+        path: src/components/common/ThemeToggleButton.tsx
+        summary: Obtener toggleTheme desde useAppUIStore, exponer aria-pressed y envolver con observer.
+      - type: note
+        summary: Si existe src/components/common/ThemeTogglerTwo.tsx, repetir el mismo cambio; en proyectos ya depurados este archivo no está presente.
+
+  - id: remove-legacy-contexts
+    description: Limpiar los contextos anteriores y confirmar que no queden imports colgando.
+    actions:
+      - type: delete_file
+        path: src/context/SidebarContext.tsx
+        summary: Eliminar el contexto del sidebar reemplazado por MobX.
+      - type: delete_file
+        path: src/context/ThemeContext.tsx
+        summary: Retirar el ThemeContext basado en useState.
+      - type: note
+        summary: Ejecutar una búsqueda global de useTheme/useSidebar para asegurarse de que no queden referencias antes de borrar.
+
+  - id: verify-build
+    description: Validar que la migración compila sin advertencias.
+    actions:
+      - type: command
+        command: npm run build
+        summary: Confirmar que el build de Vite finaliza correctamente tras la migración a MobX.

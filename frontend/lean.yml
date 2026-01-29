@@ -1,0 +1,222 @@
+rules:
+  - Conservar el branding del sidebar (icono y título de la aplicación) definido en `src/layout/AppSidebar.tsx`; no eliminarlo ni sustituirlo durante la limpieza.
+  - Mantener en el header el botón que colapsa/expande el sidebar, el cuadro de búsqueda, el ThemeToggleButton, el NotificationDropdown y el UserDropdown con su avatar.
+  - Conservar el directorio `src/components/header` y las utilidades necesarias (`src/components/ui/dropdown`) para no romper los dropdowns y menús del header mientras se eliminan otros componentes.
+phases:
+  - id: remove-non-home-pages
+    description: Eliminar todas las páginas excepto Home para iniciar la limpieza.
+    timestamp: 2025-11-04T13:32:30Z
+    actions:
+      - type: delete_paths
+        paths:
+          - src/pages/AuthPages
+          - src/pages/Blank.tsx
+          - src/pages/Calendar.tsx
+          - src/pages/Charts
+          - src/pages/Forms
+          - src/pages/OtherPage
+          - src/pages/Tables
+          - src/pages/UiElements
+          - src/pages/UserProfiles.tsx
+      - type: update_file
+        path: src/App.tsx
+        summary: Quitar rutas e imports de páginas eliminadas.
+  - id: prune-sidebar-menu
+    description: Ajustar el menú lateral para reflejar solo el Home.
+    timestamp: 2025-11-04T13:35:10Z
+    actions:
+      - type: note
+        path: src/layout/AppSidebar.tsx
+        summary: Asegurarse de mantener el icono y el título de la aplicación en la sección superior del sidebar.
+      - type: update_file
+        path: src/layout/AppSidebar.tsx
+        summary: Simplificar los items de navegación y eliminar secciones obsoletas.
+  - id: remove-branding
+    description: Retirar el branding de TailAdmin del sidebar y nombrarlo My Project.
+    timestamp: 2025-11-04T13:37:20Z
+    actions:
+      - type: update_file
+        path: src/layout/AppSidebar.tsx
+        summary: Sustituir los logos por el icono genérico y mostrar el título My Project.
+  - id: remove-sidebar-banner
+    description: Eliminar el banner promocional del sidebar.
+    timestamp: 2025-11-04T13:39:05Z
+    actions:
+      - type: update_file
+        path: src/layout/AppSidebar.tsx
+        summary: Quitar la referencia al componente SidebarWidget.
+      - type: delete_file
+        path: src/layout/SidebarWidget.tsx
+        summary: Retirar el componente que mostraba el banner de TailAdmin.
+  - id: clear-home-dashboard
+    description: Vaciar la página Home para dejar un lienzo en blanco.
+    timestamp: 2025-11-04T13:42:45Z
+    actions:
+      - type: update_file
+        path: src/pages/Dashboard/Home.tsx
+        summary: Eliminar componentes del dashboard y conservar solo los metadatos sin placeholders.
+  - id: remove-unused-components
+    description: Retirar componentes generales que quedaron sin uso tras la limpieza del dashboard.
+    timestamp: 2025-11-04T13:54:10Z
+    actions:
+      - type: note
+        path: src/components/header
+        summary: Mantener NotificationDropdown, UserDropdown y las piezas que soportan el cuadro de búsqueda junto con sus utilidades de dropdown, ya que el header depende de ellas.
+      - type: delete_paths
+        paths:
+          - src/components/UserProfile
+          - src/components/auth
+          - src/components/charts
+          - src/components/ecommerce
+          - src/components/form
+          - src/components/tables
+          - src/components/ui/alert
+          - src/components/ui/avatar
+          - src/components/ui/badge
+          - src/components/ui/button
+          - src/components/ui/images
+          - src/components/ui/modal
+          - src/components/ui/table
+          - src/components/ui/videos
+      - type: delete_files
+        paths:
+          - src/components/common/ChartTab.tsx
+          - src/components/common/ComponentCard.tsx
+          - src/components/common/GridShape.tsx
+          - src/components/common/ThemeTogglerTwo.tsx
+  - id: build-and-fix-css-warnings
+    description: Ejecutar el build y repetir correcciones hasta eliminar todas las advertencias de CSS.
+    timestamp: 2025-11-04T13:50:30Z
+    actions:
+      - type: command
+        command: npm run build
+        summary: Detectar advertencias sobre selectores ::-webkit-scrollbar-thumb y documentar cualquier warning pendiente.
+      - type: update_file
+        path: src/index.css
+        summary: Ajustar los estilos del scrollbar para evitar variantes dark dentro de pseudoelementos.
+      - type: command
+        command: npm run build
+        summary: Repetir el build hasta que no se reporten advertencias de CSS.
+  - id: remove-pro-pages
+    description: Eliminar módulos adicionales de TailAdmin Pro y dejar solo la página base.
+    timestamp: 2025-11-12T21:52:00Z
+    actions:
+      - type: delete_paths
+        paths:
+          - src/pages/Ai
+          - src/pages/AuthPages
+          - src/pages/Charts
+          - src/pages/Chat
+          - src/pages/Ecommerce
+          - src/pages/Email
+          - src/pages/Forms
+          - src/pages/OtherPage
+          - src/pages/Tables
+          - src/pages/Task
+          - src/pages/UiElements
+          - src/pages/Support
+      - type: delete_files
+        paths:
+          - src/pages/Blank.tsx
+          - src/pages/Calendar.tsx
+          - src/pages/Faqs.tsx
+          - src/pages/FileManager.tsx
+          - src/pages/Invoices.tsx
+          - src/pages/PricingTables.tsx
+          - src/pages/UserProfiles.tsx
+          - src/pages/Dashboard/Analytics.tsx
+          - src/pages/Dashboard/Crm.tsx
+          - src/pages/Dashboard/Ecommerce.tsx
+          - src/pages/Dashboard/Logistics.tsx
+          - src/pages/Dashboard/Marketing.tsx
+          - src/pages/Dashboard/Saas.tsx
+          - src/pages/Dashboard/Stocks.tsx
+  - id: create-empty-home
+    description: Regenerar la página Home como un lienzo limpio.
+    timestamp: 2025-11-12T21:53:00Z
+    actions:
+      - type: create_file
+        path: src/pages/Dashboard/Home.tsx
+        summary: Definir Home con PageMeta y contenido vacío.
+  - id: simplify-pro-routing
+    description: Reducir las rutas de la app a solo Dashboard/Home.
+    timestamp: 2025-11-12T21:54:00Z
+    actions:
+      - type: update_file
+        path: src/App.tsx
+        summary: Mantener únicamente la ruta raíz que carga Home dentro del AppLayout.
+  - id: reset-sidebar-pro
+    description: Simplificar la navegación lateral y retirar branding Pro.
+    timestamp: 2025-11-12T21:55:00Z
+    actions:
+      - type: update_file
+        path: src/layout/AppSidebar.tsx
+        summary: Dejar un solo enlace a Dashboard y mostrar el título My Project.
+      - type: delete_file
+        path: src/layout/SidebarWidget.tsx
+        summary: Quitar el banner promocional del sidebar.
+  - id: prune-remaining-components
+    description: Eliminar componentes residuales del paquete Pro manteniendo intacto el header predeterminado.
+    timestamp: 2025-11-12T22:04:00Z
+    actions:
+      - type: note
+        path: src/layout/AppHeader.tsx
+        summary: Confirmar que el header conserva el botón de menú, el cuadro de búsqueda, el ThemeToggleButton, el NotificationDropdown y el UserDropdown con avatar.
+      - type: note
+        path: src/components/ui/dropdown
+        summary: No eliminar las utilidades de dropdown porque son dependencias directas del header.
+      - type: delete_file
+        path: src/layout/AlternativeLayout.tsx
+        summary: Retirar el layout alternativo que dependía de componentes eliminados.
+      - type: delete_paths
+        paths:
+          - src/components/UiExample
+          - src/components/UserProfile
+          - src/components/ai
+          - src/components/analytics
+          - src/components/api-keys
+          - src/components/auth
+          - src/components/cards
+          - src/components/charts
+          - src/components/chats
+          - src/components/crm
+          - src/components/ecommerce
+          - src/components/email
+          - src/components/faqs
+          - src/components/file-manager
+          - src/components/form
+          - src/components/integration
+          - src/components/invoice
+          - src/components/links
+          - src/components/list
+          - src/components/logistics
+          - src/components/marketing
+          - src/components/price-table
+          - src/components/saas
+          - src/components/stocks
+          - src/components/support
+          - src/components/tables
+          - src/components/task
+          - src/components/transactions
+      - type: delete_files
+        paths:
+          - src/components/common/ChartTab.tsx
+          - src/components/common/ComponentCard.tsx
+          - src/components/common/CountdownTimer.tsx
+          - src/components/common/GridShape.tsx
+          - src/components/common/PageBreadCrumb.tsx
+          - src/components/common/TableDropdown.tsx
+          - src/components/common/ThemeTogglerTwo.tsx
+      - type: command
+        command: npm run build
+        summary: Verificar que la aplicación compila sin los componentes eliminados.
+  - id: resolve-css-warnings-pro
+    description: Ajustar los estilos del scrollbar y volver a ejecutar el build hasta eliminar por completo las advertencias de CSS.
+    timestamp: 2025-11-12T22:05:00Z
+    actions:
+      - type: update_file
+        path: src/index.css
+        summary: Retirar utilidades dark dentro de pseudoelementos y declarar la variante oscura en reglas separadas.
+      - type: command
+        command: npm run build
+        summary: Ejecutar el build y repetirlo hasta confirmar que no quedan advertencias CSS.
