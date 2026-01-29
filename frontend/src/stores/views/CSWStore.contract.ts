@@ -61,7 +61,7 @@ export namespace ICSWStore {
     situation: string;
     information: string;
     solution: string;
-    requester: string;
+    requester: string | { _id: string; name: string }; // Puede ser ID o objeto poblado
     requesterName: string;
     requesterPosition: string;
     requesterDivision: string;

@@ -158,7 +158,7 @@ const router = Router();
 
 /**
  * @swagger
- * /api/v1/csw:
+ * /csw:
  *   get:
  *     summary: Obtener todas las solicitudes CSW
  *     description: Lista todas las solicitudes con filtros opcionales
@@ -233,7 +233,7 @@ router.get(
 
 /**
  * @swagger
- * /api/v1/csw/my-pending:
+ * /csw/my-pending:
  *   get:
  *     summary: Obtener solicitudes pendientes de mi aprobación
  *     description: Lista todas las solicitudes donde el usuario actual es el aprobador del nivel actual
@@ -254,7 +254,7 @@ router.get(
 
 /**
  * @swagger
- * /api/v1/csw/my-requests:
+ * /csw/my-requests:
  *   get:
  *     summary: Obtener mis solicitudes creadas
  *     description: Lista todas las solicitudes creadas por el usuario actual
@@ -275,7 +275,7 @@ router.get(
 
 /**
  * @swagger
- * /api/v1/csw/stats:
+ * /csw/stats:
  *   get:
  *     summary: Obtener estadísticas de CSW
  *     tags: [CSW]
@@ -295,7 +295,7 @@ router.get(
 
 /**
  * @swagger
- * /api/v1/csw/{id}:
+ * /csw/{id}:
  *   get:
  *     summary: Obtener una solicitud por ID
  *     tags: [CSW]
@@ -323,7 +323,7 @@ router.get(
 
 /**
  * @swagger
- * /api/v1/csw/{id}/history:
+ * /csw/{id}/history:
  *   get:
  *     summary: Obtener historial de una solicitud
  *     description: Retorna el historial completo de acciones realizadas sobre la solicitud
@@ -361,7 +361,7 @@ router.get(
 
 /**
  * @swagger
- * /api/v1/csw:
+ * /csw:
  *   post:
  *     summary: Crear una nueva solicitud CSW
  *     description: |
@@ -419,7 +419,7 @@ router.post(
 
 /**
  * @swagger
- * /api/v1/csw/{id}:
+ * /csw/{id}:
  *   put:
  *     summary: Editar una solicitud CSW
  *     description: |
@@ -472,7 +472,7 @@ router.put(
 
 /**
  * @swagger
- * /api/v1/csw/{id}/approve:
+ * /csw/{id}/approve:
  *   post:
  *     summary: Aprobar una solicitud en el nivel actual
  *     description: |
@@ -522,7 +522,7 @@ router.post(
 
 /**
  * @swagger
- * /api/v1/csw/{id}/reject:
+ * /csw/{id}/reject:
  *   post:
  *     summary: Rechazar una solicitud en el nivel actual
  *     description: |
@@ -571,7 +571,7 @@ router.post(
 
 /**
  * @swagger
- * /api/v1/csw/{id}/cancel:
+ * /csw/{id}/cancel:
  *   post:
  *     summary: Cancelar una solicitud
  *     description: |
@@ -615,7 +615,7 @@ router.post(
 
 /**
  * @swagger
- * /api/v1/csw/{id}:
+ * /csw/{id}:
  *   delete:
  *     summary: Eliminar una solicitud (soft delete)
  *     tags: [CSW]

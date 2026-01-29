@@ -69,8 +69,8 @@ const DivisionFormModal = observer(
     const loadEmployees = async () => {
       setLoadingEmployees(true);
       try {
-        const data = await employeesService.getAll();
-        setEmployees(Array.isArray(data) ? data : []);
+        const result = await employeesService.getAll();
+        setEmployees(Array.isArray(result.data) ? result.data : []);
       } catch (error) {
         console.error("Error al cargar empleados:", error);
         setEmployees([]);

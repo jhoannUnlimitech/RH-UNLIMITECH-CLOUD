@@ -14,8 +14,8 @@ export const divisionsService = {
    * Obtener una división por ID
    */
   async getById(id: string): Promise<IDivisionsStore.Division> {
-    const response = await apiClient.get<{ success: boolean; data: IDivisionsStore.Division }>(`/divisions/${id}`);
-    return response.data.data;
+    const response = await apiClient.get<{ success: boolean; data: { division: IDivisionsStore.Division; employeeCount: number; employees: any[] } }>(`/divisions/${id}`);
+    return response.data.data.division;
   },
 
   /**

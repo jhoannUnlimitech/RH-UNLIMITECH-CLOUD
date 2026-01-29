@@ -12,14 +12,17 @@ import {
 } from "../../components/ui/table";
 import Badge from "../../components/ui/badge/Badge";
 import Button from "../../components/ui/button/Button";
+import SearchableSelect from "../../components/form/SearchableSelect";
 // import CSWViewModal from "../../components/csw/CSWViewModal";
 // import DeleteConfirmModal from "../../components/csw/DeleteConfirmModal";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import TableSkeleton from "../../components/ui/skeleton/TableSkeleton";
 import Alert from "../../components/ui/alert/Alert";
 import Pagination from "../../components/ui/pagination/Pagination";
+import CSWApprovalModal from "../../components/csw/CSWApprovalModal";
+import Notification from "../../components/ui/notification/Notfication";
 // import { useModal } from "../../hooks/useModal";
-import { PencilIcon, TrashBinIcon, EyeIcon } from "../../icons";
+import { PencilIcon, TrashBinIcon } from "../../icons";
 
 const CSWList = observer(() => {
   const location = useLocation();
@@ -30,6 +33,10 @@ const CSWList = observer(() => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [approvalModalOpen, setApprovalModalOpen] = useState(false);
+  const [approvalModalType, setApprovalModalType] = useState<"approve" | "reject">("approve");
+  const [selectedCSWForApproval, setSelectedCSWForApproval] = useState<{ id: string; number: string; level: number } | null>(null);
+  const [notification, setNotification] = useState<{ variant: "success" | "error"; title: string; description?: string } | null>(null);
   // const [viewingCSWId, setViewingCSWId] = useState<string | null>(null);
   // const [deletingCSWId, setDeletingCSWId] = useState<string | null>(null);
   // const [deletingCSWNumber, setDeletingCSWNumber] = useState("");
@@ -81,8 +88,14 @@ const CSWList = observer(() => {
 
   // Fetch data on mount
   useEffect(() => {
-    cswStore.fetchCSWs();
-    cswCategoryStore.fetchCategories();
+    const loadData = async () => {
+      // Verificar autenticación primero y esperar
+      await authStore.checkAuth();
+      // Luego cargar los datos
+      cswStore.fetchCSWs();
+      cswCategoryStore.fetchCategories();
+    };
+    loadData();
   }, []);
 
   // Status badge configuration
@@ -100,13 +113,28 @@ const CSWList = observer(() => {
   const filteredCSWs = useMemo(() => {
     const csws = Array.isArray(cswStore.csws) ? cswStore.csws : [];
     const currentUserId = authStore.user?._id;
+    
+    // Si authStore está cargando, retornar array vacío (se mostrará loading)
+    if (authStore.isLoading) {
+      return [];
+    }
+    
+    // Si no hay usuario autenticado después de cargar, retornar array vacío
+    if (!currentUserId && (routeConfig.filterType === "my-requests" || routeConfig.filterType === "pending")) {
+      return [];
+    }
+    
     // Crear una copia del array para evitar mutaciones en MobX
     let filtered = csws.slice();
 
     // Filtro automático por ruta
     if (routeConfig.filterType === "my-requests") {
       // Solo mis solicitudes
-      filtered = filtered.filter((csw) => csw.requester === currentUserId);
+      filtered = filtered.filter((csw) => {
+        // Manejar requester como string (ID) u objeto con _id
+        const requesterId = typeof csw.requester === 'string' ? csw.requester : csw.requester?._id;
+        return requesterId === currentUserId;
+      });
     } else if (routeConfig.filterType === "pending") {
       // Solo solicitudes pendientes donde soy aprobador
       filtered = filtered.filter((csw) => {
@@ -115,7 +143,11 @@ const CSWList = observer(() => {
         const currentLevelApproval = csw.approvalChain.find(
           (approval) => approval.level === csw.currentLevel
         );
-        return currentLevelApproval?.approverId === currentUserId &&
+        // Manejar approverId como string u objeto
+        const approverId = typeof currentLevelApproval?.approverId === 'string' 
+          ? currentLevelApproval.approverId 
+          : currentLevelApproval?.approverId?._id;
+        return approverId === currentUserId &&
                currentLevelApproval?.status === ICSWStore.ApprovalStatus.PENDING;
       });
     }
@@ -174,13 +206,13 @@ const CSWList = observer(() => {
     setCurrentPage(1);
   };
 
-  const handleStatusFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setStatusFilter(e.target.value);
+  const handleStatusFilterChange = (value: string) => {
+    setStatusFilter(value);
     setCurrentPage(1);
   };
 
-  const handleCategoryFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setCategoryFilter(e.target.value);
+  const handleCategoryFilterChange = (value: string) => {
+    setCategoryFilter(value);
     setCurrentPage(1);
   };
 
@@ -209,6 +241,56 @@ const CSWList = observer(() => {
     // deleteModal.openModal();
   };
 
+  const handleApprove = (csw: any) => {
+    setSelectedCSWForApproval({ id: csw._id, number: csw.requestNumber, level: csw.currentLevel });
+    setApprovalModalType("approve");
+    setApprovalModalOpen(true);
+  };
+
+  const handleReject = (csw: any) => {
+    setSelectedCSWForApproval({ id: csw._id, number: csw.requestNumber, level: csw.currentLevel });
+    setApprovalModalType("reject");
+    setApprovalModalOpen(true);
+  };
+
+  const handleApprovalConfirm = async (comments: string) => {
+    if (!selectedCSWForApproval) return;
+
+    try {
+      if (approvalModalType === "approve") {
+        await cswStore.approveCSW(selectedCSWForApproval.id, selectedCSWForApproval.level, comments || undefined);
+        setNotification({
+          variant: "success",
+          title: "Solicitud aprobada",
+          description: `La solicitud ${selectedCSWForApproval.number} ha sido aprobada exitosamente`
+        });
+      } else {
+        await cswStore.rejectCSW(selectedCSWForApproval.id, selectedCSWForApproval.level, comments);
+        setNotification({
+          variant: "success",
+          title: "Solicitud rechazada",
+          description: `La solicitud ${selectedCSWForApproval.number} ha sido rechazada`
+        });
+      }
+      setApprovalModalOpen(false);
+      setSelectedCSWForApproval(null);
+      await cswStore.fetchCSWs();
+      setTimeout(() => setNotification(null), 3000);
+    } catch (error) {
+      setNotification({
+        variant: "error",
+        title: "Error al procesar solicitud",
+        description: error instanceof Error ? error.message : "Ocurrió un error inesperado"
+      });
+      setTimeout(() => setNotification(null), 5000);
+    }
+  };
+
+  const handleApprovalClose = () => {
+    setApprovalModalOpen(false);
+    setSelectedCSWForApproval(null);
+  };
+
   // const handleCloseViewModal = () => {
   //   viewModal.closeModal();
   //   setViewingCSWId(null);
@@ -224,6 +306,18 @@ const CSWList = observer(() => {
 
   return (
     <>
+      {/* Notificación flotante */}
+      {notification && (
+        <div className="fixed right-4 top-4 z-50 animate-slide-in">
+          <Notification
+            variant={notification.variant}
+            title={notification.title}
+            description={notification.description}
+            hideDuration={3000}
+          />
+        </div>
+      )}
+
       {/* Breadcrumb */}
       <PageBreadcrumb pageTitle={routeConfig.breadcrumb} />
 
@@ -266,74 +360,6 @@ const CSWList = observer(() => {
               </div>
             )}
 
-            {/* Filters */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <div>
-                <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                  Buscar
-                </label>
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  placeholder="Buscar por número, solicitante, categoría..."
-                  className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition placeholder:text-dark-6 focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                  Estado
-                </label>
-                <div className="relative">
-                  <select
-                    value={statusFilter}
-                    onChange={handleStatusFilterChange}
-                    className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 pr-10 text-dark outline-none transition appearance-none focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
-                  >
-                    <option value="all">Todos los estados</option>
-                    <option value={ICSWStore.CSWStatus.PENDING}>Pendiente</option>
-                    <option value={ICSWStore.CSWStatus.APPROVED}>Aprobada</option>
-                    <option value={ICSWStore.CSWStatus.REJECTED}>Rechazada</option>
-                    <option value={ICSWStore.CSWStatus.CANCELLED}>Cancelada</option>
-                  </select>
-                  <span className="absolute text-gray-500 -translate-y-1/2 right-4 top-1/2 dark:text-gray-400 pointer-events-none">
-                    <svg className="stroke-current" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path d="M3.8335 5.9165L8.00016 10.0832L12.1668 5.9165" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </span>
-                </div>
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                  Categoría
-                </label>
-                <div className="relative">
-                  <select
-                    value={categoryFilter}
-                    onChange={handleCategoryFilterChange}
-                    className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 pr-10 text-dark outline-none transition appearance-none focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
-                  >
-                    <option value="all">Todas las categorías</option>
-                    {categories
-                      .slice()
-                      .sort((a, b) => a.order - b.order)
-                      .map((category) => (
-                        <option key={category._id} value={category._id}>
-                          {category.name}
-                        </option>
-                      ))}
-                  </select>
-                  <span className="absolute text-gray-500 -translate-y-1/2 right-4 top-1/2 dark:text-gray-400 pointer-events-none">
-                    <svg className="stroke-current" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path d="M3.8335 5.9165L8.00016 10.0832L12.1668 5.9165" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </span>
-                </div>
-              </div>
-            </div>
-
             {/* Error Alert */}
             {cswStore.error && (
               <Alert
@@ -343,47 +369,155 @@ const CSWList = observer(() => {
               />
             )}
 
+            {/* Filters and Search Bar */}
+            <div className="rounded-lg border border-gray-100 bg-white p-6 dark:border-white/[0.05] dark:bg-gray-dark">
+              <div className="space-y-4">
+                {/* Search Bar */}
+                <div className="relative">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                    <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    placeholder="Buscar por número, solicitante o descripción..."
+                    className="w-full rounded-lg border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm text-gray-900 placeholder-gray-400 transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 dark:focus:border-primary"
+                  />
+                </div>
+
+                {/* Filters Row */}
+                <div className="flex flex-wrap items-end gap-3">
+                  {/* Items per page */}
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Mostrar
+                    </label>
+                    <select
+                      value={itemsPerPage}
+                      onChange={handleItemsPerPageChange}
+                      className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                    >
+                      <option value="5">5</option>
+                      <option value="10">10</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                    </select>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">entradas</span>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="h-8 w-px bg-gray-200 dark:bg-gray-700" />
+
+                  {/* Status Filter */}
+                  <div className="flex-1 min-w-[200px]">
+                    <SearchableSelect
+                      id="statusFilter"
+                      label="Estado"
+                      options={[
+                        { value: "all", label: "Todos los estados" },
+                        { value: ICSWStore.CSWStatus.PENDING, label: "Pendiente" },
+                        { value: ICSWStore.CSWStatus.APPROVED, label: "Aprobada" },
+                        { value: ICSWStore.CSWStatus.REJECTED, label: "Rechazada" },
+                        { value: ICSWStore.CSWStatus.CANCELLED, label: "Cancelada" },
+                      ]}
+                      value={statusFilter}
+                      onChange={handleStatusFilterChange}
+                      placeholder="Filtrar por estado..."
+                      debounceMs={300}
+                    />
+                  </div>
+
+                  {/* Category Filter */}
+                  <div className="flex-1 min-w-[200px]">
+                    <SearchableSelect
+                      id="categoryFilter"
+                      label="Categoría"
+                      options={[
+                        { value: "all", label: "Todas las categorías" },
+                        ...categories
+                          .slice()
+                          .sort((a, b) => a.order - b.order)
+                          .map((category) => ({
+                            value: category._id,
+                            label: category.name,
+                          })),
+                      ]}
+                      value={categoryFilter}
+                      onChange={handleCategoryFilterChange}
+                      placeholder="Filtrar por categoría..."
+                      debounceMs={300}
+                    />
+                  </div>
+
+                  {/* Clear Filters Button */}
+                  {(searchTerm || statusFilter !== "all" || categoryFilter !== "all") && (
+                    <button
+                      onClick={() => {
+                        setSearchTerm("");
+                        setStatusFilter("all");
+                        setCategoryFilter("all");
+                        setCurrentPage(1);
+                      }}
+                      className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                    >
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                      Limpiar filtros
+                    </button>
+                  )}
+                </div>
+
+                {/* Active Filters Summary */}
+                {(debouncedSearchTerm || statusFilter !== "all" || categoryFilter !== "all") && (
+                  <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+                    <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Filtros activos:</span>
+                    {debouncedSearchTerm && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                        Búsqueda: "{debouncedSearchTerm}"
+                      </span>
+                    )}
+                    {statusFilter !== "all" && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                        Estado: {statusFilter}
+                      </span>
+                    )}
+                    {categoryFilter !== "all" && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                        Categoría: {categories.find(c => c._id === categoryFilter)?.name || categoryFilter}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* Table or Loading */}
-            {cswStore.isLoading ? (
+            {(cswStore.isLoading || authStore.isLoading) ? (
               <TableSkeleton rows={itemsPerPage} columns={7} />
             ) : (
               <>
-                {/* Table Header with Show selector */}
-                <div className="flex flex-col gap-2 px-4 py-4 border border-b-0 border-gray-100 dark:border-white/[0.05] rounded-t-xl sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="text-gray-500 dark:text-gray-400">Show</span>
-                    <div className="relative z-20 bg-transparent">
-                      <select
-                        className="w-full py-2 pl-3 pr-8 text-sm text-gray-800 bg-transparent border border-gray-300 rounded-lg appearance-none h-9 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                        value={itemsPerPage}
-                        onChange={handleItemsPerPageChange}
-                      >
-                        <option value="5" className="text-gray-500 dark:bg-gray-900 dark:text-gray-400">5</option>
-                        <option value="10" className="text-gray-500 dark:bg-gray-900 dark:text-gray-400">10</option>
-                        <option value="25" className="text-gray-500 dark:bg-gray-900 dark:text-gray-400">25</option>
-                        <option value="50" className="text-gray-500 dark:bg-gray-900 dark:text-gray-400">50</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
 
-                <div className="overflow-x-auto">
-                  <Table>
+                <div className="overflow-x-auto border border-gray-100 dark:border-white/[0.05] rounded-b-xl">
+                  <Table className="border-collapse">
                     <TableHeader>
-                      <TableRow>
-                        <TableCell>Número</TableCell>
-                        <TableCell>Solicitante</TableCell>
-                        <TableCell>Categoría</TableCell>
-                        <TableCell>Estado</TableCell>
-                        <TableCell>Fecha</TableCell>
-                        <TableCell>Progreso</TableCell>
-                        <TableCell className="text-center">Acciones</TableCell>
+                      <TableRow className="border-b border-gray-100 bg-gray-50 dark:border-white/[0.05] dark:bg-gray-800/50">
+                        <TableCell className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300">Número</TableCell>
+                        <TableCell className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300">Solicitante</TableCell>
+                        <TableCell className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300">Categoría</TableCell>
+                        <TableCell className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300">Estado</TableCell>
+                        <TableCell className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300">Fecha</TableCell>
+                        <TableCell className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300">Progreso</TableCell>
+                        <TableCell className="px-6 py-4 text-center align-middle text-xs font-bold uppercase tracking-wider text-primary-700 dark:text-primary-400">Acciones</TableCell>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {currentData.length === 0 ? (
                         <TableRow>
-                          <TableCell className="text-center py-12">
+                          <TableCell colSpan={7} className="text-center py-12">
                             <div className="flex flex-col items-center justify-center gap-3 mx-auto max-w-md">
                               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
                                 <svg className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -412,70 +546,130 @@ const CSWList = observer(() => {
                         </TableRow>
                       ) : (
                         currentData.map((csw) => {
-                          const approved = csw.approvalChain.filter(
+                          // Calcular progreso basado en la cadena de aprobación específica de este CSW
+                          const approvalChain = csw.approvalChain || [];
+                          const approved = approvalChain.filter(
                             (a) => a.status === ICSWStore.ApprovalStatus.APPROVED
                           ).length;
-                          const total = csw.approvalChain.length;
+                          const total = approvalChain.length;
+                          
+                          // Calcular porcentaje de progreso
+                          let progressPercent = 0;
+                          if (total > 0) {
+                            if (csw.status === ICSWStore.CSWStatus.APPROVED) {
+                              progressPercent = 100; // Si está aprobado completamente
+                            } else if (csw.status === ICSWStore.CSWStatus.REJECTED || csw.status === ICSWStore.CSWStatus.CANCELLED) {
+                              progressPercent = (approved / total) * 100; // Mostrar hasta donde llegó
+                            } else {
+                              progressPercent = (approved / total) * 100; // Progreso actual
+                            }
+                          }
+                          
                           const statusBadge = getStatusBadge(csw.status);
                           const categoryName = typeof csw.category === 'object' ? csw.category.name : 'Sin categoría';
 
                           return (
-                            <TableRow key={csw._id}>
-                              <TableCell className="font-medium">CSW-{csw._id}</TableCell>
-                              <TableCell>
-                                <div>
-                                  <div className="font-medium">{csw.requesterName}</div>
-                                  <div className="text-sm text-gray-500">{csw.requesterPosition}</div>
+                            <TableRow key={csw._id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors dark:border-white/[0.05] dark:hover:bg-gray-800/30">
+                              <TableCell className="px-6 py-4 font-medium text-gray-900 dark:text-white">CSW-{csw._id}</TableCell>
+                              <TableCell className="px-6 py-4">
+                                <div className="space-y-1.5">
+                                  <div className="font-medium text-gray-900 dark:text-white">{csw.requesterName}</div>
+                                  <Badge color="info" className="inline-block text-xs">
+                                    {csw.requesterPosition}
+                                  </Badge>
                                 </div>
                               </TableCell>
-                              <TableCell>{categoryName}</TableCell>
-                              <TableCell>
+                              <TableCell className="px-6 py-4 text-gray-700 dark:text-gray-300">{categoryName}</TableCell>
+                              <TableCell className="px-6 py-4">
                                 <Badge color={statusBadge.color}>{statusBadge.text}</Badge>
                               </TableCell>
-                              <TableCell>
+                              <TableCell className="px-6 py-4 text-gray-700 dark:text-gray-300">
                                 {new Date(csw.createdAt).toLocaleDateString("es-ES", {
                                   year: "numeric",
                                   month: "short",
                                   day: "numeric",
                                 })}
                               </TableCell>
-                              <TableCell>
+                              <TableCell className="px-6 py-4">
                                 <div className="flex items-center gap-2">
                                   <div className="text-sm text-gray-600 dark:text-gray-400">
                                     {approved}/{total}
                                   </div>
                                   <div className="h-2 w-20 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
                                     <div
-                                      className="h-full bg-primary transition-all"
-                                      style={{ width: `${(approved / total) * 100}%` }}
+                                      className={`h-full transition-all ${
+                                        csw.status === ICSWStore.CSWStatus.APPROVED 
+                                          ? 'bg-green-500' 
+                                          : csw.status === ICSWStore.CSWStatus.REJECTED 
+                                          ? 'bg-red-500'
+                                          : 'bg-primary'
+                                      }`}
+                                      style={{ width: `${progressPercent}%` }}
                                     />
                                   </div>
                                 </div>
                               </TableCell>
-                              <TableCell>
-                                <div className="flex items-center justify-center gap-3">
+                              <TableCell className="px-6 py-4 text-center align-middle">
+                                <div className="flex flex-col items-center justify-center gap-2 w-full h-full min-h-[48px]">
                                   <button
                                     onClick={() => handleView(csw._id)}
-                                    className="text-primary hover:text-primary/80"
+                                    className="inline-flex items-center justify-center rounded-lg p-2 text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-white/[0.05]"
                                     title="Ver detalles"
                                   >
-                                    <EyeIcon />
+                                    <EyeIcon className="h-[18px] w-[18px]" />
                                   </button>
+                                  
+                                  {/* Botones de aprobación para pendientes */}
+                                  {routeConfig.filterType === "pending" && (
+                                    <>
+                                      <div className="flex flex-row items-center justify-center gap-4 h-full">
+                                        <button
+                                          onClick={() => handleView(csw._id)}
+                                          className="inline-flex items-center justify-center rounded-lg p-2 text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.05] transition"
+                                          title="Ver detalles"
+                                        >
+                                          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path fillRule="evenodd" clipRule="evenodd" d="M10.0002 13.8619C7.23361 13.8619 4.86803 12.1372 3.92328 9.70241C4.86804 7.26761 7.23361 5.54297 10.0002 5.54297C12.7667 5.54297 15.1323 7.26762 16.0771 9.70243C15.1323 12.1372 12.7667 13.8619 10.0002 13.8619ZM10.0002 4.04297C6.48191 4.04297 3.49489 6.30917 2.4155 9.4593C2.3615 9.61687 2.3615 9.78794 2.41549 9.94552C3.49488 13.0957 6.48191 15.3619 10.0002 15.3619C13.5184 15.3619 16.5055 13.0957 17.5849 9.94555C17.6389 9.78797 17.6389 9.6169 17.5849 9.45932C16.5055 6.30919 13.5184 4.04297 10.0002 4.04297ZM9.99151 7.84413C8.96527 7.84413 8.13333 8.67606 8.13333 9.70231C8.13333 10.7286 8.96527 11.5605 9.99151 11.5605H10.0064C11.0326 11.5605 11.8646 10.7286 11.8646 9.70231C11.8646 8.67606 11.0326 7.84413 10.0064 7.84413H9.99151Z" fill="currentColor"/>
+                                          </svg>
+                                        </button>
+                                        <button
+                                          onClick={() => handleApprove(csw)}
+                                          className="inline-flex items-center justify-center rounded-lg p-2 text-green-700 bg-green-100 hover:bg-green-200 dark:text-green-300 dark:bg-green-900/40 dark:hover:bg-green-900/60 transition"
+                                          title="Aprobar"
+                                        >
+                                          <svg className="h-[20px] w-[20px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                          </svg>
+                                        </button>
+                                        <button
+                                          onClick={() => handleReject(csw)}
+                                          className="inline-flex items-center justify-center rounded-lg p-2 text-red-700 bg-red-100 hover:bg-red-200 dark:text-red-300 dark:bg-red-900/40 dark:hover:bg-red-900/60 transition"
+                                          title="Rechazar"
+                                        >
+                                          <svg className="h-[20px] w-[20px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                          </svg>
+                                        </button>
+                                      </div>
+                                    </>
+                                  )}
+                                  
+                                  {/* Botones de edición/eliminación para mis solicitudes */}
                                   {routeConfig.filterType === "my-requests" && csw.status === ICSWStore.CSWStatus.PENDING && (
                                     <>
                                       <button
                                         onClick={() => handleEdit(csw._id)}
-                                        className="text-dark hover:text-dark/80 dark:text-white dark:hover:text-white/80"
+                                        className="inline-flex items-center justify-center rounded-lg p-2 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-white/[0.05]"
                                         title="Editar"
                                       >
-                                        <PencilIcon />
+                                        <PencilIcon className="h-[18px] w-[18px]" />
                                       </button>
                                       <button
                                         onClick={() => handleDelete(csw._id, csw.requesterName)}
-                                        className="text-red hover:text-red/80"
+                                        className="inline-flex items-center justify-center rounded-lg p-2 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-white/[0.05]"
                                         title="Eliminar"
                                       >
-                                        <TrashBinIcon />
+                                        <TrashBinIcon className="h-[18px] w-[18px]" />
                                       </button>
                                     </>
                                   )}
@@ -490,9 +684,9 @@ const CSWList = observer(() => {
                 </div>
 
                 {/* Pagination Footer */}
-                <div className="flex flex-col gap-3 px-4 py-4 border-t border-gray-100 dark:border-white/[0.05] sm:flex-row sm:items-center sm:justify-between">
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Mostrando {startIndex + 1} a {Math.min(endIndex, filteredCSWs.length)} de {filteredCSWs.length} entradas
+                <div className="flex flex-col gap-4 rounded-b-xl border border-t-0 border-gray-100 bg-gray-50 px-6 py-4 dark:border-white/[0.05] dark:bg-gray-800/50 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Mostrando <span className="font-medium text-gray-900 dark:text-white">{startIndex + 1}</span> a <span className="font-medium text-gray-900 dark:text-white">{Math.min(endIndex, filteredCSWs.length)}</span> de <span className="font-medium text-gray-900 dark:text-white">{filteredCSWs.length}</span> resultados
                   </p>
                   <Pagination
                     currentPage={currentPage}
@@ -523,6 +717,16 @@ const CSWList = observer(() => {
           cswNumber={deletingCSWNumber}
         />
       )} */}
+
+      {/* Modal de aprobación/rechazo */}
+      <CSWApprovalModal
+        isOpen={approvalModalOpen}
+        onClose={handleApprovalClose}
+        onConfirm={handleApprovalConfirm}
+        cswNumber={selectedCSWForApproval?.number || ""}
+        type={approvalModalType}
+        isLoading={cswStore.loading}
+      />
     </>
   );
 });

@@ -5,6 +5,7 @@ import { cswStore, cswCategoryStore, authStore } from "../../stores/views";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import Button from "../../components/ui/button/Button";
 import Alert from "../../components/ui/alert/Alert";
+import SearchableSelect from "../../components/form/SearchableSelect";
 
 const CSWForm = observer(() => {
   const navigate = useNavigate();
@@ -19,6 +20,18 @@ const CSWForm = observer(() => {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Límites de palabras para cada campo
+  const WORD_LIMITS = {
+    situation: 1000,
+    information: 1000,
+    solution: 1000,
+  };
+
+  // Función para contar palabras
+  const countWords = (text: string): number => {
+    return text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
+  };
 
   useEffect(() => {
     cswCategoryStore.fetchCategories();
@@ -41,11 +54,19 @@ const CSWForm = observer(() => {
   }, [isEditing, cswStore.selectedCSW]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     // Clear error when user types
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    // Clear error when user selects
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -59,12 +80,18 @@ const CSWForm = observer(() => {
     }
     if (!formData.situation.trim()) {
       newErrors.situation = "La situación es requerida";
+    } else if (countWords(formData.situation) > WORD_LIMITS.situation) {
+      newErrors.situation = `Excede el límite de ${WORD_LIMITS.situation} palabras`;
     }
     if (!formData.information.trim()) {
       newErrors.information = "La información es requerida";
+    } else if (countWords(formData.information) > WORD_LIMITS.information) {
+      newErrors.information = `Excede el límite de ${WORD_LIMITS.information} palabras`;
     }
     if (!formData.solution.trim()) {
       newErrors.solution = "La solución es requerida";
+    } else if (countWords(formData.solution) > WORD_LIMITS.solution) {
+      newErrors.solution = `Excede el límite de ${WORD_LIMITS.solution} palabras`;
     }
 
     setErrors(newErrors);
@@ -78,23 +105,34 @@ const CSWForm = observer(() => {
       return;
     }
 
-    try {
-      const submitData = {
-        situation: formData.situation,
-        information: formData.information,
-        solution: formData.solution,
-        category: formData.category,
-      };
+    const submitData = {
+      situation: formData.situation,
+      information: formData.information,
+      solution: formData.solution,
+      category: formData.category,
+    };
 
+    console.log("Enviando datos CSW:", submitData);
+
+    try {
       if (isEditing && id) {
         await cswStore.updateCSW(id, submitData);
+        console.log("CSW actualizado exitosamente");
       } else {
         await cswStore.createCSW(submitData);
+        console.log("CSW creado exitosamente");
       }
 
-      navigate("/csw/my-requests");
+      // Solo navegar si no hubo error
+      if (!cswStore.error) {
+        console.log("Navegando a /csw/my-requests");
+        navigate("/csw/my-requests");
+      } else {
+        console.error("Error en el store:", cswStore.error);
+      }
     } catch (error) {
-      // Error is handled by the store
+      // Error is handled by the store, no navegar si hay error
+      console.error("Error capturado al guardar CSW:", error);
     }
   };
 
@@ -167,34 +205,23 @@ const CSWForm = observer(() => {
 
           {/* Categoría */}
           <div>
-            <label className="mb-2.5 block text-sm font-medium text-dark dark:text-white">
-              Categoría <span className="text-red">*</span>
-            </label>
-            <div className="relative">
-              <select
-                name="category"
-                value={formData.category}
-                onChange={handleInputChange}
-                className={`w-full rounded-[7px] border-[1.5px] bg-transparent px-5.5 py-3 pr-10 text-dark outline-none transition appearance-none focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary ${
-                  errors.category ? "border-red" : "border-stroke"
-                }`}
-              >
-                <option value="">Selecciona una categoría</option>
-                {categories.map((category) => (
-                  <option key={category._id} value={category._id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-              <span className="absolute text-gray-500 -translate-y-1/2 right-4 top-1/2 dark:text-gray-400 pointer-events-none">
-                <svg className="stroke-current" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M3.8335 5.9165L8.00016 10.0832L12.1668 5.9165" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </span>
-            </div>
-            {errors.category && (
-              <p className="mt-1 text-sm text-red">{errors.category}</p>
-            )}
+            <SearchableSelect
+              id="category"
+              label="Categoría"
+              options={[
+                { value: "", label: "Selecciona una categoría" },
+                ...categories.map((category) => ({
+                  value: category._id,
+                  label: category.name,
+                })),
+              ]}
+              value={formData.category}
+              onChange={(value) => handleSelectChange("category", value)}
+              placeholder="Buscar categoría..."
+              error={errors.category}
+              required
+              debounceMs={300}
+            />
           </div>
 
           {/* Situación */}
@@ -215,9 +242,20 @@ const CSWForm = observer(() => {
                 errors.situation ? "border-red" : "border-stroke"
               }`}
             />
-            {errors.situation && (
-              <p className="mt-1 text-sm text-red">{errors.situation}</p>
-            )}
+            <div className="flex items-center justify-between mt-1">
+              {errors.situation ? (
+                <p className="text-sm text-red">{errors.situation}</p>
+              ) : (
+                <span></span>
+              )}
+              <p className={`text-xs ${
+                countWords(formData.situation) > WORD_LIMITS.situation
+                  ? "text-red font-medium"
+                  : "text-gray-500 dark:text-gray-400"
+              }`}>
+                {countWords(formData.situation)} / {WORD_LIMITS.situation} palabras
+              </p>
+            </div>
           </div>
 
           {/* Información */}
@@ -238,9 +276,20 @@ const CSWForm = observer(() => {
                 errors.information ? "border-red" : "border-stroke"
               }`}
             />
-            {errors.information && (
-              <p className="mt-1 text-sm text-red">{errors.information}</p>
-            )}
+            <div className="flex items-center justify-between mt-1">
+              {errors.information ? (
+                <p className="text-sm text-red">{errors.information}</p>
+              ) : (
+                <span></span>
+              )}
+              <p className={`text-xs ${
+                countWords(formData.information) > WORD_LIMITS.information
+                  ? "text-red font-medium"
+                  : "text-gray-500 dark:text-gray-400"
+              }`}>
+                {countWords(formData.information)} / {WORD_LIMITS.information} palabras
+              </p>
+            </div>
           </div>
 
           {/* Solución */}
@@ -261,9 +310,20 @@ const CSWForm = observer(() => {
                 errors.solution ? "border-red" : "border-stroke"
               }`}
             />
-            {errors.solution && (
-              <p className="mt-1 text-sm text-red">{errors.solution}</p>
-            )}
+            <div className="flex items-center justify-between mt-1">
+              {errors.solution ? (
+                <p className="text-sm text-red">{errors.solution}</p>
+              ) : (
+                <span></span>
+              )}
+              <p className={`text-xs ${
+                countWords(formData.solution) > WORD_LIMITS.solution
+                  ? "text-red font-medium"
+                  : "text-gray-500 dark:text-gray-400"
+              }`}>
+                {countWords(formData.solution)} / {WORD_LIMITS.solution} palabras
+              </p>
+            </div>
           </div>
 
           {/* Form Actions */}

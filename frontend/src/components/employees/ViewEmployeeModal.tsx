@@ -22,6 +22,7 @@ const ViewEmployeeModal: React.FC<ViewEmployeeModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       className="relative w-full max-w-[600px] m-5 sm:m-0 rounded-3xl bg-white p-6 lg:p-8 dark:bg-gray-900"
+      showCloseButton={true}
     >
       <div>
         {/* Header */}
@@ -47,26 +48,7 @@ const ViewEmployeeModal: React.FC<ViewEmployeeModalProps> = ({
               </Badge>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 text-gray-400 transition-colors rounded-lg border border-[#D0D5DD] hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-white/[0.05] dark:hover:text-gray-300"
-          >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M18 6L6 18M6 6L18 18"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
+          {/* El botón de cerrar superior ahora lo maneja el Modal MCP WebForge */}
         </div>
 
         {/* Information Grid */}
@@ -156,7 +138,12 @@ const ViewEmployeeModal: React.FC<ViewEmployeeModalProps> = ({
 
         {/* Footer */}
         <div className="mt-6 flex justify-end border-t border-gray-100 pt-4 dark:border-gray-800">
-          <Button onClick={onClose} variant="secondary">
+          <Button
+            onClick={onClose}
+            variant="secondary"
+            className="border border-[#D0D5DD] border-solid border-1"
+            style={{ borderWidth: 1, borderColor: '#D0D5DD' }}
+          >
             Cerrar
           </Button>
         </div>
