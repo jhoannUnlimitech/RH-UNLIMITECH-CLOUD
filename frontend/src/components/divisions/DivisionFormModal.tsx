@@ -10,9 +10,7 @@ import Alert from "../../components/ui/alert/Alert";
 import { Modal } from "../../components/ui/modal";
 import { IDivisionsStore } from "../../stores/views/DivisionsStore.contract";
 import { employeesService, Employee } from "../../api/services/employees";
-import ApprovalFlowManager, {
-  ApprovalLevel,
-} from "./ApprovalFlowManager";
+import ApprovalFlowManager from "./ApprovalFlowManager";
 
 interface DivisionFormModalProps {
   isOpen: boolean;
@@ -83,7 +81,7 @@ const DivisionFormModal = observer(
     const employeeOptions = useMemo(() => {
       if (!Array.isArray(employees) || employees.length === 0) return [];
       
-      const idField = employees[0]._id ? '_id' : (employees[0].id ? 'id' : null);
+      const idField = employees[0]._id ? '_id' : null;
       
       if (!idField) {
         return [];
@@ -274,6 +272,21 @@ const DivisionFormModal = observer(
               </p>
             </div>
 
+            {/* Status Field */}
+            <div>
+              <Label htmlFor="status">Estado</Label>
+              <Select
+                options={[
+                  { value: "active", label: "Activo" },
+                  { value: "inactive", label: "Inactivo" },
+                ]}
+                placeholder="Selecciona el estado"
+                value={formData.status}
+                onChange={(value) => handleSelectChange("status", value as "active" | "inactive")}
+                disabled={isSubmitting}
+              />
+            </div>
+
             {/* Manager/Representative Field */}
             <div>
               <Label htmlFor="managerId">
@@ -294,21 +307,6 @@ const DivisionFormModal = observer(
               {errors.managerId && (
                 <p className="mt-1 text-xs text-red-500">{errors.managerId}</p>
               )}
-            </div>
-
-            {/* Status Field */}
-            <div>
-              <Label htmlFor="status">Estado</Label>
-              <Select
-                options={[
-                  { value: "active", label: "Activo" },
-                  { value: "inactive", label: "Inactivo" },
-                ]}
-                placeholder="Selecciona el estado"
-                value={formData.status}
-                onChange={(value) => handleSelectChange("status", value as "active" | "inactive")}
-                disabled={isSubmitting}
-              />
             </div>
 
             {/* Description Field */}

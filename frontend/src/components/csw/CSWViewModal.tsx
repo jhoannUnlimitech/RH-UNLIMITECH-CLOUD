@@ -1,24 +1,82 @@
 import { observer } from "mobx-react-lite";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Modal } from "../ui/modal";
 import Badge from "../ui/badge/Badge";
-import { cswStore } from "../../stores/views";
+import Button from "../ui/button/Button";
+import { cswStore, authStore } from "../../stores/views";
 import { ICSWStore } from "../../stores/views/CSWStore.contract";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   cswId: string;
+  onApprove?: (cswId: string, comments: string) => void;
+  onReject?: (cswId: string, comments: string) => void;
+  showApprovalActions?: boolean;
 }
 
-const CSWViewModal = observer(({ isOpen, onClose, cswId }: Props) => {
+const CSWViewModal = observer(({ isOpen, onClose, cswId, onApprove, onReject, showApprovalActions }: Props) => {
+  const [approvalComments, setApprovalComments] = useState("");
+  const [isSubmittingApproval, setIsSubmittingApproval] = useState(false);
+  const [commentsError, setCommentsError] = useState("");
+  const csw = cswStore.selectedCSW;
+  const currentUserId = authStore.user?.id;
+
   useEffect(() => {
     if (isOpen && cswId) {
       cswStore.fetchCSWById(cswId);
     }
   }, [isOpen, cswId]);
 
-  const csw = cswStore.selectedCSW;
+  // Verificar si el usuario actual es aprobador en el nivel actual
+  const isCurrentUserApprover = csw?.approvalChain.some((approval) => {
+    const approverId = typeof approval.approverId === 'string' 
+      ? approval.approverId 
+      : (approval.approverId as any)?._id;
+    return approval.level === csw.currentLevel && 
+           approverId === currentUserId && 
+           approval.status === ICSWStore.ApprovalStatus.PENDING;
+  });
+
+  const validateRejectComments = (): boolean => {
+    if (!approvalComments.trim()) {
+      setCommentsError("Los comentarios son obligatorios para rechazar una solicitud");
+      return false;
+    }
+    setCommentsError("");
+    return true;
+  };
+
+  const handleApprove = async () => {
+    if (!csw || !onApprove) return;
+    setCommentsError("");
+    setIsSubmittingApproval(true);
+    try {
+      await onApprove(csw._id, approvalComments);
+      setApprovalComments("");
+      onClose();
+    } finally {
+      setIsSubmittingApproval(false);
+    }
+  };
+
+  const handleReject = async () => {
+    if (!csw || !onReject) return;
+    
+    if (!validateRejectComments()) {
+      setIsSubmittingApproval(false);
+      return;
+    }
+    
+    setIsSubmittingApproval(true);
+    try {
+      await onReject(csw._id, approvalComments);
+      setApprovalComments("");
+      onClose();
+    } finally {
+      setIsSubmittingApproval(false);
+    }
+  };
 
   if (!csw) {
     return (
@@ -53,11 +111,11 @@ const CSWViewModal = observer(({ isOpen, onClose, cswId }: Props) => {
   const categoryName = typeof csw.category === 'object' ? csw.category.name : 'Sin categoría';
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-5xl p-6 sm:p-8">
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-5xl p-6 sm:p-8 max-h-[90vh] flex flex-col">
       {/* Header */}
-      <div className="mb-6 border-b border-stroke pb-4 dark:border-dark-3">
-        <div className="flex items-start justify-between">
-          <div>
+      <div className="mb-6 border-b border-stroke pb-4 dark:border-dark-3 flex-shrink-0">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
               Solicitud CSW-{csw._id}
             </h2>
@@ -65,11 +123,13 @@ const CSWViewModal = observer(({ isOpen, onClose, cswId }: Props) => {
               Creada el {new Date(csw.createdAt).toLocaleString("es-ES")}
             </p>
           </div>
-          <Badge color={statusBadge.color}>{statusBadge.text}</Badge>
+          <div className="flex-shrink-0">
+            <Badge color={statusBadge.color}>{statusBadge.text}</Badge>
+          </div>
         </div>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-6 overflow-y-auto flex-1 pr-4">
         {/* Requester Information */}
         <div className="rounded-lg border border-stroke bg-gray-2 p-4 dark:border-dark-3 dark:bg-dark-2">
           <h3 className="mb-3 text-lg font-semibold text-dark dark:text-white">
@@ -208,6 +268,72 @@ const CSWViewModal = observer(({ isOpen, onClose, cswId }: Props) => {
             ))}
           </div>
         </div>
+
+        {/* Approval Section - Show if user is current approver */}
+        {isCurrentUserApprover && (
+          <div className="rounded-lg border border-warning/30 bg-warning/5 p-4 dark:border-warning/20 dark:bg-warning/10">
+            <h3 className="mb-3 text-lg font-semibold text-warning dark:text-warning">
+              Acciones de Aprobación
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
+                  Comentarios
+                  <span className="ml-1 text-xs text-gray-500 dark:text-gray-400">
+                    (opcional para aprobación, obligatorio para rechazo)
+                  </span>
+                </label>
+                <textarea
+                  value={approvalComments}
+                  onChange={(e) => {
+                    setApprovalComments(e.target.value);
+                    setCommentsError("");
+                  }}
+                  placeholder="Añade tus comentarios sobre esta solicitud..."
+                  rows={4}
+                  className={`w-full rounded-lg border px-3 py-2 text-sm text-dark outline-none transition focus:border-primary disabled:bg-gray-2 disabled:text-gray-4 dark:bg-dark-2 dark:text-white dark:disabled:bg-dark-3 ${
+                    commentsError 
+                      ? "border-red-500 dark:border-red-400" 
+                      : "border-stroke dark:border-dark-3 bg-white dark:bg-dark-2"
+                  }`}
+                  disabled={isSubmittingApproval}
+                />
+                {commentsError && (
+                  <p className="mt-2 text-sm text-red-500 dark:text-red-400">
+                    {commentsError}
+                  </p>
+                )}
+              </div>
+              <div className="flex gap-3">
+                <Button
+                  className="flex-1"
+                  variant="outline"
+                  type="button"
+                  onClick={onClose}
+                  disabled={isSubmittingApproval}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  className="flex-1 bg-red-600 hover:bg-red-700"
+                  type="button"
+                  onClick={handleReject}
+                  disabled={isSubmittingApproval}
+                >
+                  {isSubmittingApproval ? "Rechazando..." : "Rechazar"}
+                </Button>
+                <Button
+                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  type="button"
+                  onClick={handleApprove}
+                  disabled={isSubmittingApproval}
+                >
+                  {isSubmittingApproval ? "Aprobando..." : "Aprobar"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </Modal>
   );

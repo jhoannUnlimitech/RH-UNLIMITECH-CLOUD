@@ -13,14 +13,11 @@ import {
 import Badge from "../../components/ui/badge/Badge";
 import Button from "../../components/ui/button/Button";
 import SearchableSelect from "../../components/form/SearchableSelect";
-// import CSWViewModal from "../../components/csw/CSWViewModal";
 // import DeleteConfirmModal from "../../components/csw/DeleteConfirmModal";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import TableSkeleton from "../../components/ui/skeleton/TableSkeleton";
 import Alert from "../../components/ui/alert/Alert";
 import Pagination from "../../components/ui/pagination/Pagination";
-import CSWApprovalModal from "../../components/csw/CSWApprovalModal";
-import Notification from "../../components/ui/notification/Notfication";
 // import { useModal } from "../../hooks/useModal";
 import { PencilIcon, TrashBinIcon } from "../../icons";
 
@@ -33,16 +30,6 @@ const CSWList = observer(() => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
-  const [approvalModalOpen, setApprovalModalOpen] = useState(false);
-  const [approvalModalType, setApprovalModalType] = useState<"approve" | "reject">("approve");
-  const [selectedCSWForApproval, setSelectedCSWForApproval] = useState<{ id: string; number: string; level: number } | null>(null);
-  const [notification, setNotification] = useState<{ variant: "success" | "error"; title: string; description?: string } | null>(null);
-  // const [viewingCSWId, setViewingCSWId] = useState<string | null>(null);
-  // const [deletingCSWId, setDeletingCSWId] = useState<string | null>(null);
-  // const [deletingCSWNumber, setDeletingCSWNumber] = useState("");
-
-  // const viewModal = useModal();
-  // const deleteModal = useModal();
 
   // Determinar configuración según la ruta
   const routeConfig = useMemo(() => {
@@ -146,7 +133,7 @@ const CSWList = observer(() => {
         // Manejar approverId como string u objeto
         const approverId = typeof currentLevelApproval?.approverId === 'string' 
           ? currentLevelApproval.approverId 
-          : currentLevelApproval?.approverId?._id;
+          : (currentLevelApproval?.approverId as any)?._id;
         return approverId === currentUserId &&
                currentLevelApproval?.status === ICSWStore.ApprovalStatus.PENDING;
       });
@@ -217,107 +204,26 @@ const CSWList = observer(() => {
   };
 
   const handleView = (id: string) => {
-    // Temporal: navegar a la página de edición como vista de solo lectura
-    navigate(`/csw/edit/${id}`);
-    // TODO: Implementar modal de vista cuando CSWViewModal esté creado
-    // setViewingCSWId(id);
-    // cswStore.fetchCSWById(id);
-    // viewModal.openModal();
+    // Navegar a la página de detalle para todas las rutas
+    navigate(`/csw/view/${id}`);
   };
 
   const handleEdit = (id: string) => {
     navigate(`/csw/edit/${id}`);
   };
 
-  const handleDelete = (id: string, requestNumber: string) => {
-    // TODO: Implementar modal de confirmación cuando DeleteConfirmModal esté creado
-    if (window.confirm(`¿Estás seguro de eliminar la solicitud ${requestNumber}?`)) {
+  const handleDelete = (id: string, requesterName: string) => {
+    if (window.confirm(`¿Estás seguro de eliminar la solicitud de ${requesterName}?`)) {
       cswStore.deleteCSW(id).then(() => {
         cswStore.fetchCSWs();
       });
     }
-    // setDeletingCSWId(id);
-    // setDeletingCSWNumber(requestNumber);
-    // deleteModal.openModal();
   };
-
-  const handleApprove = (csw: any) => {
-    setSelectedCSWForApproval({ id: csw._id, number: csw.requestNumber, level: csw.currentLevel });
-    setApprovalModalType("approve");
-    setApprovalModalOpen(true);
-  };
-
-  const handleReject = (csw: any) => {
-    setSelectedCSWForApproval({ id: csw._id, number: csw.requestNumber, level: csw.currentLevel });
-    setApprovalModalType("reject");
-    setApprovalModalOpen(true);
-  };
-
-  const handleApprovalConfirm = async (comments: string) => {
-    if (!selectedCSWForApproval) return;
-
-    try {
-      if (approvalModalType === "approve") {
-        await cswStore.approveCSW(selectedCSWForApproval.id, selectedCSWForApproval.level, comments || undefined);
-        setNotification({
-          variant: "success",
-          title: "Solicitud aprobada",
-          description: `La solicitud ${selectedCSWForApproval.number} ha sido aprobada exitosamente`
-        });
-      } else {
-        await cswStore.rejectCSW(selectedCSWForApproval.id, selectedCSWForApproval.level, comments);
-        setNotification({
-          variant: "success",
-          title: "Solicitud rechazada",
-          description: `La solicitud ${selectedCSWForApproval.number} ha sido rechazada`
-        });
-      }
-      setApprovalModalOpen(false);
-      setSelectedCSWForApproval(null);
-      await cswStore.fetchCSWs();
-      setTimeout(() => setNotification(null), 3000);
-    } catch (error) {
-      setNotification({
-        variant: "error",
-        title: "Error al procesar solicitud",
-        description: error instanceof Error ? error.message : "Ocurrió un error inesperado"
-      });
-      setTimeout(() => setNotification(null), 5000);
-    }
-  };
-
-  const handleApprovalClose = () => {
-    setApprovalModalOpen(false);
-    setSelectedCSWForApproval(null);
-  };
-
-  // const handleCloseViewModal = () => {
-  //   viewModal.closeModal();
-  //   setViewingCSWId(null);
-  // };
-
-  // const handleCloseDeleteModal = () => {
-  //   deleteModal.closeModal();
-  //   setDeletingCSWId(null);
-  //   setDeletingCSWNumber("");
-  // };
 
   const categories = Array.isArray(cswCategoryStore.categories) ? cswCategoryStore.categories : [];
 
   return (
     <>
-      {/* Notificación flotante */}
-      {notification && (
-        <div className="fixed right-4 top-4 z-50 animate-slide-in">
-          <Notification
-            variant={notification.variant}
-            title={notification.title}
-            description={notification.description}
-            hideDuration={3000}
-          />
-        </div>
-      )}
-
       {/* Breadcrumb */}
       <PageBreadcrumb pageTitle={routeConfig.breadcrumb} />
 
@@ -574,8 +480,8 @@ const CSWList = observer(() => {
                               <TableCell className="px-6 py-4">
                                 <div className="space-y-1.5">
                                   <div className="font-medium text-gray-900 dark:text-white">{csw.requesterName}</div>
-                                  <Badge color="info" className="inline-block text-xs">
-                                    {csw.requesterPosition}
+                                  <Badge color="info">
+                                    <span className="inline-block text-xs">{csw.requesterPosition}</span>
                                   </Badge>
                                 </div>
                               </TableCell>
@@ -609,53 +515,20 @@ const CSWList = observer(() => {
                                   </div>
                                 </div>
                               </TableCell>
-                              <TableCell className="px-6 py-4 text-center align-middle">
-                                <div className="flex flex-col items-center justify-center gap-2 w-full h-full min-h-[48px]">
+                              <TableCell className="px-6 py-4">
+                                <div className="flex items-center justify-center gap-3">
                                   <button
                                     onClick={() => handleView(csw._id)}
-                                    className="inline-flex items-center justify-center rounded-lg p-2 text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-white/[0.05]"
+                                    className="inline-flex items-center justify-center rounded-lg p-2 text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.05] transition"
                                     title="Ver detalles"
                                   >
-                                    <EyeIcon className="h-[18px] w-[18px]" />
+                                    <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                      <path fillRule="evenodd" clipRule="evenodd" d="M10.0002 13.8619C7.23361 13.8619 4.86803 12.1372 3.92328 9.70241C4.86804 7.26761 7.23361 5.54297 10.0002 5.54297C12.7667 5.54297 15.1323 7.26762 16.0771 9.70243C15.1323 12.1372 12.7667 13.8619 10.0002 13.8619ZM10.0002 4.04297C6.48191 4.04297 3.49489 6.30917 2.4155 9.4593C2.3615 9.61687 2.3615 9.78794 2.41549 9.94552C3.49488 13.0957 6.48191 15.3619 10.0002 15.3619C13.5184 15.3619 16.5055 13.0957 17.5849 9.94555C17.6389 9.78797 17.6389 9.6169 17.5849 9.45932C16.5055 6.30919 13.5184 4.04297 10.0002 4.04297ZM9.99151 7.84413C8.96527 7.84413 8.13333 8.67606 8.13333 9.70231C8.13333 10.7286 8.96527 11.5605 9.99151 11.5605H10.0064C11.0326 11.5605 11.8646 10.7286 11.8646 9.70231C11.8646 8.67606 11.0326 7.84413 10.0064 7.84413H9.99151Z" fill="currentColor"/>
+                                    </svg>
                                   </button>
                                   
-                                  {/* Botones de aprobación para pendientes */}
-                                  {routeConfig.filterType === "pending" && (
-                                    <>
-                                      <div className="flex flex-row items-center justify-center gap-4 h-full">
-                                        <button
-                                          onClick={() => handleView(csw._id)}
-                                          className="inline-flex items-center justify-center rounded-lg p-2 text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.05] transition"
-                                          title="Ver detalles"
-                                        >
-                                          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path fillRule="evenodd" clipRule="evenodd" d="M10.0002 13.8619C7.23361 13.8619 4.86803 12.1372 3.92328 9.70241C4.86804 7.26761 7.23361 5.54297 10.0002 5.54297C12.7667 5.54297 15.1323 7.26762 16.0771 9.70243C15.1323 12.1372 12.7667 13.8619 10.0002 13.8619ZM10.0002 4.04297C6.48191 4.04297 3.49489 6.30917 2.4155 9.4593C2.3615 9.61687 2.3615 9.78794 2.41549 9.94552C3.49488 13.0957 6.48191 15.3619 10.0002 15.3619C13.5184 15.3619 16.5055 13.0957 17.5849 9.94555C17.6389 9.78797 17.6389 9.6169 17.5849 9.45932C16.5055 6.30919 13.5184 4.04297 10.0002 4.04297ZM9.99151 7.84413C8.96527 7.84413 8.13333 8.67606 8.13333 9.70231C8.13333 10.7286 8.96527 11.5605 9.99151 11.5605H10.0064C11.0326 11.5605 11.8646 10.7286 11.8646 9.70231C11.8646 8.67606 11.0326 7.84413 10.0064 7.84413H9.99151Z" fill="currentColor"/>
-                                          </svg>
-                                        </button>
-                                        <button
-                                          onClick={() => handleApprove(csw)}
-                                          className="inline-flex items-center justify-center rounded-lg p-2 text-green-700 bg-green-100 hover:bg-green-200 dark:text-green-300 dark:bg-green-900/40 dark:hover:bg-green-900/60 transition"
-                                          title="Aprobar"
-                                        >
-                                          <svg className="h-[20px] w-[20px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                          </svg>
-                                        </button>
-                                        <button
-                                          onClick={() => handleReject(csw)}
-                                          className="inline-flex items-center justify-center rounded-lg p-2 text-red-700 bg-red-100 hover:bg-red-200 dark:text-red-300 dark:bg-red-900/40 dark:hover:bg-red-900/60 transition"
-                                          title="Rechazar"
-                                        >
-                                          <svg className="h-[20px] w-[20px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                          </svg>
-                                        </button>
-                                      </div>
-                                    </>
-                                  )}
-                                  
-                                  {/* Botones de edición/eliminación para mis solicitudes */}
-                                  {routeConfig.filterType === "my-requests" && csw.status === ICSWStore.CSWStatus.PENDING && (
+                                  {/* Botones de edición/eliminación para mis solicitudes (solo si NO está aprobada) */}
+                                  {routeConfig.filterType === "my-requests" && csw.status !== ICSWStore.CSWStatus.APPROVED && (
                                     <>
                                       <button
                                         onClick={() => handleEdit(csw._id)}
@@ -699,34 +572,6 @@ const CSWList = observer(() => {
           </div>
         </div>
       </div>
-
-      {/* Modals - TODO: Implementar cuando los componentes estén creados */}
-      {/* {viewingCSWId && (
-        <CSWViewModal
-          isOpen={viewModal.isOpen}
-          onClose={handleCloseViewModal}
-          cswId={viewingCSWId}
-        />
-      )}
-
-      {deletingCSWId && (
-        <DeleteConfirmModal
-          isOpen={deleteModal.isOpen}
-          onClose={handleCloseDeleteModal}
-          cswId={deletingCSWId}
-          cswNumber={deletingCSWNumber}
-        />
-      )} */}
-
-      {/* Modal de aprobación/rechazo */}
-      <CSWApprovalModal
-        isOpen={approvalModalOpen}
-        onClose={handleApprovalClose}
-        onConfirm={handleApprovalConfirm}
-        cswNumber={selectedCSWForApproval?.number || ""}
-        type={approvalModalType}
-        isLoading={cswStore.loading}
-      />
     </>
   );
 });
