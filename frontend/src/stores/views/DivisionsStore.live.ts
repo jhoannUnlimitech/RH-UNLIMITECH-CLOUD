@@ -1,6 +1,7 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import { IDivisionsStore } from './DivisionsStore.contract';
 import { divisionsService } from '../../api/services/divisions';
+import { notify } from '../../utils/toast';
 
 /**
  * DivisionsStore Live Implementation
@@ -71,10 +72,12 @@ export class DivisionsStoreLive implements IDivisionsStore {
       runInAction(() => {
         this.divisions.push(newDivision);
       });
+      notify.success('División creada exitosamente');
     } catch (err: any) {
       runInAction(() => {
         this.error = err.response?.data?.message || 'Error al crear división';
       });
+      notify.error(err.response?.data?.message || 'Error al crear división');
       throw err;
     } finally {
       runInAction(() => {
@@ -100,11 +103,13 @@ export class DivisionsStoreLive implements IDivisionsStore {
           this.divisions[index] = updatedDivision;
         }
       });
+      notify.success('División actualizada exitosamente');
     } catch (err: any) {
       runInAction(() => {
         this.error =
           err.response?.data?.message || 'Error al actualizar división';
       });
+      notify.error(err.response?.data?.message || 'Error al actualizar división');
       throw err;
     } finally {
       runInAction(() => {
@@ -124,10 +129,12 @@ export class DivisionsStoreLive implements IDivisionsStore {
       runInAction(() => {
         this.divisions = this.divisions.filter((d) => d._id !== id);
       });
+      notify.success('División eliminada exitosamente');
     } catch (err: any) {
       runInAction(() => {
         this.error = err.response?.data?.message || 'Error al eliminar división';
       });
+      notify.error(err.response?.data?.message || 'Error al eliminar división');
       throw err;
     } finally {
       runInAction(() => {

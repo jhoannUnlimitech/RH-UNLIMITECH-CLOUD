@@ -1,6 +1,7 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import { IHatsStore } from "./HatsStore.contract";
 import { hatsService } from "../../api/services/hats";
+import { notify } from "../../utils/toast";
 
 export class HatsStoreLive implements IHatsStore {
   roles: IHatsStore.Role[] = [];
@@ -59,11 +60,13 @@ export class HatsStoreLive implements IHatsStore {
       runInAction(() => {
         this.isLoading = false;
       });
+      notify.success("Hat creado exitosamente");
     } catch (error: any) {
       runInAction(() => {
         this.error = error.response?.data?.message || "Error al crear el hat";
         this.isLoading = false;
       });
+      notify.error(error.response?.data?.message || "Error al crear el hat");
       throw error;
     }
   }
@@ -77,11 +80,13 @@ export class HatsStoreLive implements IHatsStore {
       runInAction(() => {
         this.isLoading = false;
       });
+      notify.success("Hat actualizado exitosamente");
     } catch (error: any) {
       runInAction(() => {
         this.error = error.response?.data?.message || "Error al actualizar el hat";
         this.isLoading = false;
       });
+      notify.error(error.response?.data?.message || "Error al actualizar el hat");
       throw error;
     }
   }
@@ -96,11 +101,13 @@ export class HatsStoreLive implements IHatsStore {
         this.roles = this.roles.filter(role => role._id !== id);
         this.isLoading = false;
       });
+      notify.success("Hat eliminado exitosamente");
     } catch (error: any) {
       runInAction(() => {
         this.error = error.response?.data?.message || "Error al eliminar el hat";
         this.isLoading = false;
       });
+      notify.error(error.response?.data?.message || "Error al eliminar el hat");
       throw error;
     }
   }

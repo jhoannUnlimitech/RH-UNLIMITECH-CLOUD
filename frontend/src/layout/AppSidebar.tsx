@@ -226,7 +226,7 @@ const AppSidebar: React.FC = () => {
         <Link to="/">
           {isExpanded || isHovered || isMobileOpen ? (
             <div className="flex items-center gap-3">
-              <img src="/images/logo.webp" alt="Unlimitech Cloud" className="h-9" />
+              <img src="/images/logo.webp" alt="Unlimitech Cloud" className="h-18" />
             </div>
           ) : (
             <img src="/favicon.png" alt="UC" className="h-10 w-10 rounded-lg" />

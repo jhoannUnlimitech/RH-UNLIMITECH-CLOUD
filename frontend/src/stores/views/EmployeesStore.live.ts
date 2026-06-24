@@ -1,6 +1,7 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import { IEmployeesStore } from './EmployeesStore.contract';
 import { employeesService } from '../../api/services/employees';
+import { notify } from '../../utils/toast';
 
 /**
  * EmployeesStore Live Implementation
@@ -73,10 +74,12 @@ export class EmployeesStoreLive implements IEmployeesStore {
       runInAction(() => {
         this.employees.push(newEmployee);
       });
+      notify.success('Empleado creado exitosamente');
     } catch (err: any) {
       runInAction(() => {
         this.error = err.response?.data?.message || 'Error al crear empleado';
       });
+      notify.error(err.response?.data?.message || 'Error al crear empleado');
       throw err;
     } finally {
       runInAction(() => {
@@ -102,11 +105,13 @@ export class EmployeesStoreLive implements IEmployeesStore {
           this.employees[index] = updatedEmployee;
         }
       });
+      notify.success('Empleado actualizado exitosamente');
     } catch (err: any) {
       runInAction(() => {
         this.error =
           err.response?.data?.message || 'Error al actualizar empleado';
       });
+      notify.error(err.response?.data?.message || 'Error al actualizar empleado');
       throw err;
     } finally {
       runInAction(() => {
@@ -126,10 +131,12 @@ export class EmployeesStoreLive implements IEmployeesStore {
       runInAction(() => {
         this.employees = this.employees.filter((e) => e._id !== id);
       });
+      notify.success('Empleado eliminado exitosamente');
     } catch (err: any) {
       runInAction(() => {
         this.error = err.response?.data?.message || 'Error al eliminar empleado';
       });
+      notify.error(err.response?.data?.message || 'Error al eliminar empleado');
       throw err;
     } finally {
       runInAction(() => {
@@ -147,15 +154,16 @@ export class EmployeesStoreLive implements IEmployeesStore {
       const updatedEmployee = await employeesService.update(id, { status: newStatus });
       
       runInAction(() => {
-        // Crear un nuevo array para que MobX detecte el cambio
         this.employees = this.employees.map((e) => 
           e._id === id ? updatedEmployee : e
         );
       });
+      notify.success(`Estado cambiado a ${newStatus === 'active' ? 'activo' : 'inactivo'}`);
     } catch (err: any) {
       runInAction(() => {
         this.error = err.response?.data?.message || 'Error al cambiar estado del empleado';
       });
+      notify.error(err.response?.data?.message || 'Error al cambiar estado');
       throw err;
     }
   }
