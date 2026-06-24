@@ -4,6 +4,7 @@ import { divisionsStore } from "../../stores/views";
 import InputField from "../../components/form/input/InputField";
 import TextArea from "../../components/form/input/TextArea";
 import Select from "../../components/form/Select";
+import SearchableSelect from "../../components/form/SearchableSelect";
 import Label from "../../components/form/Label";
 import Button from "../../components/ui/button/Button";
 import Alert from "../../components/ui/alert/Alert";
@@ -295,17 +296,18 @@ const DivisionFormModal = observer(
               {loadingEmployees ? (
                 <div className="h-11 w-full animate-pulse rounded-lg bg-gray-200 dark:bg-gray-700"></div>
               ) : (
-                <Select
-                  options={employeeOptions}
-                  placeholder="Selecciona un representante"
+                <SearchableSelect
+                  id="managerId"
+                  options={[
+                    { value: "", label: "Seleccionar representante" },
+                    ...employeeOptions,
+                  ]}
+                  placeholder="Buscar representante..."
                   value={formData.managerId}
                   onChange={(value) => handleSelectChange("managerId", value)}
-                  error={Boolean(errors.managerId)}
+                  error={errors.managerId}
                   disabled={isSubmitting}
                 />
-              )}
-              {errors.managerId && (
-                <p className="mt-1 text-xs text-red-500">{errors.managerId}</p>
               )}
             </div>
 
