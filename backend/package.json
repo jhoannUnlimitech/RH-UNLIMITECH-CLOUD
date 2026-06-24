@@ -7,7 +7,10 @@
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "seed": "ts-node src/scripts/seed.ts"
+    "seed": "ts-node src/database/seeds/seed.ts",
+    "db:reset-password": "ts-node src/database/seeds/reset-password.ts",
+    "migrate": "ts-node src/database/migrations/",
+    "db:check-permissions": "ts-node src/scripts/check-permissions.ts"
   },
   "keywords": [
     "rrhh",

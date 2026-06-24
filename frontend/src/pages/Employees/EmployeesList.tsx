@@ -1,6 +1,7 @@
 import { observer } from "mobx-react-lite";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { employeesStore } from "../../stores/views";
+import { divisionsStore } from "../../stores/views";
 import {
   Table,
   TableBody,
@@ -17,28 +18,54 @@ import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import TableSkeleton from "../../components/ui/skeleton/TableSkeleton";
 import Alert from "../../components/ui/alert/Alert";
 import Pagination from "../../components/ui/pagination/Pagination";
+import SearchableSelect from "../../components/form/SearchableSelect";
 import { useModal } from "../../hooks/useModal";
-import { PencilIcon, TrashBinIcon, EyeIcon } from "../../icons";
+import { PencilIcon, TrashBinIcon } from "../../icons";
 import { getCountryName } from "../../utils/countries";
-import { IEmployee } from "../../api/services/employees";
+import { IEmployeesStore } from "../../stores/views/EmployeesStore.contract";
 
 const EmployeesList = observer(() => {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deletingEmployeeName, setDeletingEmployeeName] = useState<string>("");
   const [editingEmployeeId, setEditingEmployeeId] = useState<string | undefined>(undefined);
-  const [viewingEmployee, setViewingEmployee] = useState<IEmployee | null>(null);
+  const [viewingEmployee, setViewingEmployee] = useState<IEmployeesStore.Employee | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedDivisionId, setSelectedDivisionId] = useState<string>("");
   const createModal = useModal();
   const editModal = useModal();
   const deleteModal = useModal();
   const viewModal = useModal();
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+  const [isInitialized, setIsInitialized] = useState(false);
 
+  // Cargar divisiones solo una vez al montar
   useEffect(() => {
-    employeesStore.fetchEmployees();
+    divisionsStore.fetchDivisions();
   }, []);
+
+  // Cargar empleados cuando cambien los filtros o la paginación
+  useEffect(() => {
+    const params: any = {
+      page: currentPage,
+      limit: itemsPerPage
+    };
+
+    if (debouncedSearchTerm) {
+      params.search = debouncedSearchTerm;
+    }
+
+    if (selectedDivisionId) {
+      params.division = selectedDivisionId;
+    }
+
+    employeesStore.fetchEmployees(params);
+    
+    if (!isInitialized) {
+      setIsInitialized(true);
+    }
+  }, [currentPage, itemsPerPage, debouncedSearchTerm, selectedDivisionId]);
 
   // Debounce para el buscador (500ms)
   useEffect(() => {
@@ -49,47 +76,46 @@ const EmployeesList = observer(() => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // Filtrado y ordenamiento
-  const filteredEmployees = useMemo(() => {
-    const employees = Array.isArray(employeesStore.employees) ? employeesStore.employees : [];
-    let filtered = employees;
-    
-    // Aplicar filtro de búsqueda con debounce
-    if (debouncedSearchTerm) {
-      const searchLower = debouncedSearchTerm.toLowerCase();
-      filtered = filtered.filter(employee =>
-        employee.name?.toLowerCase().includes(searchLower) ||
-        employee.email?.toLowerCase().includes(searchLower) ||
-        employee.nationalId?.toLowerCase().includes(searchLower) ||
-        (employee.role?.name && employee.role.name.toLowerCase().includes(searchLower)) ||
-        (employee.division?.name && employee.division.name.toLowerCase().includes(searchLower))
-      );
-    }
-    
-    // Ordenar por nombre
-    return [...filtered].sort((a, b) => a.name.localeCompare(b.name));
-  }, [employeesStore.employees, debouncedSearchTerm]);
+  // Los empleados vienen paginados del backend
+  const employees = Array.isArray(employeesStore.employees) ? employeesStore.employees : [];
+  const pagination = employeesStore.pagination;
+  const totalPages = pagination?.pages || 1;
+  const totalEmployees = pagination?.total || employees.length;
+  const startIndex = ((pagination?.page || 1) - 1) * (pagination?.limit || itemsPerPage);
+  const endIndex = Math.min(startIndex + employees.length, totalEmployees);
 
-  const totalPages = Math.ceil(filteredEmployees.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, filteredEmployees.length);
-  const currentData = filteredEmployees.slice(startIndex, endIndex);
-
-  const handlePageChange = (page: number) => {
+  const handlePageChange = useCallback((page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
-  };
+  }, [totalPages]);
 
-  const handleItemsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleItemsPerPageChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     setItemsPerPage(parseInt(e.target.value, 10));
     setCurrentPage(1);
-  };
+  }, []);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1);
-  };
+  }, []);
+
+  const handleDivisionChange = useCallback((value: string) => {
+    setSelectedDivisionId(value);
+    setCurrentPage(1);
+  }, []);
+
+  // Opciones de divisiones para el filtro
+  const divisionOptions = useMemo(() => {
+    const divisions = Array.isArray(divisionsStore.divisions) ? divisionsStore.divisions : [];
+    return [
+      { value: "", label: "Todas las divisiones" },
+      ...divisions.map(division => ({
+        value: division._id,
+        label: division.name
+      }))
+    ];
+  }, [divisionsStore.divisions]);
 
   const handleDelete = async (id: string, name: string) => {
     setDeletingId(id);
@@ -122,7 +148,7 @@ const EmployeesList = observer(() => {
     setEditingEmployeeId(undefined);
   };
 
-  const handleView = (employee: IEmployee) => {
+  const handleView = (employee: IEmployeesStore.Employee) => {
     setViewingEmployee(employee);
     viewModal.openModal();
   };
@@ -130,6 +156,14 @@ const EmployeesList = observer(() => {
   const handleCloseViewModal = () => {
     viewModal.closeModal();
     setViewingEmployee(null);
+  };
+
+  const handleToggleStatus = async (id: string) => {
+    try {
+      await employeesStore.toggleEmployeeStatus(id);
+    } catch (error) {
+      // El error ya se maneja en el store
+    }
   };
 
   return (
@@ -187,6 +221,15 @@ const EmployeesList = observer(() => {
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="w-full sm:w-[250px]">
+              <SearchableSelect
+                id="division-filter"
+                options={divisionOptions}
+                value={selectedDivisionId}
+                onChange={handleDivisionChange}
+                placeholder="Filtrar por división"
+              />
+            </div>
             <div className="relative">
               <button className="absolute text-gray-500 -translate-y-1/2 left-4 top-1/2 dark:text-gray-400">
                 <svg
@@ -213,9 +256,11 @@ const EmployeesList = observer(() => {
                 className="h-11 w-full rounded-lg border border-gray-300 bg-transparent py-2.5 pl-11 pr-4 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[300px]"
               />
             </div>
-            <Button onClick={createModal.openModal}>
+            <Button
+              onClick={createModal.openModal}
+              className="flex items-center gap-2"
+            >
               <svg
-                className="mr-2"
                 width="20"
                 height="20"
                 viewBox="0 0 20 20"
@@ -243,7 +288,7 @@ const EmployeesList = observer(() => {
         )}
 
         {/* Empty State */}
-        {!employeesStore.isLoading && filteredEmployees.length === 0 && (
+        {!employeesStore.isLoading && employees.length === 0 && (
           <div className="flex flex-col items-center justify-center px-6 py-16 text-center border-t border-gray-100 dark:border-gray-800">
             <svg
               className="w-12 h-12 mb-4 text-gray-400 dark:text-gray-600"
@@ -265,9 +310,11 @@ const EmployeesList = observer(() => {
               {searchTerm ? "No se encontraron resultados para tu búsqueda" : "Comienza creando tu primer empleado"}
             </p>
             {!searchTerm && (
-              <Button onClick={createModal.openModal}>
+              <Button
+                onClick={createModal.openModal}
+                className="flex items-center gap-2"
+              >
                 <svg
-                  className="mr-2"
                   width="20"
                   height="20"
                   viewBox="0 0 20 20"
@@ -289,7 +336,7 @@ const EmployeesList = observer(() => {
         )}
 
         {/* Table */}
-        {!employeesStore.isLoading && filteredEmployees.length > 0 && (
+        {!employeesStore.isLoading && employees.length > 0 && (
           <>
             <div className="max-w-full overflow-x-auto">
               <Table>
@@ -327,6 +374,12 @@ const EmployeesList = observer(() => {
                     </TableCell>
                     <TableCell
                       isHeader
+                      className="py-3 px-4 sm:px-6 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400 w-28"
+                    >
+                      Estado
+                    </TableCell>
+                    <TableCell
+                      isHeader
                       className="py-3 px-4 sm:px-6 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400 text-center"
                     >
                       Acciones
@@ -335,7 +388,7 @@ const EmployeesList = observer(() => {
                 </TableHeader>
 
                 <TableBody>
-                  {currentData.map((employee) => (
+                  {employees.map((employee) => (
                   <TableRow
                     key={employee._id}
                     className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-white/[0.02]"
@@ -410,9 +463,24 @@ const EmployeesList = observer(() => {
                         {getCountryName(employee.nationality)}
                       </span>
                     </TableCell>
+                    <TableCell className="py-3.5 px-4 sm:px-6 w-28">
+                      <div className="flex justify-center">
+                        {employee.status === 'active' ? (
+                          <Badge color="success">Activo</Badge>
+                        ) : (
+                          <span 
+                            className="inline-flex items-center px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium text-sm" 
+                            style={{ color: '#d92d20', backgroundColor: '#FEF3F2' }}
+                          >
+                            Inactivo
+                          </span>
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell className="py-3.5 px-4 sm:px-6">
                       <div className="flex items-center justify-center gap-3">
                         <button
+                          type="button"
                           onClick={() => handleView(employee)}
                           className="inline-flex items-center justify-center rounded-lg p-2 text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.05] transition"
                           title="Ver detalles"
@@ -422,6 +490,7 @@ const EmployeesList = observer(() => {
                           </svg>
                         </button>
                         <button
+                          type="button"
                           onClick={() => handleEdit(employee._id)}
                           className="inline-flex items-center justify-center rounded-lg p-2 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-white/[0.05]"
                           title="Editar"
@@ -429,6 +498,29 @@ const EmployeesList = observer(() => {
                           <PencilIcon className="h-[18px] w-[18px]" />
                         </button>
                         <button
+                          type="button"
+                          onClick={() => handleToggleStatus(employee._id)}
+                          className={`inline-flex items-center justify-center rounded-lg p-2 ${
+                            employee.status === 'active' 
+                              ? 'text-orange-600 hover:bg-orange-50 dark:text-orange-400' 
+                              : 'text-green-600 hover:bg-green-50 dark:text-green-400'
+                          } dark:hover:bg-white/[0.05]`}
+                          title={employee.status === 'active' ? 'Desactivar' : 'Activar'}
+                        >
+                          {employee.status === 'active' ? (
+                            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                              <path d="M13 10H7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          ) : (
+                            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                              <path d="M10 7V13M7 10H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          )}
+                        </button>
+                        <button
+                          type="button"
                           onClick={() => handleDelete(employee._id, employee.name)}
                           className="inline-flex items-center justify-center rounded-lg p-2 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-white/[0.05]"
                           title="Eliminar"
@@ -444,15 +536,17 @@ const EmployeesList = observer(() => {
             </div>
 
             {/* Pagination */}
-            <div className="border-t border-gray-100 dark:border-gray-800">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-                startIndex={startIndex + 1}
-                endIndex={endIndex}
-                totalItems={filteredEmployees.length}
-              />
+            <div className="flex flex-col items-center justify-between gap-4 px-6 py-4 border-t border-gray-100 dark:border-gray-800 sm:flex-row">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Mostrando {startIndex + 1} a {endIndex} de {totalEmployees} entradas
+              </p>
+              {totalPages > 1 && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              )}
             </div>
           </>
         )}

@@ -54,3 +54,5 @@ export namespace IDivisionsStore {
     managerId: string; // ID del empleado representante
     status?: 'active' | 'inactive';
     approvalFlow?: ApprovalLevel[];
+  }
+}

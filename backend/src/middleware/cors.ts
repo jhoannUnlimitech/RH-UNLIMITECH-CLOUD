@@ -6,16 +6,7 @@ import { config } from '../config/env';
  * Permite solicitudes desde el frontend con credenciales (cookies)
  */
 export const corsOptions = {
-  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    // Permitir requests sin origin (como curl, Postman) o desde localhost
-    if (!origin || origin.startsWith('http://localhost')) {
-      callback(null, true);
-    } else if (origin === config.frontend.url) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: ['http://localhost:5173', 'http://localhost:5174', 'http://127.0.0.1:5173', config.frontend.url],
   credentials: true, // Permitir envío de cookies
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],

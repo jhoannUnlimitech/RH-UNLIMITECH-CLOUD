@@ -138,6 +138,28 @@ export class EmployeesStoreLive implements IEmployeesStore {
     }
   }
 
+  async toggleEmployeeStatus(id: string): Promise<void> {
+    try {
+      const employee = this.employees.find((e) => e._id === id);
+      if (!employee) return;
+
+      const newStatus = employee.status === 'active' ? 'inactive' : 'active';
+      const updatedEmployee = await employeesService.update(id, { status: newStatus });
+      
+      runInAction(() => {
+        // Crear un nuevo array para que MobX detecte el cambio
+        this.employees = this.employees.map((e) => 
+          e._id === id ? updatedEmployee : e
+        );
+      });
+    } catch (err: any) {
+      runInAction(() => {
+        this.error = err.response?.data?.message || 'Error al cambiar estado del empleado';
+      });
+      throw err;
+    }
+  }
+
   clearError(): void {
     this.error = null;
   }

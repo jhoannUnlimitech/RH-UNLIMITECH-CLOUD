@@ -16,6 +16,7 @@ export interface IEmployeesStore {
   fetchEmployeeById(id: string): Promise<void>;
   createEmployee(data: IEmployeesStore.EmployeeInput): Promise<void>;
   updateEmployee(id: string, data: IEmployeesStore.EmployeeUpdateInput): Promise<void>;
+  toggleEmployeeStatus(id: string): Promise<void>;
   deleteEmployee(id: string): Promise<void>;
   clearError(): void;
   setSelectedEmployee(employee: IEmployeesStore.Employee | null): void;
@@ -55,6 +56,7 @@ export namespace IEmployeesStore {
       email: string;
       photo?: string;
     };
+    status: 'active' | 'inactive';
     forcePasswordChange: boolean;
     deleted: boolean;
     createdAt: string;
@@ -74,6 +76,7 @@ export namespace IEmployeesStore {
     nationality: string;
     managerId?: string;
     techLeadId?: string;
+    status?: 'active' | 'inactive';
     forcePasswordChange?: boolean;
   }
 
@@ -89,6 +92,7 @@ export namespace IEmployeesStore {
     nationality?: string;
     managerId?: string;
     techLeadId?: string;
+    status?: 'active' | 'inactive';
     forcePasswordChange?: boolean
     techLeadId?: string;
   }

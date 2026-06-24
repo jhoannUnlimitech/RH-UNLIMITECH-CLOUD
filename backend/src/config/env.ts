@@ -1,13 +1,15 @@
 import dotenv from 'dotenv';
+import path from 'path';
 
-dotenv.config();
+// Cargar .env desde el directorio raíz del backend
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 export const config = {
   env: process.env.NODE_ENV || 'development',
   port: parseInt(process.env.PORT || '3000', 10),
   
   mongodb: {
-    uri: process.env.MONGO_URI || 'mongodb://admin:admin123@localhost:27017/rh_management?authSource=admin',
+    uri: process.env.MONGO_URI || 'mongodb://localhost:27017/rh_management',
   },
   
   jwt: {

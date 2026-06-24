@@ -33,6 +33,7 @@ export interface Employee {
     email: string;
     photo?: string;
   };
+  status: 'active' | 'inactive';
   deleted: boolean;
   createdAt: string;
   updatedAt: string;
@@ -51,6 +52,7 @@ export interface CreateEmployeeInput {
   nationality: string;
   managerId?: string;
   techLeadId?: string;
+  status?: 'active' | 'inactive';
 }
 
 export interface UpdateEmployeeInput {
@@ -65,6 +67,7 @@ export interface UpdateEmployeeInput {
   nationality?: string;
   managerId?: string;
   techLeadId?: string;
+  status?: 'active' | 'inactive';
 }
 
 export const employeesService = {

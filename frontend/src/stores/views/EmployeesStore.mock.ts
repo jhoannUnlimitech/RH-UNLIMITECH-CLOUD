@@ -30,6 +30,8 @@ export class EmployeesStoreMock implements IEmployeesStore {
       manager: undefined,
       techLeadId: undefined,
       techLead: undefined,
+      status: 'active',
+      forcePasswordChange: false,
       deleted: false,
       createdAt: '2024-01-15T10:00:00Z',
       updatedAt: '2024-01-15T10:00:00Z',
@@ -62,6 +64,8 @@ export class EmployeesStoreMock implements IEmployeesStore {
       },
       techLeadId: undefined,
       techLead: undefined,
+      status: 'active',
+      forcePasswordChange: false,
       deleted: false,
       createdAt: '2024-01-10T10:00:00Z',
       updatedAt: '2024-01-10T10:00:00Z',
@@ -99,6 +103,8 @@ export class EmployeesStoreMock implements IEmployeesStore {
         email: 'juan.perez@example.com',
         photo: undefined,
       },
+      status: 'inactive',
+      forcePasswordChange: false,
       deleted: false,
       createdAt: '2024-01-05T10:00:00Z',
       updatedAt: '2024-01-05T10:00:00Z',
@@ -273,6 +279,44 @@ export class EmployeesStoreMock implements IEmployeesStore {
       throw err;
     } finally {
       this.isLoading = false;
+    }
+  }
+
+  async toggleEmployeeStatus(id: string): Promise<void> {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      
+      const index = this.employees.findIndex((e) => e._id === id);
+      if (index !== -1) {
+        const newStatus = this.employees[index].status === 'active' ? 'inactive' : 'active';
+        this.employees[index] = {
+          ...this.employees[index],
+          status: newStatus,
+          updatedAt: new Date().toISOString(),
+        };
+      }
+    } catch (err: any) {
+      this.error = 'Error al cambiar estado del empleado';
+      throw err;
+    }
+  }
+
+  async toggleEmployeeStatus(id: string): Promise<void> {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      
+      const index = this.employees.findIndex((e) => e._id === id);
+      if (index !== -1) {
+        const newStatus = this.employees[index].status === 'active' ? 'inactive' : 'active';
+        this.employees[index] = {
+          ...this.employees[index],
+          status: newStatus,
+          updatedAt: new Date().toISOString(),
+        };
+      }
+    } catch (err: any) {
+      this.error = 'Error al cambiar estado del empleado';
+      throw err;
     }
   }
 

@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams, Link } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router";
 import { divisionsStore } from "../../stores/views";
 import InputField from "../../components/form/input/InputField";
 import TextArea from "../../components/form/input/TextArea";

@@ -40,6 +40,7 @@ const EmployeeFormModal = observer(
       nationality: "",
       managerId: "",
       techLeadId: "",
+      status: "active" as 'active' | 'inactive',
       forcePasswordChange: true,
     });
 
@@ -68,6 +69,7 @@ const EmployeeFormModal = observer(
           nationality: "",
           managerId: "",
           techLeadId: "",
+          status: "active" as 'active' | 'inactive',
           forcePasswordChange: true,
         });
         setErrors({});
@@ -162,6 +164,7 @@ const EmployeeFormModal = observer(
           nationality: employee.nationality || "",
           managerId: employee.managerId || employee.manager?._id || "",
           techLeadId: employee.techLeadId || employee.techLead?._id || "",
+          status: employee.status || "active",
           forcePasswordChange: employee.forcePasswordChange || false,
         });
       }
@@ -314,6 +317,7 @@ const EmployeeFormModal = observer(
             nationality: formData.nationality,
             managerId: formData.managerId || undefined,
             techLeadId: formData.techLeadId || undefined,
+            status: formData.status,
             forcePasswordChange: formData.forcePasswordChange,
           };
 
@@ -336,6 +340,7 @@ const EmployeeFormModal = observer(
             nationality: formData.nationality,
             managerId: formData.managerId || undefined,
             techLeadId: formData.techLeadId || undefined,
+            status: formData.status,
             forcePasswordChange: formData.forcePasswordChange,
           };
           await employeesStore.createEmployee(createData);
@@ -583,6 +588,51 @@ const EmployeeFormModal = observer(
                       Forzar cambio de contraseña en el primer login
                     </span>
                   </label>
+                </div>
+              )}
+
+              {/* Estado del empleado */}
+              {isEdit && (
+                <div className="md:col-span-2">
+                  <Label htmlFor="status">Estado</Label>
+                  <div className="flex items-center gap-4 mt-2">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="status"
+                        value="active"
+                        checked={formData.status === 'active'}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            status: e.target.value as 'active' | 'inactive',
+                          }))
+                        }
+                        className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-800"
+                      />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">
+                        Activo
+                      </span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="status"
+                        value="inactive"
+                        checked={formData.status === 'inactive'}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            status: e.target.value as 'active' | 'inactive',
+                          }))
+                        }
+                        className="w-4 h-4 text-gray-600 border-gray-300 focus:ring-gray-500 dark:border-gray-600 dark:bg-gray-800"
+                      />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">
+                        Inactivo
+                      </span>
+                    </label>
+                  </div>
                 </div>
               )}
 

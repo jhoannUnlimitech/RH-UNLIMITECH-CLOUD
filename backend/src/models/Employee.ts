@@ -15,6 +15,7 @@ export interface IEmployee extends IBaseModel {
   nationality: string;
   managerId?: mongoose.Types.ObjectId;  // Jefe de división (para gestión organizacional)
   techLeadId?: mongoose.Types.ObjectId; // Jefe inmediato (para aprobaciones CSW)
+  status: 'active' | 'inactive'; // Estado del empleado
   forcePasswordChange: boolean; // Forzar cambio de contraseña en primer login
   deleted: boolean;
   deletedAt?: Date;
@@ -92,6 +93,11 @@ const EmployeeSchema = new Schema<IEmployee>({
   techLeadId: { 
     type: Schema.Types.ObjectId, 
     ref: 'Employee'
+  },
+  status: {
+    type: String,
+    enum: ['active', 'inactive'],
+    default: 'active'
   },
   forcePasswordChange: {
     type: Boolean,
