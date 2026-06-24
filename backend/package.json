@@ -8,6 +8,7 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "seed": "ts-node src/database/seeds/seed.ts",
+    "seed:real": "ts-node src/database/seeds/seed-real.ts",
     "db:reset-password": "ts-node src/database/seeds/reset-password.ts",
     "migrate": "ts-node src/database/migrations/",
     "db:check-permissions": "ts-node src/scripts/check-permissions.ts"

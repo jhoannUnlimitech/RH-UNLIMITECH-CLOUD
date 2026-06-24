@@ -358,7 +358,7 @@ const EmployeesList = observer(() => {
                       isHeader
                       className="py-3 px-4 sm:px-6 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                     >
-                      Rol & División
+                      Hat & División
                     </TableCell>
                     <TableCell
                       isHeader
@@ -434,7 +434,7 @@ const EmployeesList = observer(() => {
                     <TableCell className="py-3.5 px-4 sm:px-6">
                       <div className="space-y-1.5">
                         <Badge color="info" className="inline-block">
-                          {employee.role?.name || 'Sin rol'}
+                          {employee.role?.name || 'Sin hat'}
                         </Badge>
                         <div className="flex items-center gap-1.5">
                           <svg className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">

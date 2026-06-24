@@ -8,9 +8,9 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { authStore } from "./stores/views";
 import DivisionsList from "./pages/Divisions/DivisionsList";
 import EmployeesList from "./pages/Employees/EmployeesList";
-import RolesList from "./pages/Roles/RolesList";
-import RoleForm from "./pages/Roles/RoleForm";
-import RolesView from "./pages/Roles/RolesView";
+import HatsList from "./pages/Hats/HatsList";
+import HatForm from "./pages/Hats/HatForm";
+import HatsView from "./pages/Hats/HatsView";
 import CSWCategoriesList from "./pages/CSWCategories/CSWCategoriesList";
 import CSWList from "./pages/CSW/CSWList";
 import CSWForm from "./pages/CSW/CSWForm";
@@ -40,10 +40,10 @@ export default function App() {
           <Route index path="/" element={<Home />} />
           <Route path="/divisions" element={<DivisionsList />} />
           <Route path="/employees" element={<EmployeesList />} />
-          <Route path="/roles" element={<RolesList />} />
-          <Route path="/roles/new" element={<RoleForm />} />
-          <Route path="/roles/edit/:id" element={<RoleForm />} />
-          <Route path="/roles/view/:id" element={<RolesView />} />
+          <Route path="/roles" element={<HatsList />} />
+          <Route path="/roles/new" element={<HatForm />} />
+          <Route path="/roles/edit/:id" element={<HatForm />} />
+          <Route path="/roles/view/:id" element={<HatsView />} />
           <Route path="/csw-categories" element={<CSWCategoriesList />} />
           <Route path="/csw/new" element={<CSWForm />} />
           <Route path="/csw/edit/:id" element={<CSWForm />} />

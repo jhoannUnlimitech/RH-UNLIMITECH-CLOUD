@@ -10,7 +10,7 @@ import Alert from "../ui/alert/Alert";
 import { Modal } from "../ui/modal";
 import { IEmployeesStore } from "../../stores/views/EmployeesStore.contract";
 import { divisionsService } from "../../api/services/divisions";
-import { rolesService, Role } from "../../api/services/roles";
+import { hatsService, Hat } from "../../api/services/hats";
 import { employeesService, Employee } from "../../api/services/employees";
 import { IDivisionsStore } from "../../stores/views/DivisionsStore.contract";
 import { countries } from "../../utils/countries";
@@ -47,7 +47,7 @@ const EmployeeFormModal = observer(
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [divisions, setDivisions] = useState<IDivisionsStore.Division[]>([]);
-    const [roles, setRoles] = useState<Role[]>([]);
+    const [roles, setRoles] = useState<Hat[]>([]);
     const [employees, setEmployees] = useState<Employee[]>([]);
     const [loadingData, setLoadingData] = useState(false);
     const [passwordStrength, setPasswordStrength] = useState<"weak" | "medium" | "strong">("weak");
@@ -91,7 +91,7 @@ const EmployeeFormModal = observer(
       try {
         const [divisionsData, rolesData, employeesData] = await Promise.all([
           divisionsService.getAll(),
-          rolesService.getAll(),
+          hatsService.getAll(),
           employeesService.getAll({ limit: 1000 }),
         ]);
         
@@ -265,7 +265,7 @@ const EmployeeFormModal = observer(
       }
 
       if (!formData.role) {
-        newErrors.role = "Debe seleccionar un rol";
+        newErrors.role = "Debe seleccionar un hat";
       }
 
       if (!formData.division) {
@@ -701,9 +701,9 @@ const EmployeeFormModal = observer(
               <div>
                 <SearchableSelect
                   id="role"
-                  label="Rol"
+                  label="Hat"
                   options={[
-                    { value: "", label: "Seleccionar rol" },
+                    { value: "", label: "Seleccionar hat" },
                     ...roleOptions,
                   ]}
                   value={formData.role}

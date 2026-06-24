@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { rolesStore } from "../../stores/views";
+import { hatsStore } from "../../stores/views";
 import apiClient from "../../api/client";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import Button from "../../components/ui/button/Button";
@@ -75,7 +75,7 @@ const moduleIcons: Record<string, React.ReactNode> = {
   training: <DocsIcon className="w-6 h-6 text-brand-600 dark:text-brand-400" />,
 };
 
-const RoleForm = observer(() => {
+const HatForm = observer(() => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isEditMode = !!id;
@@ -147,20 +147,20 @@ const RoleForm = observer(() => {
     if (!id) return;
 
     try {
-      let role = rolesStore.roles.find((r) => r._id === id);
+      let role = hatsStore.roles.find((r) => r._id === id);
 
       if (!role) {
-        await rolesStore.fetchRoleById(id);
-        role = rolesStore.selectedRole || undefined;
+        await hatsStore.fetchHatById(id);
+        role = hatsStore.selectedHat || undefined;
       }
 
       if (role) {
-        console.log('Cargando rol:', role);
+        console.log('Cargando hat:', role);
         setName(role.name);
         const permissionIds = role.permissions.map((p) =>
           typeof p === "string" ? p : p._id
         );
-        console.log('Permisos del rol cargados:', permissionIds);
+        console.log('Permisos del hat cargados:', permissionIds);
         setSelectedPermissions(permissionIds);
       }
     } catch (err) {
@@ -204,12 +204,12 @@ const RoleForm = observer(() => {
       };
 
       if (isEditMode && id) {
-        await rolesStore.updateRole(id, roleData);
+        await hatsStore.updateHat(id, roleData);
       } else {
-        await rolesStore.createRole(roleData);
+        await hatsStore.createHat(roleData);
       }
 
-      await rolesStore.fetchRoles();
+      await hatsStore.fetchHats();
       navigate("/roles");
     } catch (err: any) {
       setError(err.message || "Error al guardar el hat");
@@ -463,9 +463,9 @@ const RoleForm = observer(() => {
                   Guardando...
                 </>
               ) : isEditMode ? (
-                "Actualizar Rol"
+                "Actualizar Hat"
               ) : (
-                "Crear Rol"
+                "Crear Hat"
               )}
             </Button>
           </div>
@@ -475,4 +475,4 @@ const RoleForm = observer(() => {
   );
 });
 
-export default RoleForm;
+export default HatForm;

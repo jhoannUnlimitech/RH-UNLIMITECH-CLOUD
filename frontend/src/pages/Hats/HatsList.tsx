@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router";
-import { rolesStore } from "../../stores/views";
+import { hatsStore } from "../../stores/views";
 import {
   Table,
   TableBody,
@@ -16,10 +16,10 @@ import TableSkeleton from "../../components/ui/skeleton/TableSkeleton";
 import Alert from "../../components/ui/alert/Alert";
 import Pagination from "../../components/ui/pagination/Pagination";
 import { useModal } from "../../hooks/useModal";
-import DeleteConfirmModal from "../../components/roles/DeleteConfirmModal";
+import DeleteConfirmModal from "../../components/hats/DeleteConfirmModal";
 import { PencilIcon, TrashBinIcon } from "../../icons";
 
-const RolesList = observer(() => {
+const HatsList = observer(() => {
   const navigate = useNavigate();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deletingRoleName, setDeletingRoleName] = useState<string>("");
@@ -30,7 +30,7 @@ const RolesList = observer(() => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
 
   useEffect(() => {
-    rolesStore.fetchRoles();
+    hatsStore.fetchHats();
   }, []);
 
   // Debounce para el buscador (500ms)
@@ -44,7 +44,7 @@ const RolesList = observer(() => {
 
   // Filtrado y ordenamiento
   const filteredRoles = useMemo(() => {
-    const roles = Array.isArray(rolesStore.roles) ? rolesStore.roles : [];
+    const roles = Array.isArray(hatsStore.roles) ? hatsStore.roles : [];
     let filtered = roles;
     
     // Aplicar filtro de búsqueda con debounce
@@ -57,7 +57,7 @@ const RolesList = observer(() => {
     
     // Ordenar por nombre
     return [...filtered].sort((a, b) => a.name.localeCompare(b.name));
-  }, [rolesStore.roles, debouncedSearchTerm]);
+  }, [hatsStore.roles, debouncedSearchTerm]);
 
   const totalPages = Math.ceil(filteredRoles.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -90,8 +90,8 @@ const RolesList = observer(() => {
     if (!deletingId) return;
     
     try {
-      await rolesStore.deleteRole(deletingId);
-      await rolesStore.fetchRoles();
+      await hatsStore.deleteHat(deletingId);
+      await hatsStore.fetchHats();
     } catch (error) {
       // El error ya se maneja en el store
     } finally {
@@ -115,12 +115,12 @@ const RolesList = observer(() => {
       <PageBreadcrumb pageTitle="Lista de Hats" />
       
       {/* Error Display */}
-      {rolesStore.error && (
+      {hatsStore.error && (
         <Alert
           variant="error"
           title="Error"
-          message={rolesStore.error}
-          onClose={() => rolesStore.clearError()}
+          message={hatsStore.error}
+          onClose={() => hatsStore.clearError()}
         />
       )}
 
@@ -214,14 +214,14 @@ const RolesList = observer(() => {
         </div>
 
         {/* Loading State */}
-        {rolesStore.isLoading && (
+        {hatsStore.isLoading && (
           <div className="border-t border-gray-100 dark:border-gray-800">
             <TableSkeleton rows={itemsPerPage} columns={4} />
           </div>
         )}
 
         {/* Empty State */}
-        {!rolesStore.isLoading && filteredRoles.length === 0 && (
+        {!hatsStore.isLoading && filteredRoles.length === 0 && (
           <div className="flex flex-col items-center justify-center px-6 py-16 text-center border-t border-gray-100 dark:border-gray-800">
             <svg
               className="w-12 h-12 mb-4 text-gray-400 dark:text-gray-600"
@@ -267,7 +267,7 @@ const RolesList = observer(() => {
         )}
 
         {/* Table */}
-        {!rolesStore.isLoading && filteredRoles.length > 0 && (
+        {!hatsStore.isLoading && filteredRoles.length > 0 && (
           <>
             <div className="max-w-full overflow-x-auto">
               <Table>
@@ -390,4 +390,4 @@ const RolesList = observer(() => {
   );
 });
 
-export default RolesList;
+export default HatsList;

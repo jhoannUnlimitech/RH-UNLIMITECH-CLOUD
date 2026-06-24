@@ -2,7 +2,7 @@ import { Router } from 'express';
 import authRoutes from './auth.routes';
 import employeesRoutes from './employees.routes';
 import divisionsRoutes from './divisions.routes';
-import rolesRoutes from './roles.routes';
+import hatsRoutes from './hats.routes';
 import permissionsRoutes from './permissions.routes';
 import approvalFlowRoutes from './approvalFlow.routes';
 import cswCategoryRoutes from './cswCategory.routes';
@@ -19,8 +19,8 @@ router.use('/employees', employeesRoutes);
 // Rutas de divisiones
 router.use('/divisions', divisionsRoutes);
 
-// Rutas de roles
-router.use('/roles', rolesRoutes);
+// Rutas de hats
+router.use('/roles', hatsRoutes);
 
 // Rutas de permisos
 router.use('/permissions', permissionsRoutes);

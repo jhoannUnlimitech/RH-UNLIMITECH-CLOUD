@@ -7,9 +7,9 @@ import { DivisionsStoreLive } from './DivisionsStore.live';
 import { IEmployeesStore } from './EmployeesStore.contract';
 import { EmployeesStoreMock } from './EmployeesStore.mock';
 import { EmployeesStoreLive } from './EmployeesStore.live';
-import { IRolesStore } from './RolesStore.contract';
-import { RolesStoreMock } from './RolesStore.mock';
-import { RolesStoreLive } from './RolesStore.live';
+import { IHatsStore } from './HatsStore.contract';
+import { HatsStoreMock } from './HatsStore.mock';
+import { HatsStoreLive } from './HatsStore.live';
 import { ICSWCategoryStore } from './CSWCategoryStore.contract';
 import { CSWCategoryStoreMock } from './CSWCategoryStore.mock';
 import { CSWCategoryStoreLive } from './CSWCategoryStore.live';
@@ -42,11 +42,11 @@ export function createEmployeesStore(mode: 'mock' | 'live' = 'mock'): IEmployees
 }
 
 /**
- * Factory para crear el store de roles
+ * Factory para crear el store de hats
  * @param mode - 'mock' para desarrollo con datos de ejemplo, 'live' para producción
  */
-export function createRolesStore(mode: 'mock' | 'live' = 'mock'): IRolesStore {
-  return mode === 'mock' ? new RolesStoreMock() : new RolesStoreLive();
+export function createHatsStore(mode: 'mock' | 'live' = 'mock'): IHatsStore {
+  return mode === 'mock' ? new HatsStoreMock() : new HatsStoreLive();
 }
 
 /**
@@ -69,11 +69,11 @@ export function createCSWStore(mode: 'mock' | 'live' = 'mock'): ICSWStore {
 export const authStore = createAuthStore('live');
 export const divisionsStore = createDivisionsStore('live');
 export const employeesStore = createEmployeesStore('live');
-export const rolesStore = createRolesStore('live');
+export const hatsStore = createHatsStore('live');
 export const cswCategoryStore = createCSWCategoryStore('live');
 export const cswStore = createCSWStore('live');
 
-export type { IAuthStore, IDivisionsStore, IEmployeesStore, IRolesStore, ICSWCategoryStore, ICSWStore };
+export type { IAuthStore, IDivisionsStore, IEmployeesStore, IHatsStore, ICSWCategoryStore, ICSWStore };
 export { 
   AuthStoreMock, 
   AuthStoreLive, 
@@ -81,8 +81,8 @@ export {
   DivisionsStoreLive, 
   EmployeesStoreMock, 
   EmployeesStoreLive,
-  RolesStoreMock,
-  RolesStoreLive,
+  HatsStoreMock,
+  HatsStoreLive,
   CSWCategoryStoreMock,
   CSWCategoryStoreLive,
   CSWStoreMock,

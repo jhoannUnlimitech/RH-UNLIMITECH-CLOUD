@@ -1,13 +1,13 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
-import { rolesStore } from "../../stores/views";
+import { hatsStore } from "../../stores/views";
 import { permissionsService } from "../../api/services/permissions";
 import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
 import Label from "../form/Label";
 import Alert from "../ui/alert/Alert";
 
-interface RoleFormModalProps {
+interface HatFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   roleId?: string;
@@ -40,7 +40,7 @@ const actionNames: Record<string, string> = {
   cancel: 'Cancelar',
 };
 
-const RoleFormModal = observer(({ isOpen, onClose, roleId }: RoleFormModalProps) => {
+const HatFormModal = observer(({ isOpen, onClose, roleId }: HatFormModalProps) => {
   const [name, setName] = useState("");
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
   const [availablePermissions, setAvailablePermissions] = useState<Permission[]>([]);
@@ -100,11 +100,11 @@ const RoleFormModal = observer(({ isOpen, onClose, roleId }: RoleFormModalProps)
     
     try {
       // Obtener el rol desde el store o hacer fetch si no existe
-      let role = rolesStore.roles.find((r) => r._id === roleId);
+      let role = hatsStore.roles.find((r) => r._id === roleId);
       
       if (!role) {
-        await rolesStore.fetchRoleById(roleId);
-        role = rolesStore.selectedRole || undefined;
+        await hatsStore.fetchHatById(roleId);
+        role = hatsStore.selectedHat || undefined;
       }
       
       if (role) {
@@ -184,12 +184,12 @@ const RoleFormModal = observer(({ isOpen, onClose, roleId }: RoleFormModalProps)
       };
 
       if (isEditMode && roleId) {
-        await rolesStore.updateRole(roleId, roleData);
+        await hatsStore.updateHat(roleId, roleData);
       } else {
-        await rolesStore.createRole(roleData);
+        await hatsStore.createHat(roleData);
       }
 
-      await rolesStore.fetchRoles();
+      await hatsStore.fetchHats();
       handleClose();
     } catch (err: any) {
       setError(err.message || "Error al guardar el rol");
@@ -350,4 +350,4 @@ const RoleFormModal = observer(({ isOpen, onClose, roleId }: RoleFormModalProps)
   );
 });
 
-export default RoleFormModal;
+export default HatFormModal;

@@ -1,24 +1,24 @@
 import { makeAutoObservable, runInAction } from "mobx";
-import { IRolesStore } from "./RolesStore.contract";
-import { rolesService } from "../../api/services/roles";
+import { IHatsStore } from "./HatsStore.contract";
+import { hatsService } from "../../api/services/hats";
 
-export class RolesStoreLive implements IRolesStore {
-  roles: IRolesStore.Role[] = [];
-  selectedRole: IRolesStore.Role | null = null;
+export class HatsStoreLive implements IHatsStore {
+  roles: IHatsStore.Role[] = [];
+  selectedHat: IHatsStore.Role | null = null;
   isLoading = false;
   error: string | null = null;
-  pagination: IRolesStore.Pagination | null = null;
+  pagination: IHatsStore.Pagination | null = null;
 
   constructor() {
     makeAutoObservable(this, {}, { autoBind: true });
   }
 
-  async fetchRoles(params?: IRolesStore.FetchParams): Promise<void> {
+  async fetchHats(params?: IHatsStore.FetchParams): Promise<void> {
     this.isLoading = true;
     this.error = null;
 
     try {
-      const response = await rolesService.getAll(params);
+      const response = await hatsService.getAll(params);
       runInAction(() => {
         this.roles = response.data || response;
         this.pagination = response.pagination || null;
@@ -26,79 +26,79 @@ export class RolesStoreLive implements IRolesStore {
       });
     } catch (error: any) {
       runInAction(() => {
-        this.error = error.response?.data?.message || "Error al cargar los roles";
+        this.error = error.response?.data?.message || "Error al cargar los hats";
         this.isLoading = false;
       });
     }
   }
 
-  async fetchRoleById(id: string): Promise<void> {
+  async fetchHatById(id: string): Promise<void> {
     this.isLoading = true;
     this.error = null;
 
     try {
-      const response = await rolesService.getById(id);
+      const response = await hatsService.getById(id);
       runInAction(() => {
-        this.selectedRole = response.data?.role || response;
+        this.selectedHat = response.data?.role || response;
         this.isLoading = false;
       });
     } catch (error: any) {
       runInAction(() => {
-        this.error = error.response?.data?.message || "Error al cargar el rol";
+        this.error = error.response?.data?.message || "Error al cargar el hat";
         this.isLoading = false;
       });
     }
   }
 
-  async createRole(data: IRolesStore.RoleInput): Promise<void> {
+  async createHat(data: IHatsStore.RoleInput): Promise<void> {
     this.isLoading = true;
     this.error = null;
 
     try {
-      await rolesService.create(data);
+      await hatsService.create(data);
       runInAction(() => {
         this.isLoading = false;
       });
     } catch (error: any) {
       runInAction(() => {
-        this.error = error.response?.data?.message || "Error al crear el rol";
+        this.error = error.response?.data?.message || "Error al crear el hat";
         this.isLoading = false;
       });
       throw error;
     }
   }
 
-  async updateRole(id: string, data: IRolesStore.RoleUpdateInput): Promise<void> {
+  async updateHat(id: string, data: IHatsStore.RoleUpdateInput): Promise<void> {
     this.isLoading = true;
     this.error = null;
 
     try {
-      await rolesService.update(id, data);
+      await hatsService.update(id, data);
       runInAction(() => {
         this.isLoading = false;
       });
     } catch (error: any) {
       runInAction(() => {
-        this.error = error.response?.data?.message || "Error al actualizar el rol";
+        this.error = error.response?.data?.message || "Error al actualizar el hat";
         this.isLoading = false;
       });
       throw error;
     }
   }
 
-  async deleteRole(id: string): Promise<void> {
+  async deleteHat(id: string): Promise<void> {
     this.isLoading = true;
     this.error = null;
 
     try {
-      await rolesService.delete(id);
+      await hatsService.delete(id);
       runInAction(() => {
         this.roles = this.roles.filter(role => role._id !== id);
         this.isLoading = false;
       });
     } catch (error: any) {
       runInAction(() => {
-        this.error = error.response?.data?.message || "Error al eliminar el rol";
+        this.error = error.response?.data?.message || "Error al eliminar el hat";
         this.isLoading = false;
       });
       throw error;
@@ -109,9 +109,9 @@ export class RolesStoreLive implements IRolesStore {
     this.error = null;
   }
 
-  setSelectedRole(role: IRolesStore.Role | null): void {
-    this.selectedRole = role;
+  setSelectedHat(role: IHatsStore.Role | null): void {
+    this.selectedHat = role;
   }
 }
 
-export const rolesStore = new RolesStoreLive();
+export const hatsStore = new HatsStoreLive();

@@ -1,27 +1,27 @@
 /**
- * RolesStore Contract
- * Define la interfaz y tipos para el store de roles
+ * HatsStore Contract
+ * Define la interfaz y tipos para el store de hats
  */
 
-export interface IRolesStore {
+export interface IHatsStore {
   // State
-  roles: IRolesStore.Role[];
-  selectedRole: IRolesStore.Role | null;
+  roles: IHatsStore.Role[];
+  selectedHat: IHatsStore.Role | null;
   isLoading: boolean;
   error: string | null;
-  pagination: IRolesStore.Pagination | null;
+  pagination: IHatsStore.Pagination | null;
 
   // Actions
-  fetchRoles(params?: IRolesStore.FetchParams): Promise<void>;
-  fetchRoleById(id: string): Promise<void>;
-  createRole(data: IRolesStore.RoleInput): Promise<void>;
-  updateRole(id: string, data: IRolesStore.RoleUpdateInput): Promise<void>;
-  deleteRole(id: string): Promise<void>;
+  fetchHats(params?: IHatsStore.FetchParams): Promise<void>;
+  fetchHatById(id: string): Promise<void>;
+  createHat(data: IHatsStore.RoleInput): Promise<void>;
+  updateHat(id: string, data: IHatsStore.RoleUpdateInput): Promise<void>;
+  deleteHat(id: string): Promise<void>;
   clearError(): void;
-  setSelectedRole(role: IRolesStore.Role | null): void;
+  setSelectedHat(role: IHatsStore.Role | null): void;
 }
 
-export namespace IRolesStore {
+export namespace IHatsStore {
   export interface Role {
     _id: string;
     name: string;
