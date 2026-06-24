@@ -112,7 +112,7 @@ const RolesList = observer(() => {
   return (
     <div className="flex flex-col gap-6">
       {/* Breadcrumb */}
-      <PageBreadcrumb pageTitle="Lista de Roles" />
+      <PageBreadcrumb pageTitle="Lista de Hats" />
       
       {/* Error Display */}
       {rolesStore.error && (
@@ -166,7 +166,7 @@ const RolesList = observer(() => {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Buscar roles..."
+                placeholder="Buscar hats..."
                 value={searchTerm}
                 onChange={handleSearchChange}
                 className="w-full sm:w-64 h-9 rounded-lg border border-gray-300 appearance-none px-4 py-2 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 bg-transparent text-gray-800 border-gray-300 focus:border-brand-300 focus:ring-brand-500/20 dark:border-gray-700 dark:focus:border-brand-800"
@@ -240,7 +240,7 @@ const RolesList = observer(() => {
               No hay roles
             </p>
             <p className="mb-6 text-sm text-gray-500 dark:text-gray-400">
-              {searchTerm ? "No se encontraron resultados para tu búsqueda" : "Comienza creando tu primer rol"}
+              {searchTerm ? "No se encontraron resultados para tu búsqueda" : "Comienza creando tu primer hat"}
             </p>
             {!searchTerm && (
               <Button onClick={() => navigate('/roles/new')}>
@@ -384,7 +384,7 @@ const RolesList = observer(() => {
         onClose={deleteModal.closeModal}
         onConfirm={confirmDelete}
         itemName={deletingRoleName}
-        warningMessage="Si hay empleados asignados a este rol, no se podrá eliminar."
+        warningMessage="Si hay empleados asignados a este hat, no se podrá eliminar."
       />
     </div>
   );

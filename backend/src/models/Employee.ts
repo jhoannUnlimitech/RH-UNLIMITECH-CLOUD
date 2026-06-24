@@ -17,6 +17,7 @@ export interface IEmployee extends IBaseModel {
   techLeadId?: mongoose.Types.ObjectId; // Jefe inmediato (para aprobaciones CSW)
   status: 'active' | 'inactive'; // Estado del empleado
   forcePasswordChange: boolean; // Forzar cambio de contraseña en primer login
+  approve_csw: boolean; // Si puede aprobar solicitudes CSW
   deleted: boolean;
   deletedAt?: Date;
   
@@ -102,6 +103,10 @@ const EmployeeSchema = new Schema<IEmployee>({
   forcePasswordChange: {
     type: Boolean,
     default: true // Por defecto, forzar cambio de contraseña en primer login
+  },
+  approve_csw: {
+    type: Boolean,
+    default: false // Por defecto, no puede aprobar solicitudes CSW
   },
   deleted: { 
     type: Boolean, 

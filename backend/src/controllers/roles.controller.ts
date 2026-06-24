@@ -92,7 +92,7 @@ export const createRole = async (
     // Verificar que el nombre no esté en uso
     const existingRole = await Role.findOne({ name });
     if (existingRole) {
-      throw new AppError('Ya existe un rol con ese nombre', 400);
+      throw new AppError('Ya existe un hat con ese nombre', 400);
     }
 
     // Verificar que los permisos existan
@@ -113,7 +113,7 @@ export const createRole = async (
     res.status(201).json({
       success: true,
       data: roleData,
-      message: 'Rol creado exitosamente'
+      message: 'Hat creado exitosamente'
     });
   } catch (error) {
     next(error);
@@ -166,7 +166,7 @@ export const updateRole = async (
     res.status(200).json({
       success: true,
       data: updatedRole,
-      message: 'Rol actualizado exitosamente'
+      message: 'Hat actualizado exitosamente'
     });
   } catch (error) {
     next(error);
@@ -196,7 +196,7 @@ export const deleteRole = async (
     const employeesCount = await Employee.countDocuments({ role: id, deleted: false });
     if (employeesCount > 0) {
       throw new AppError(
-        `No se puede eliminar el rol. Tiene ${employeesCount} empleado(s) asignado(s)`,
+        `No se puede eliminar el hat. Tiene ${employeesCount} empleado(s) asignado(s)`,
         400
       );
     }
@@ -206,7 +206,7 @@ export const deleteRole = async (
 
     res.status(200).json({
       success: true,
-      message: 'Rol eliminado exitosamente'
+      message: 'Hat eliminado exitosamente'
     });
   } catch (error) {
     next(error);

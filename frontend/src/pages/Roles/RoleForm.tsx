@@ -34,7 +34,7 @@ const resourceNames: Record<string, string> = {
   // Submódulos de Administración
   employees: "Empleados",
   divisions: "Divisiones",
-  roles: "Roles",
+  roles: "Hats",
   permissions: "Permisos",
   
   // Submódulos de CSW
@@ -164,8 +164,8 @@ const RoleForm = observer(() => {
         setSelectedPermissions(permissionIds);
       }
     } catch (err) {
-      console.error("Error al cargar datos del rol:", err);
-      setError("Error al cargar los datos del rol");
+      console.error("Error al cargar datos del hat:", err);
+      setError("Error al cargar los datos del hat");
     }
   };
 
@@ -186,7 +186,7 @@ const RoleForm = observer(() => {
     setError(null);
 
     if (!name.trim()) {
-      setError("El nombre del rol es obligatorio");
+      setError("El nombre del hat es obligatorio");
       return;
     }
 
@@ -212,7 +212,7 @@ const RoleForm = observer(() => {
       await rolesStore.fetchRoles();
       navigate("/roles");
     } catch (err: any) {
-      setError(err.message || "Error al guardar el rol");
+      setError(err.message || "Error al guardar el hat");
     } finally {
       setIsSubmitting(false);
     }
@@ -245,7 +245,7 @@ const RoleForm = observer(() => {
   return (
     <div className="flex flex-col gap-6">
       {/* Breadcrumb */}
-      <PageBreadcrumb pageTitle={isEditMode ? "Editar Rol" : "Nuevo Rol"} />
+      <PageBreadcrumb pageTitle={isEditMode ? "Editar Hat" : "Nuevo Hat"} />
 
       {/* Error Display */}
       {error && (
@@ -263,18 +263,18 @@ const RoleForm = observer(() => {
           {/* Header */}
           <div className="border-b border-gray-200 dark:border-gray-800 pb-6">
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
-              {isEditMode ? "Editar Rol" : "Crear Nuevo Rol"}
+              {isEditMode ? "Editar Hat" : "Crear Nuevo Hat"}
             </h2>
             <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
               {isEditMode
-                ? "Actualiza el nombre y los permisos del rol"
-                : "Define el nombre y asigna los permisos que tendrá este rol"}
+                ? "Actualiza el nombre y los permisos del hat"
+                : "Define el nombre y asigna los permisos que tendrá este hat"}
             </p>
           </div>
 
-          {/* Nombre del Rol */}
+          {/* Nombre del Hat */}
           <div className="max-w-2xl">
-            <Label htmlFor="roleName">Nombre del Rol *</Label>
+            <Label htmlFor="roleName">Nombre del Hat *</Label>
             <input
               id="roleName"
               type="text"
@@ -295,10 +295,10 @@ const RoleForm = observer(() => {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Permisos del Rol *
+                  Permisos del Hat *
                 </h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Selecciona los permisos que tendrá este rol
+                  Selecciona los permisos que tendrá este hat
                 </p>
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">

@@ -28,7 +28,7 @@ const navItems: NavItem[] = [
     subItems: [
       { name: "Lista de Empleados", path: "/employees" },
       { name: "Divisiones", path: "/divisions" },
-      { name: "Roles", path: "/roles" },
+      { name: "Hats", path: "/roles" },
     ],
   },
   {
