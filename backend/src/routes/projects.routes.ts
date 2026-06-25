@@ -20,14 +20,14 @@ router.use(authMiddleware);
 router.get('/my-projects', getMyProjects);
 
 // CRUD con permisos
-router.get('/', requirePermission('employees', 'read'), getProjects);
-router.get('/:id', requirePermission('employees', 'read'), getProjectById);
-router.post('/', requirePermission('divisions', 'create'), createProject);
-router.put('/:id', requirePermission('divisions', 'update'), updateProject);
-router.delete('/:id', requirePermission('divisions', 'delete'), deleteProject);
+router.get('/', requirePermission('projects', 'read'), getProjects);
+router.get('/:id', requirePermission('projects', 'read'), getProjectById);
+router.post('/', requirePermission('projects', 'create'), createProject);
+router.put('/:id', requirePermission('projects', 'update'), updateProject);
+router.delete('/:id', requirePermission('projects', 'delete'), deleteProject);
 
 // Miembros
-router.post('/:id/members', requirePermission('divisions', 'update'), addMember);
-router.delete('/:id/members/:employeeId', requirePermission('divisions', 'update'), removeMember);
+router.post('/:id/members', requirePermission('projects', 'update'), addMember);
+router.delete('/:id/members/:employeeId', requirePermission('projects', 'update'), removeMember);
 
 export default router;

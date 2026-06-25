@@ -38,6 +38,7 @@ export namespace IAuthStore {
       permissions: Permission[];
     };
     photo?: string;
+    approve_csw?: boolean;
   }
 
   export interface Permission {

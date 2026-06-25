@@ -141,23 +141,28 @@ npx ts-node src/database/migrations/003-add-permissions-module.ts
 ## Módulos del Sistema
 
 ### ✅ Completados (Backend + Frontend)
-- **Autenticación** — Login/Logout JWT en cookies httpOnly
-- **Empleados** — CRUD completo con foto, división, rol
+- **Autenticación** — Login/Logout JWT en cookies httpOnly, checkAuth, refresh
+- **Empleados** — CRUD completo con foto, división, hat, approve_csw
 - **Divisiones** — Gestión con manager asignado
-- **Roles y Permisos** — RBAC completo (32 permisos, 5 roles)
+- **Hats (Roles)** — RBAC completo (38 permisos, 13 hats), vista con tabla de empleados asignados
+- **Proyectos** — CRUD, asignación a división, equipo (miembros + líder), links asociados
+- **CSW (Solicitudes)** — CRUD, flujo de aprobación, categorías, pendientes
+- **Categorías CSW** — CRUD con flujo predeterminado o aprobador directo
 
-### ✅ Backend Completo / 🟡 Frontend Pendiente
-- **CSW (Solicitudes)** — Flujo de aprobación multinivel
-- **Flujos de Aprobación** — Configurables por división
-- **Categorías CSW** — 15 categorías configurables
+### 🟡 Parcial
+- **Flujos de Aprobación** — Backend completo, frontend básico
+- **Dashboard** — Dinámico por permisos del hat (CSW stats, proyectos, divisiones, empleados)
 
 ### ❌ No Iniciados
 - **Capacitaciones (Training)** — Cursos, HP, exámenes
-- **Dashboard / Reportes** — Métricas y gráficas
+- **Reportes de Productividad** — Métricas semanales QA/Dev
+- **Perfil de Usuario** — /profile con cambio de contraseña
 
 ---
 
-## Permisos del Sistema
+## Sistema de Permisos (RBAC)
+
+38 permisos organizados en 9 módulos. Cada hat agrupa N permisos.
 
 | Módulo | Acciones |
 |--------|----------|
@@ -165,10 +170,21 @@ npx ts-node src/database/migrations/003-add-permissions-module.ts
 | divisions | read, create, update, delete |
 | roles | read, create, update, delete |
 | permissions | read, create, update, delete |
+| projects | read, create, update, delete |
 | csw | read, create, update, approve, cancel, delete |
 | csw_categories | read, create, update, delete |
 | approval_flows | read, create, update, delete |
 | training | read, create, update, delete |
+
+### Control de acceso implementado
+
+| Capa | Función |
+|------|---------|
+| Sidebar dinámico | Oculta módulos sin permiso |
+| PermissionRoute | Redirige a / si accede por URL directa |
+| Botones condicionados | Crear/Editar/Eliminar ocultos sin permiso |
+| Dashboard adaptativo | Cards según permisos del hat |
+| Backend middleware | `requirePermission()` → 403 si no tiene permiso |
 
 ---
 
@@ -188,10 +204,11 @@ docker compose down -v      # Detener + borrar volúmenes (CUIDADO)
 
 - [Arquitectura Backend](docs/AGENTS-BACKEND.md)
 - [Arquitectura Frontend](docs/AGENTS-FRONTEND.md)
+- [Sistema de Hats y Permisos](docs/HATS_PERMISSIONS_SYSTEM.md)
+- [Módulo de Proyectos](docs/PROJECTS_MODULE.md)
+- [Dashboard de Productividad](docs/DASHBOARD_PRODUCTIVITY_ANALYSIS.md)
 - [Sistema CSW](docs/CSW_ARCHITECTURE.md)
-- [Sistema de Permisos](docs/PERMISSIONS_SYSTEM.md)
-- [Estado del Proyecto](docs/PROJECT_STATUS.md)
-- [Patrones de Tabla](docs/TABLE_PATTERN.md)
+- [Organigrama](docs/organigrama/organigrama-unlimitech-cloud.md)
 - [Cómo Levantar Backend](docs/COMO_LEVANTAR_BACKEND.md)
 - [Diagramas del Sistema](docs/diagrams/README.md)
 - [Base de Datos (Migrations/Seeds)](backend/src/database/README.md)

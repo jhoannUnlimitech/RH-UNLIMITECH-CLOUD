@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router";
+import { BrowserRouter as Router, Routes, Route } from "react-router";
 import Home from "./pages/Dashboard/Home";
 import SignIn from "./pages/AuthPages/SignIn";
 import AppLayout from "./layout/AppLayout";
@@ -9,6 +9,8 @@ import PermissionRoute from "./components/auth/PermissionRoute";
 import { authStore } from "./stores/views";
 import DivisionsList from "./pages/Divisions/DivisionsList";
 import EmployeesList from "./pages/Employees/EmployeesList";
+import ProjectsList from "./pages/Projects/ProjectsList";
+import ProjectDetail from "./pages/Projects/ProjectDetail";
 import HatsList from "./pages/Hats/HatsList";
 import HatForm from "./pages/Hats/HatForm";
 import HatsView from "./pages/Hats/HatsView";
@@ -16,6 +18,7 @@ import CSWCategoriesList from "./pages/CSWCategories/CSWCategoriesList";
 import CSWList from "./pages/CSW/CSWList";
 import CSWForm from "./pages/CSW/CSWForm";
 import CSWView from "./pages/CSW/CSWView";
+import NotFound from "./pages/Errors/NotFound";
 
 export default function App() {
   // Verificar autenticación al cargar la aplicación
@@ -41,6 +44,8 @@ export default function App() {
           <Route index path="/" element={<Home />} />
           <Route path="/employees" element={<PermissionRoute resource="employees"><EmployeesList /></PermissionRoute>} />
           <Route path="/divisions" element={<PermissionRoute resource="divisions"><DivisionsList /></PermissionRoute>} />
+          <Route path="/projects" element={<PermissionRoute resource="projects"><ProjectsList /></PermissionRoute>} />
+          <Route path="/projects/:id" element={<PermissionRoute resource="projects"><ProjectDetail /></PermissionRoute>} />
           <Route path="/roles" element={<PermissionRoute resource="roles"><HatsList /></PermissionRoute>} />
           <Route path="/roles/new" element={<PermissionRoute resource="roles"><HatForm /></PermissionRoute>} />
           <Route path="/roles/edit/:id" element={<PermissionRoute resource="roles"><HatForm /></PermissionRoute>} />
@@ -54,8 +59,8 @@ export default function App() {
           <Route path="/csw/all" element={<PermissionRoute resource="csw"><CSWList /></PermissionRoute>} />
         </Route>
 
-        {/* Redirect any unknown routes to home */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* 404 */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );

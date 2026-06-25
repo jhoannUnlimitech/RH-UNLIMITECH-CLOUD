@@ -146,7 +146,7 @@ const CSWList = observer(() => {
       filtered = filtered.filter(
         (csw) =>
           csw.requesterName.toLowerCase().includes(searchLower) ||
-          (typeof csw.category === 'object' && csw.category.name.toLowerCase().includes(searchLower)) ||
+          (typeof csw.category === 'object' && csw.category?.name?.toLowerCase().includes(searchLower)) ||
           csw.situation.toLowerCase().includes(searchLower)
       );
     }
@@ -472,7 +472,7 @@ const CSWList = observer(() => {
                           }
                           
                           const statusBadge = getStatusBadge(csw.status);
-                          const categoryName = typeof csw.category === 'object' ? csw.category.name : 'Sin categoría';
+                          const categoryName = (csw.category && typeof csw.category === 'object') ? csw.category.name : 'Sin categoría';
 
                           return (
                             <TableRow key={csw._id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors dark:border-white/[0.05] dark:hover:bg-gray-800/30">

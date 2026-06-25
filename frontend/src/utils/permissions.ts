@@ -14,6 +14,7 @@ export type PermissionResource =
   | 'csw_categories'
   | 'approval_flows' 
   | 'training'
+  | 'projects'
   | 'policies'
   | 'tasks';
 
