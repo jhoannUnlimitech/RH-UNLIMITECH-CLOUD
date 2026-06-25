@@ -4,6 +4,7 @@ import mongoose, { Document, Schema, Types, Model } from 'mongoose';
  * Estado general de la solicitud CSW
  */
 export enum CSWStatus {
+  DRAFT = 'draft',           // Borrador (no visible para aprobadores)
   PENDING = 'pending',       // Pendiente de aprobación
   APPROVED = 'approved',     // Aprobado por todos
   REJECTED = 'rejected',     // Rechazado por algún nivel

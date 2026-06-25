@@ -638,3 +638,69 @@ export const getCSWStats = async (
     next(error);
   }
 };
+
+
+/**
+ * Enviar borrador para aprobación (draft → pending)
+ * POST /api/v1/csw/:id/submit
+ */
+export const submitCSW = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+    
+    const csw = await CSW.findOne({ _id: id, deleted: false });
+    
+    if (!csw) {
+      res.status(404).json({ success: false, message: 'Solicitud no encontrada' });
+      return;
+    }
+
+    // Solo el creador puede enviar
+    if (csw.requester.toString() !== req.user!.id) {
+      res.status(403).json({ success: false, message: 'Solo el creador puede enviar la solicitud' });
+      return;
+    }
+
+    // Solo se puede enviar si está en draft
+    if (csw.status !== 'draft') {
+      res.status(400).json({ success: false, message: 'Solo se pueden enviar solicitudes en borrador' });
+      return;
+    }
+
+    // Validar campos requeridos
+    if (!csw.situation || !csw.information || !csw.solution) {
+      res.status(400).json({ success: false, message: 'Debe completar situación, información y solución antes de enviar' });
+      return;
+    }
+
+    // Inicializar cadena de aprobación si no existe
+    if (!csw.approvalChain || csw.approvalChain.length === 0) {
+      await csw.initializeApprovalChain();
+    }
+
+    // Cambiar estado a pending
+    csw.status = CSWStatus.PENDING;
+    csw.currentLevel = 1;
+
+    // Agregar al historial
+    csw.addToHistory('submitted', req.user!.id as any, req.user!.roleName || 'Usuario', {
+      previousStatus: 'draft',
+      newStatus: 'pending',
+      comments: 'Solicitud enviada para aprobación'
+    });
+
+    await csw.save();
+
+    res.json({
+      success: true,
+      data: csw,
+      message: 'Solicitud enviada para aprobación exitosamente'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
