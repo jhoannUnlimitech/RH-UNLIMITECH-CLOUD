@@ -21,6 +21,7 @@ const Home = observer(() => {
   const { can, canAccessResource } = usePermissions();
   const [cswStats, setCswStats] = useState<CSWStats>({ total: 0, pending: 0, approved: 0, rejected: 0 });
   const [loadingCSW, setLoadingCSW] = useState(false);
+  const [myProjects, setMyProjects] = useState<any[]>([]);
 
   const canSeeEmployees = canAccessResource('employees');
   const canSeeDivisions = canAccessResource('divisions');
@@ -34,6 +35,22 @@ const Home = observer(() => {
       loadCSWStats();
     }
   }, [canSeeCSW]);
+
+  // Cargar mis proyectos
+  useEffect(() => {
+    if (canAccessResource('projects')) {
+      loadMyProjects();
+    }
+  }, []);
+
+  const loadMyProjects = async () => {
+    try {
+      const response = await apiClient.get('/projects/my-projects');
+      setMyProjects(response.data?.data || []);
+    } catch {
+      // silenciar
+    }
+  };
 
   const loadCSWStats = async () => {
     setLoadingCSW(true);
@@ -163,6 +180,37 @@ const Home = observer(() => {
                     <p className="font-semibold text-gray-900 dark:text-white">{userDivision}</p>
                     <p className="text-sm text-gray-500 dark:text-gray-400">{userHat}</p>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Mis Proyectos */}
+            {canAccessResource('projects') && myProjects.length > 0 && (
+              <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-base font-semibold text-gray-800 dark:text-white">
+                    Mis Proyectos
+                  </h4>
+                  <Link to="/projects" className="text-sm text-brand-600 hover:text-brand-700 dark:text-brand-400">
+                    Ver todos →
+                  </Link>
+                </div>
+                <div className="space-y-3">
+                  {myProjects.slice(0, 4).map((project: any) => (
+                    <div key={project._id} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-white/[0.03]">
+                      <div>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{project.name}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">{project.code}</p>
+                      </div>
+                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                        project.status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                        project.status === 'on_hold' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                        'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+                      }`}>
+                        {project.status === 'active' ? 'Activo' : project.status === 'on_hold' ? 'Pausa' : project.status}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}

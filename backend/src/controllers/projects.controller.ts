@@ -20,7 +20,11 @@ export const getProjects = async (
 
     const projects = await Project.find(filter)
       .populate('divisionId', 'name code')
-      .populate('members', 'name email photo role')
+      .populate({
+        path: 'members',
+        select: 'name email photo role',
+        populate: { path: 'role', select: 'name' }
+      })
       .populate('leadId', 'name email photo')
       .sort('-createdAt');
 
@@ -45,11 +49,26 @@ export const getProjectById = async (
   try {
     const project = await Project.findById(req.params.id)
       .populate('divisionId', 'name code')
-      .populate('members', 'name email photo role division')
+      .populate({
+        path: 'members',
+        select: 'name email photo role division',
+        populate: { path: 'role', select: 'name' }
+      })
       .populate('leadId', 'name email photo');
 
     if (!project) {
       throw new AppError('Proyecto no encontrado', 404);
+    }
+
+    // Deduplicar miembros (por si hay duplicados en el array)
+    if (project.members && project.members.length > 0) {
+      const seen = new Set<string>();
+      project.members = project.members.filter((m: any) => {
+        const id = m._id?.toString() || m.toString();
+        if (seen.has(id)) return false;
+        seen.add(id);
+        return true;
+      });
     }
 
     res.status(200).json({
@@ -78,7 +97,11 @@ export const getMyProjects = async (
       ]
     })
       .populate('divisionId', 'name code')
-      .populate('members', 'name email photo')
+      .populate({
+        path: 'members',
+        select: 'name email photo role',
+        populate: { path: 'role', select: 'name' }
+      })
       .populate('leadId', 'name email photo')
       .sort('-createdAt');
 

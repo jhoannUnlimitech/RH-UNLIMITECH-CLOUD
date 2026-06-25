@@ -1,0 +1,18 @@
+feat(projects): complete Projects module + fix CSW null error + sidebar permissions logic
+
+- feat(projects): full CRUD frontend (list, detail, create/edit modal)
+- feat(projects): skeleton loading in modal to prevent layout jumps
+- feat(projects): links asociados (name + url) replacing repositories dropdown
+- feat(projects): filter by status + search + pagination + action buttons working
+- feat(projects): detail page with info cards, team table, links section
+- feat(projects): FolderIcon for sidebar
+- fix(csw): null check on category.name in CSWList (typeof null === 'object' bug)
+- fix(sidebar): CSW admin logic changed from csw:delete to csw_categories:update
+- fix(sidebar): approve_csw now properly mapped to User interface and auth service
+- fix(projects): populate members.role.name with nested populate
+- fix(projects): deduplicate members array in getProjectById response
+- feat(errors): 404 NotFound and 500 ServerError pages in Spanish
+- feat(permissions): projects:read/create/update/delete added to DB (38 total)
+- docs: PROJECTS_MODULE.md complete documentation
+- docs: README.md updated with modules, permissions, access control
+- docs: AGENTS-BACKEND.md and AGENTS-FRONTEND.md updated

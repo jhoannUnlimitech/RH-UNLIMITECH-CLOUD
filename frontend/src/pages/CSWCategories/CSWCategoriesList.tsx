@@ -18,8 +18,13 @@ import Alert from "../../components/ui/alert/Alert";
 import Pagination from "../../components/ui/pagination/Pagination";
 import { useModal } from "../../hooks/useModal";
 import { PencilIcon, TrashBinIcon } from "../../icons";
+import { usePermissions } from "../../hooks/usePermissions";
 
 const CSWCategoriesList = observer(() => {
+  const { can } = usePermissions();
+  const canCreate = can('csw_categories', 'create');
+  const canUpdate = can('csw_categories', 'update');
+  const canDelete = can('csw_categories', 'delete');
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -129,9 +134,11 @@ const CSWCategoriesList = observer(() => {
             Gestiona las categorías para las solicitudes de cambio
           </p>
         </div>
+        {canCreate && (
         <Button onClick={createModal.openModal} className="w-full sm:w-auto">
           Crear Categoría
         </Button>
+        )}
       </div>
 
       {/* Error Alert */}
@@ -236,7 +243,7 @@ const CSWCategoriesList = observer(() => {
                       isHeader
                       className="py-3 px-4 sm:px-6 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
                     >
-                      Acciones
+                      {(canUpdate || canDelete) ? "Acciones" : ""}
                     </TableCell>
                   </TableRow>
                 </TableHeader>
@@ -269,6 +276,7 @@ const CSWCategoriesList = observer(() => {
                       </TableCell>
                       <TableCell className="py-3.5 px-4 sm:px-6">
                         <div className="flex items-center justify-center gap-3">
+                          {canUpdate && (
                           <button
                             onClick={() => handleEdit(category._id)}
                             className="inline-flex items-center justify-center rounded-lg p-2 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-white/[0.05]"
@@ -276,6 +284,8 @@ const CSWCategoriesList = observer(() => {
                           >
                             <PencilIcon className="h-[18px] w-[18px]" />
                           </button>
+                          )}
+                          {canDelete && (
                           <button
                             onClick={() => handleDelete(category._id, category.name)}
                             className="inline-flex items-center justify-center rounded-lg p-2 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-white/[0.05]"
@@ -283,6 +293,7 @@ const CSWCategoriesList = observer(() => {
                           >
                             <TrashBinIcon className="h-[18px] w-[18px]" />
                           </button>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>

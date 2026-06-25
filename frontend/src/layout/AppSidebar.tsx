@@ -5,6 +5,7 @@ import {
   GridIcon,
   UserCircleIcon,
   BoxCubeIcon,
+  FolderIcon,
   ChevronDownIcon,
   HorizontaLDots,
 } from "../icons";
@@ -16,7 +17,10 @@ import type { PermissionResource } from "../utils/permissions";
 type SubNavItem = {
   name: string;
   path: string;
-  resource?: PermissionResource; // Si es null, siempre visible
+  resource?: PermissionResource;
+  action?: string;              // Acción específica requerida (ej: 'approve')
+  requireApproveCSW?: boolean;  // Requiere approve_csw=true en el usuario
+  adminOnly?: boolean;          // Solo para hats con permisos de gestión completa
 };
 
 type NavItem = {
@@ -49,13 +53,19 @@ const navItems: NavItem[] = [
     ],
   },
   {
+    name: "Proyectos",
+    icon: <FolderIcon />,
+    path: "/projects",
+    resource: "projects",
+  },
+  {
     name: "CSW",
     icon: <BoxCubeIcon />,
     subItems: [
-      { name: "Categorías", path: "/csw-categories", resource: "csw_categories" },
+      { name: "Categorías", path: "/csw-categories", resource: "csw_categories", action: "update" },
       { name: "Mis Solicitudes", path: "/csw/my-requests", resource: "csw" },
-      { name: "Pendientes de Aprobación", path: "/csw/pending", resource: "csw" },
-      { name: "Todas las Solicitudes", path: "/csw/all", resource: "csw" },
+      { name: "Pendientes de Aprobación", path: "/csw/pending", resource: "csw", requireApproveCSW: true },
+      { name: "Todas las Solicitudes", path: "/csw/all", resource: "csw", adminOnly: true },
     ],
   },
 ];
@@ -67,6 +77,13 @@ const AppSidebar: React.FC = observer(() => {
 
   // Permisos del usuario actual
   const userPermissions = authStore.user?.role?.permissions || [];
+  const userApproveCSW = authStore.user?.approve_csw || false;
+
+  // Admin CSW = tiene permisos de gestión de categorías o flujos de aprobación
+  const isCSWAdmin = userPermissions.some(
+    (p: any) => (p.resource === 'csw_categories' && p.action === 'update') ||
+                (p.resource === 'approval_flows' && p.action === 'read')
+  );
 
   // Filtrar items del sidebar según permisos
   const filteredNavItems = useMemo(() => {
@@ -74,16 +91,26 @@ const AppSidebar: React.FC = observer(() => {
       .map((item) => {
         // Item sin subItems (ej: Dashboard)
         if (!item.subItems) {
-          // Sin resource → siempre visible
           if (!item.resource) return item;
-          // Con resource → verificar permiso
           if (hasAnyPermissionInResource(userPermissions, item.resource)) return item;
           return null;
         }
 
         // Item con subItems → filtrar subItems visibles
         const visibleSubItems = item.subItems.filter((sub) => {
+          // Sin resource → siempre visible
           if (!sub.resource) return true;
+          // Requiere approve_csw del usuario
+          if (sub.requireApproveCSW && !userApproveCSW) return false;
+          // Solo admin
+          if (sub.adminOnly && !isCSWAdmin) return false;
+          // Acción específica requerida
+          if (sub.action) {
+            return userPermissions.some(
+              (p: any) => p.resource === sub.resource && p.action === sub.action
+            );
+          }
+          // Verificar que tenga al menos un permiso en el recurso
           return hasAnyPermissionInResource(userPermissions, sub.resource);
         });
 
@@ -93,7 +120,7 @@ const AppSidebar: React.FC = observer(() => {
         return { ...item, subItems: visibleSubItems };
       })
       .filter(Boolean) as NavItem[];
-  }, [userPermissions]);
+  }, [userPermissions, userApproveCSW, isCSWAdmin]);
 
   // Auto-close sidebar on mobile after route change
   useEffect(() => {

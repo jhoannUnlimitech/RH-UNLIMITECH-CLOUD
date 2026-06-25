@@ -16,6 +16,7 @@ export interface IProject extends Document {
   endDate?: Date;
   members: Types.ObjectId[];          // Empleados asignados
   leadId?: Types.ObjectId;            // Líder del proyecto (TL o PM)
+  repositories?: { name: string; url: string; type: string }[]; // Links a repositorios
   
   // Soft delete
   deleted: boolean;
@@ -70,6 +71,11 @@ const ProjectSchema = new Schema<IProject>({
     type: Schema.Types.ObjectId,
     ref: 'Employee'
   },
+  repositories: [{
+    name: { type: String, required: true },
+    url: { type: String, required: true },
+    type: { type: String, enum: ['github', 'gitlab', 'bitbucket', 'other'], default: 'github' }
+  }],
   deleted: {
     type: Boolean,
     default: false

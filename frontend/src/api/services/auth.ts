@@ -37,7 +37,8 @@ export const authService = {
           name: employee.role?.name || '',
           permissions: employee.role?.permissions || []
         },
-        photo: employee.photo
+        photo: employee.photo,
+        approve_csw: employee.approve_csw || false
       }
     };
   },
@@ -76,7 +77,8 @@ export const authService = {
         name: employee.role?.name || '',
         permissions: employee.role?.permissions || []
       },
-      photo: employee.photo
+      photo: employee.photo,
+      approve_csw: employee.approve_csw || false
     };
   },
 };
