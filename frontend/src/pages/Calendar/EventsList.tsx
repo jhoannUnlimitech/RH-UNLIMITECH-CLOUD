@@ -195,6 +195,11 @@ const EventsList = observer(() => {
                       {canManage && (
                         <TableCell className="py-3 px-4">
                           <div className="flex items-center justify-center gap-2">
+                            {event.link && (
+                              <a href={event.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center rounded-lg p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/[0.05]" title="Abrir link">
+                                <svg className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                              </a>
+                            )}
                             <Link to="/calendar" className="inline-flex items-center justify-center rounded-lg p-2 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-white/[0.05]" title="Editar en calendario">
                               <PencilIcon className="h-[18px] w-[18px]" />
                             </Link>
