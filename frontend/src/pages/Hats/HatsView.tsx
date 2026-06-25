@@ -29,7 +29,7 @@ const resourceNames: Record<string, string> = {
   csw: "Solicitudes CSW",
   employees: "Empleados",
   divisions: "Divisiones",
-  roles: "Roles",
+  roles: "Hats",
   permissions: "Permisos",
   csw_categories: "Categorías CSW",
   approval_flows: "Flujos de Aprobación",
@@ -96,22 +96,19 @@ const HatsView = observer(() => {
     if (!id) return;
 
     try {
-      let role = hatsStore.roles.find((r) => r._id === id);
-
-      if (!role) {
-        await hatsStore.fetchHatById(id);
-        role = hatsStore.selectedHat || undefined;
-      }
+      // Siempre cargar desde API para obtener empleados
+      await hatsStore.fetchHatById(id);
+      const role = hatsStore.selectedHat;
 
       if (role) {
         setRoleName(role.name);
-        const permissionIds = role.permissions.map((p) =>
+        const permissionIds = role.permissions.map((p: any) =>
           typeof p === "string" ? p : p._id
         );
         setSelectedPermissions(permissionIds);
       }
     } catch (err) {
-      console.error("Error al cargar datos del rol:", err);
+      console.error("Error al cargar datos del hat:", err);
     }
   };
 
@@ -137,11 +134,11 @@ const HatsView = observer(() => {
     (module) => groupedPermissions[module] || moduleHierarchy[module].length > 0
   );
 
-  const role = hatsStore.roles.find((r) => r._id === id);
+  const role = hatsStore.selectedHat as any;
 
   return (
     <div className="space-y-6">
-      <PageBreadcrumb pageTitle="Detalle del Rol" />
+      <PageBreadcrumb pageTitle="Detalle del Hat" />
 
       {/* Form Container */}
       <div className="rounded-xl bg-white dark:bg-white/[0.03] p-6 lg:p-8">
@@ -154,7 +151,7 @@ const HatsView = observer(() => {
                   {roleName}
                 </h2>
                 <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                  Información y permisos asignados al rol
+                  Información y permisos asignados al hat
                 </p>
               </div>
               <Button onClick={() => navigate(`/roles/edit/${id}`)}>
@@ -202,10 +199,10 @@ const HatsView = observer(() => {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Permisos del Rol
+                  Permisos del Hat
                 </h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Vista de los permisos asignados a este rol
+                  Vista de los permisos asignados a este hat
                 </p>
               </div>
             </div>
@@ -327,6 +324,45 @@ const HatsView = observer(() => {
             )}
           </div>
 
+          {/* Empleados con este Hat */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              Empleados asignados
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              Personas que tienen este hat asignado actualmente
+            </p>
+
+            {role?.employees && role.employees.length > 0 ? (
+              <div className="border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 dark:bg-white/[0.03]">
+                    <tr>
+                      <th className="py-3 px-4 text-left font-medium text-gray-500 dark:text-gray-400">Nombre</th>
+                      <th className="py-3 px-4 text-left font-medium text-gray-500 dark:text-gray-400">Email</th>
+                      <th className="py-3 px-4 text-left font-medium text-gray-500 dark:text-gray-400">División</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {role.employees.map((emp: any) => (
+                      <tr key={emp._id} className="border-t border-gray-100 dark:border-gray-800">
+                        <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">{emp.name}</td>
+                        <td className="py-3 px-4 text-gray-600 dark:text-gray-400">{emp.email}</td>
+                        <td className="py-3 px-4 text-gray-600 dark:text-gray-400">{emp.division?.name || '—'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-center py-8 border border-gray-200 dark:border-gray-800 rounded-xl">
+                <p className="text-gray-500 dark:text-gray-400">
+                  No hay empleados con este hat asignado
+                </p>
+              </div>
+            )}
+          </div>
+
           {/* Form Actions */}
           <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-800">
             <Button
@@ -337,7 +373,7 @@ const HatsView = observer(() => {
               Atrás
             </Button>
             <Button onClick={() => navigate(`/roles/edit/${id}`)}>
-              Editar Rol
+              Editar Hat
             </Button>
           </div>
         </div>

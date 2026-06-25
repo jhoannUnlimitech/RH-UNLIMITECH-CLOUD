@@ -24,7 +24,7 @@ const UserDropdown = observer(() => {
 
   const userName = authStore.userName || "Usuario";
   const userEmail = authStore.user?.email || "";
-  const userRole = authStore.userRole || "Sin rol";
+  const userRole = authStore.userRole || "Sin hat";
 
   return (
     <div className="relative">

@@ -44,7 +44,7 @@ const ViewEmployeeModal: React.FC<ViewEmployeeModalProps> = ({
                 {employee.name}
               </h4>
               <Badge color="info" className="mt-1.5">
-                {employee.role?.name || 'Sin rol'}
+                {employee.role?.name || 'Sin hat'}
               </Badge>
             </div>
           </div>

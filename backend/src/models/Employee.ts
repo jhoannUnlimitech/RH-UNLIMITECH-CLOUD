@@ -61,7 +61,7 @@ const EmployeeSchema = new Schema<IEmployee>({
   role: { 
     type: Schema.Types.ObjectId, 
     ref: 'Role', 
-    required: [true, 'El rol es requerido']
+    required: [true, 'El hat es requerido']
   },
   division: { 
     type: Schema.Types.ObjectId, 

@@ -1,6 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useState, useMemo } from "react";
 import { divisionsStore } from "../../stores/views";
+import { usePermissions } from "../../hooks/usePermissions";
 import {
   Table,
   TableBody,
@@ -21,6 +22,7 @@ import { useModal } from "../../hooks/useModal";
 import { PencilIcon, TrashBinIcon } from "../../icons";
 
 const DivisionsList = observer(() => {
+  const { can } = usePermissions();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deletingDivisionName, setDeletingDivisionName] = useState<string>("");
   const [editingDivisionId, setEditingDivisionId] = useState<string | undefined>(undefined);
@@ -205,6 +207,7 @@ const DivisionsList = observer(() => {
                 className="h-11 w-full rounded-lg border border-gray-300 bg-transparent py-2.5 pl-11 pr-4 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[300px]"
               />
             </div>
+            {can('divisions', 'create') && (
             <Button onClick={createModal.openModal}>
               <svg
                 className="mr-2"
@@ -224,6 +227,7 @@ const DivisionsList = observer(() => {
               </svg>
               Nueva División
             </Button>
+            )}
           </div>
         </div>
 

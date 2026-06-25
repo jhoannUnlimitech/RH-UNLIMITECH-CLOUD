@@ -58,17 +58,21 @@ export const getRoleById = async (
       .populate('permissions', 'resource action');
 
     if (!role) {
-      throw new AppError('Rol no encontrado', 404);
+      throw new AppError('Hat no encontrado', 404);
     }
 
-    // Obtener empleados con este rol
-    const employeesCount = await Employee.countDocuments({ role: role._id, deleted: false });
+    // Obtener empleados con este hat
+    const employees = await Employee.find({ role: role._id, deleted: false })
+      .select('name email division')
+      .populate('division', 'name')
+      .sort('name');
 
     res.status(200).json({
       success: true,
       data: {
         role,
-        employeesCount
+        employeesCount: employees.length,
+        employees
       }
     });
   } catch (error) {
@@ -134,17 +138,17 @@ export const updateRole = async (
     const { id } = req.params;
     const { name, permissions } = req.body;
 
-    // Verificar que el rol exista
+    // Verificar que el hat exista
     const role = await Role.findById(id);
     if (!role) {
-      throw new AppError('Rol no encontrado', 404);
+      throw new AppError('Hat no encontrado', 404);
     }
 
     // Si se actualiza el nombre, verificar que no esté en uso
     if (name && name !== role.name) {
       const existingRole = await Role.findOne({ name });
       if (existingRole) {
-        throw new AppError('Ya existe un rol con ese nombre', 400);
+        throw new AppError('Ya existe un hat con ese nombre', 400);
       }
     }
 
@@ -186,10 +190,10 @@ export const deleteRole = async (
   try {
     const { id } = req.params;
 
-    // Verificar que el rol exista
+    // Verificar que el hat exista
     const role = await Role.findById(id);
     if (!role) {
-      throw new AppError('Rol no encontrado', 404);
+      throw new AppError('Hat no encontrado', 404);
     }
 
     // Verificar que no tenga empleados asignados

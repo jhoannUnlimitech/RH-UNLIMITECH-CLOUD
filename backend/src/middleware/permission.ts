@@ -18,7 +18,7 @@ export const requirePermission = (resource: string, action: string) => {
         .populate('permissions');
 
       if (!role) {
-        throw new AppError('Rol no encontrado', 403);
+        throw new AppError('Hat no encontrado', 403);
       }
 
       const hasPermission = (role.permissions as any[]).some(

@@ -11,7 +11,7 @@ export interface IRole extends IBaseModel {
 const RoleSchema = new Schema<IRole>({
   name: { 
     type: String, 
-    required: [true, 'El nombre del rol es requerido'],
+    required: [true, 'El nombre del hat es requerido'],
     trim: true,
     uppercase: true
   },

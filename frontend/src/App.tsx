@@ -5,6 +5,7 @@ import SignIn from "./pages/AuthPages/SignIn";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import PermissionRoute from "./components/auth/PermissionRoute";
 import { authStore } from "./stores/views";
 import DivisionsList from "./pages/Divisions/DivisionsList";
 import EmployeesList from "./pages/Employees/EmployeesList";
@@ -38,19 +39,19 @@ export default function App() {
           }
         >
           <Route index path="/" element={<Home />} />
-          <Route path="/divisions" element={<DivisionsList />} />
-          <Route path="/employees" element={<EmployeesList />} />
-          <Route path="/roles" element={<HatsList />} />
-          <Route path="/roles/new" element={<HatForm />} />
-          <Route path="/roles/edit/:id" element={<HatForm />} />
-          <Route path="/roles/view/:id" element={<HatsView />} />
-          <Route path="/csw-categories" element={<CSWCategoriesList />} />
-          <Route path="/csw/new" element={<CSWForm />} />
-          <Route path="/csw/edit/:id" element={<CSWForm />} />
-          <Route path="/csw/view/:id" element={<CSWView />} />
-          <Route path="/csw/my-requests" element={<CSWList />} />
-          <Route path="/csw/pending" element={<CSWList />} />
-          <Route path="/csw/all" element={<CSWList />} />
+          <Route path="/employees" element={<PermissionRoute resource="employees"><EmployeesList /></PermissionRoute>} />
+          <Route path="/divisions" element={<PermissionRoute resource="divisions"><DivisionsList /></PermissionRoute>} />
+          <Route path="/roles" element={<PermissionRoute resource="roles"><HatsList /></PermissionRoute>} />
+          <Route path="/roles/new" element={<PermissionRoute resource="roles"><HatForm /></PermissionRoute>} />
+          <Route path="/roles/edit/:id" element={<PermissionRoute resource="roles"><HatForm /></PermissionRoute>} />
+          <Route path="/roles/view/:id" element={<PermissionRoute resource="roles"><HatsView /></PermissionRoute>} />
+          <Route path="/csw-categories" element={<PermissionRoute resource="csw_categories"><CSWCategoriesList /></PermissionRoute>} />
+          <Route path="/csw/new" element={<PermissionRoute resource="csw"><CSWForm /></PermissionRoute>} />
+          <Route path="/csw/edit/:id" element={<PermissionRoute resource="csw"><CSWForm /></PermissionRoute>} />
+          <Route path="/csw/view/:id" element={<PermissionRoute resource="csw"><CSWView /></PermissionRoute>} />
+          <Route path="/csw/my-requests" element={<PermissionRoute resource="csw"><CSWList /></PermissionRoute>} />
+          <Route path="/csw/pending" element={<PermissionRoute resource="csw"><CSWList /></PermissionRoute>} />
+          <Route path="/csw/all" element={<PermissionRoute resource="csw"><CSWList /></PermissionRoute>} />
         </Route>
 
         {/* Redirect any unknown routes to home */}
