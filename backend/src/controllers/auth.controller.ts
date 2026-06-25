@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 import { Employee } from '../models/Employee';
 import { AppError } from '../middleware/error';
 import { config } from '../config/env';
@@ -183,10 +184,17 @@ export const login = async (
           id: employee.id,
           name: employee.name,
           email: employee.email,
-          role: (employee.role as any).name,
-          division: (employee.division as any).name,
+          role: {
+            id: (employeeWithPerms?.role as any)?._id?.toString() || '',
+            name: (employee.role as any).name,
+            permissions: (employeeWithPerms?.role as any)?.permissions || []
+          },
+          division: {
+            id: (employee.division as any)._id?.toString() || '',
+            name: (employee.division as any).name
+          },
           photo: employee.photo,
-          permissions: (employeeWithPerms?.role as any)?.permissions || []
+          approve_csw: employee.approve_csw
         },
         session: {
           expiresAt: new Date(decoded.exp * 1000).toISOString(),
@@ -252,13 +260,25 @@ export const getMe = async (
     }
 
     const employee = await Employee.findById(req.user.id)
-      .populate('role', 'name')
-      .populate('division', 'name')
+      .populate({
+        path: 'role',
+        populate: { path: 'permissions', select: 'resource action' }
+      })
+      .populate('division', 'name code')
       .populate('managerId', 'name email');
 
     if (!employee) {
       throw new AppError('Usuario no encontrado', 404);
     }
+
+    // Obtener proyectos asignados
+    const Project = mongoose.model('Project');
+    const projects = await Project.find({
+      $or: [{ members: employee._id }, { leadId: employee._id }],
+      deleted: { $ne: true }
+    }).select('name code status').sort('-createdAt');
+
+    const role = employee.role as any;
 
     res.json({
       status: 'success',
@@ -267,13 +287,23 @@ export const getMe = async (
           id: employee.id,
           name: employee.name,
           email: employee.email,
-          role: (employee.role as any).name,
-          division: (employee.division as any).name,
+          role: {
+            id: role._id || role.id,
+            name: role.name,
+            permissions: role.permissions || []
+          },
+          division: {
+            id: (employee.division as any)._id || (employee.division as any).id,
+            name: (employee.division as any).name,
+            code: (employee.division as any).code
+          },
           birthDate: employee.birthDate,
           nationalId: employee.nationalId,
           phone: employee.phone,
           nationality: employee.nationality,
           photo: employee.photo,
+          approve_csw: employee.approve_csw,
+          projects,
           manager: employee.managerId ? {
             id: (employee.managerId as any).id,
             name: (employee.managerId as any).name,

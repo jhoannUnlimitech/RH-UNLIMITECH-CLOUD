@@ -40,7 +40,14 @@ export class HatsStoreLive implements IHatsStore {
     try {
       const response = await hatsService.getById(id);
       runInAction(() => {
-        this.selectedHat = response.data?.role || response;
+        const data = response.data || response;
+        const role = data.role || data;
+        // Adjuntar employees al role object para la vista
+        if (data.employees) {
+          role.employees = data.employees;
+          role.employeesCount = data.employeesCount || data.employees.length;
+        }
+        this.selectedHat = role;
         this.isLoading = false;
       });
     } catch (error: any) {

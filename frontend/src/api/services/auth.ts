@@ -21,22 +21,21 @@ export const authService = {
     
     const employee = response.data.data.employee;
     
-    // Mapear la respuesta del backend al formato esperado
     return {
-      token: response.data.data.debug?.token || '', // En producción, el token está en cookie
+      token: response.data.data.debug?.token || '',
       user: {
         _id: employee.id,
         email: employee.email,
         name: employee.name,
         position: employee.position || '',
         division: {
-          _id: employee.division?.id || '',
-          name: employee.division?.name || employee.division || ''
+          _id: employee.division?.id || employee.division?._id || '',
+          name: employee.division?.name || ''
         },
         role: {
-          _id: employee.role?.id || '',
-          name: employee.role?.name || employee.role || '',
-          permissions: employee.permissions || []
+          _id: employee.role?.id || employee.role?._id || '',
+          name: employee.role?.name || '',
+          permissions: employee.role?.permissions || []
         },
         photo: employee.photo
       }
@@ -63,19 +62,18 @@ export const authService = {
     
     const employee = response.data.data.employee;
     
-    // Mapear la respuesta del backend al formato esperado por el contrato
     return {
-      _id: employee.id, // El backend usa 'id', el frontend usa '_id'
+      _id: employee.id,
       email: employee.email,
       name: employee.name,
       position: employee.position || '',
       division: {
-        _id: employee.division?.id || '',
-        name: employee.division?.name || employee.division || ''
+        _id: employee.division?.id || employee.division?._id || '',
+        name: employee.division?.name || '',
       },
       role: {
-        _id: employee.role?.id || '',
-        name: employee.role?.name || employee.role || '',
+        _id: employee.role?.id || employee.role?._id || '',
+        name: employee.role?.name || '',
         permissions: employee.role?.permissions || []
       },
       photo: employee.photo

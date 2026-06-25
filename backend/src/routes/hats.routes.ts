@@ -37,15 +37,15 @@ router.get('/permissions/all', requirePermission('roles', 'read'), getAllPermiss
  * /roles:
  *   get:
  *     tags: [Roles]
- *     summary: Listar todos los roles
- *     description: Obtiene lista completa de roles con sus permisos
+ *     summary: Listar todos los hats
+ *     description: Obtiene lista completa de hats con sus permisos
  *     security:
  *       - bearerAuth: []
  *       - cookieAuth: []
  *       - cookieAuth: []
  *     responses:
  *       200:
- *         description: Lista de roles
+ *         description: Lista de hats
  */
 router.get('/', requirePermission('roles', 'read'), getRoles);
 
@@ -54,8 +54,8 @@ router.get('/', requirePermission('roles', 'read'), getRoles);
  * /roles/{id}:
  *   get:
  *     tags: [Roles]
- *     summary: Obtener rol por ID
- *     description: Retorna detalles del rol con permisos y contador de empleados
+ *     summary: Obtener hat por ID
+ *     description: Retorna detalles del hat con permisos y contador de empleados
  *     security:
  *       - bearerAuth: []
  *       - cookieAuth: []
@@ -68,9 +68,9 @@ router.get('/', requirePermission('roles', 'read'), getRoles);
  *           type: string
  *     responses:
  *       200:
- *         description: Rol encontrado
+ *         description: Hat encontrado
  *       404:
- *         description: Rol no encontrado
+ *         description: Hat no encontrado
  */
 router.get('/:id', requirePermission('roles', 'read'), getRoleById);
 
@@ -79,7 +79,7 @@ router.get('/:id', requirePermission('roles', 'read'), getRoleById);
  * /roles:
  *   post:
  *     tags: [Roles]
- *     summary: Crear nuevo rol
+ *     summary: Crear nuevo hat
  *     security:
  *       - bearerAuth: []
  *       - cookieAuth: []
@@ -103,7 +103,7 @@ router.get('/:id', requirePermission('roles', 'read'), getRoleById);
  *                 description: Array de IDs de permisos
  *     responses:
  *       201:
- *         description: Rol creado
+ *         description: Hat creado
  */
 router.post('/', requirePermission('roles', 'create'), createRole);
 
@@ -112,7 +112,7 @@ router.post('/', requirePermission('roles', 'create'), createRole);
  * /roles/{id}:
  *   put:
  *     tags: [Roles]
- *     summary: Actualizar rol
+ *     summary: Actualizar hat
  *     security:
  *       - bearerAuth: []
  *       - cookieAuth: []
@@ -138,7 +138,7 @@ router.post('/', requirePermission('roles', 'create'), createRole);
  *                   type: string
  *     responses:
  *       200:
- *         description: Rol actualizado
+ *         description: Hat actualizado
  */
 router.put('/:id', requirePermission('roles', 'update'), updateRole);
 
@@ -147,7 +147,7 @@ router.put('/:id', requirePermission('roles', 'update'), updateRole);
  * /roles/{id}:
  *   delete:
  *     tags: [Roles]
- *     summary: Eliminar rol
+ *     summary: Eliminar hat
  *     description: Solo si no tiene empleados asignados
  *     security:
  *       - bearerAuth: []
@@ -161,7 +161,7 @@ router.put('/:id', requirePermission('roles', 'update'), updateRole);
  *           type: string
  *     responses:
  *       200:
- *         description: Rol eliminado
+ *         description: Hat eliminado
  *       400:
  *         description: No se puede eliminar, tiene empleados asignados
  */

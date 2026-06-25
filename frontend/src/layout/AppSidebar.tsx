@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { Link, useLocation } from "react-router";
+import { observer } from "mobx-react-lite";
 import {
   GridIcon,
   UserCircleIcon,
@@ -8,45 +9,91 @@ import {
   HorizontaLDots,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
+import { authStore } from "../stores/views";
+import { hasAnyPermissionInResource } from "../utils/permissions";
+import type { PermissionResource } from "../utils/permissions";
+
+type SubNavItem = {
+  name: string;
+  path: string;
+  resource?: PermissionResource; // Si es null, siempre visible
+};
 
 type NavItem = {
   name: string;
   icon: React.ReactNode;
   path?: string;
-  subItems?: { name: string; path: string }[];
+  resource?: PermissionResource; // Para items sin subItems
+  subItems?: SubNavItem[];
 };
 
+/**
+ * Definición de navegación con permisos requeridos.
+ * Si resource es undefined → siempre visible.
+ * Si tiene resource → solo visible si el usuario tiene al menos 1 permiso en ese resource.
+ */
 const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
     path: "/",
+    // Sin resource → siempre visible
   },
   {
     name: "Empleados",
     icon: <UserCircleIcon />,
     subItems: [
-      { name: "Lista de Empleados", path: "/employees" },
-      { name: "Divisiones", path: "/divisions" },
-      { name: "Hats", path: "/roles" },
+      { name: "Lista de Empleados", path: "/employees", resource: "employees" },
+      { name: "Divisiones", path: "/divisions", resource: "divisions" },
+      { name: "Hats", path: "/roles", resource: "roles" },
     ],
   },
   {
     name: "CSW",
     icon: <BoxCubeIcon />,
     subItems: [
-      { name: "Categorías", path: "/csw-categories" },
-      { name: "Mis Solicitudes", path: "/csw/my-requests" },
-      { name: "Pendientes de Aprobación", path: "/csw/pending" },
-      { name: "Todas las Solicitudes", path: "/csw/all" },
+      { name: "Categorías", path: "/csw-categories", resource: "csw_categories" },
+      { name: "Mis Solicitudes", path: "/csw/my-requests", resource: "csw" },
+      { name: "Pendientes de Aprobación", path: "/csw/pending", resource: "csw" },
+      { name: "Todas las Solicitudes", path: "/csw/all", resource: "csw" },
     ],
   },
 ];
 
-const AppSidebar: React.FC = () => {
+const AppSidebar: React.FC = observer(() => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered, setIsMobileOpen } =
     useSidebar();
   const location = useLocation();
+
+  // Permisos del usuario actual
+  const userPermissions = authStore.user?.role?.permissions || [];
+
+  // Filtrar items del sidebar según permisos
+  const filteredNavItems = useMemo(() => {
+    return navItems
+      .map((item) => {
+        // Item sin subItems (ej: Dashboard)
+        if (!item.subItems) {
+          // Sin resource → siempre visible
+          if (!item.resource) return item;
+          // Con resource → verificar permiso
+          if (hasAnyPermissionInResource(userPermissions, item.resource)) return item;
+          return null;
+        }
+
+        // Item con subItems → filtrar subItems visibles
+        const visibleSubItems = item.subItems.filter((sub) => {
+          if (!sub.resource) return true;
+          return hasAnyPermissionInResource(userPermissions, sub.resource);
+        });
+
+        // Si no hay subItems visibles → no mostrar el padre
+        if (visibleSubItems.length === 0) return null;
+
+        return { ...item, subItems: visibleSubItems };
+      })
+      .filter(Boolean) as NavItem[];
+  }, [userPermissions]);
 
   // Auto-close sidebar on mobile after route change
   useEffect(() => {
@@ -67,7 +114,7 @@ const AppSidebar: React.FC = () => {
 
   useEffect(() => {
     let submenuMatched = false;
-    navItems.forEach((nav, index) => {
+    filteredNavItems.forEach((nav, index) => {
       if (nav.subItems) {
         nav.subItems.forEach((subItem) => {
           if (isActive(subItem.path)) {
@@ -81,7 +128,7 @@ const AppSidebar: React.FC = () => {
     if (!submenuMatched) {
       setOpenSubmenu(null);
     }
-  }, [location, isActive]);
+  }, [location, isActive, filteredNavItems]);
 
   useEffect(() => {
     if (openSubmenu !== null) {
@@ -205,7 +252,7 @@ const AppSidebar: React.FC = () => {
 
   return (
     <aside
-      className={`fixed  flex flex-col  top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
+      className={`fixed flex flex-col top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
         ${
           isExpanded || isMobileOpen
             ? "w-[290px]"
@@ -219,7 +266,7 @@ const AppSidebar: React.FC = () => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className={`py-8  flex ${
+        className={`py-8 flex ${
           !isExpanded && !isHovered ? "xl:justify-center" : "justify-start"
         }`}
       >
@@ -245,18 +292,18 @@ const AppSidebar: React.FC = () => {
                 }`}
               >
                 {isExpanded || isHovered || isMobileOpen ? (
-                  "Menu"
+                  "Menú"
                 ) : (
                   <HorizontaLDots className="size-6" />
                 )}
               </h2>
-              {renderMenuItems(navItems)}
+              {renderMenuItems(filteredNavItems)}
             </div>
           </div>
         </nav>
       </div>
     </aside>
   );
-};
+});
 
 export default AppSidebar;

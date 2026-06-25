@@ -7,6 +7,7 @@ import permissionsRoutes from './permissions.routes';
 import approvalFlowRoutes from './approvalFlow.routes';
 import cswCategoryRoutes from './cswCategory.routes';
 import cswRoutes from './csw.routes';
+import projectsRoutes from './projects.routes';
 
 const router = Router();
 
@@ -33,6 +34,9 @@ router.use('/csw-categories', cswCategoryRoutes);
 
 // Rutas de CSW (Canal de Solicitudes de Trabajo)
 router.use('/csw', cswRoutes);
+
+// Rutas de proyectos
+router.use('/projects', projectsRoutes);
 
 // Rutas de capacitaciones (se agregarán después)
 // router.use('/training', trainingRoutes);

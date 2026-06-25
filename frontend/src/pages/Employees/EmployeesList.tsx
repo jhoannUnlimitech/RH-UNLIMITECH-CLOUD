@@ -2,6 +2,7 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { employeesStore } from "../../stores/views";
 import { divisionsStore } from "../../stores/views";
+import { usePermissions } from "../../hooks/usePermissions";
 import {
   Table,
   TableBody,
@@ -25,6 +26,7 @@ import { getCountryName } from "../../utils/countries";
 import { IEmployeesStore } from "../../stores/views/EmployeesStore.contract";
 
 const EmployeesList = observer(() => {
+  const { can } = usePermissions();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deletingEmployeeName, setDeletingEmployeeName] = useState<string>("");
   const [editingEmployeeId, setEditingEmployeeId] = useState<string | undefined>(undefined);
@@ -256,6 +258,7 @@ const EmployeesList = observer(() => {
                 className="h-11 w-full rounded-lg border border-gray-300 bg-transparent py-2.5 pl-11 pr-4 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[300px]"
               />
             </div>
+            {can('employees', 'create') && (
             <Button
               onClick={createModal.openModal}
               className="flex items-center gap-2"
@@ -277,6 +280,7 @@ const EmployeesList = observer(() => {
               </svg>
               Nuevo Empleado
             </Button>
+            )}
           </div>
         </div>
 

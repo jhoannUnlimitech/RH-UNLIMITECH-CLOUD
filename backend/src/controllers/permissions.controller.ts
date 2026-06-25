@@ -172,7 +172,7 @@ export const deletePermission = async (
 
     if (rolesUsingPermission > 0) {
       throw new AppError(
-        `No se puede eliminar este permiso porque está siendo usado por ${rolesUsingPermission} rol(es)`,
+        `No se puede eliminar este permiso porque está siendo usado por ${rolesUsingPermission} hat(s)`,
         400
       );
     }

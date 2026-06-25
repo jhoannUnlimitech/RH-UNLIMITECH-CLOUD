@@ -195,7 +195,7 @@ const CSWForm = observer(() => {
                       {user.name}
                     </span>
                     <span className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
-                      {user.role?.name || "Sin rol"} • {user.division?.name || "Sin división"}
+                      {user.role?.name || "Sin hat"} • {user.division?.name || "Sin división"}
                     </span>
                   </div>
                 </div>

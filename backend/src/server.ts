@@ -10,6 +10,7 @@ import './models/Employee';
 import './models/ApprovalFlow';
 import './models/CSWCategory';
 import './models/CSW';
+import './models/Project';
 
 const startServer = async (): Promise<void> => {
   try {

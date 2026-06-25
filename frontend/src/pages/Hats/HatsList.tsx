@@ -18,9 +18,11 @@ import Pagination from "../../components/ui/pagination/Pagination";
 import { useModal } from "../../hooks/useModal";
 import DeleteConfirmModal from "../../components/hats/DeleteConfirmModal";
 import { PencilIcon, TrashBinIcon } from "../../icons";
+import { usePermissions } from "../../hooks/usePermissions";
 
 const HatsList = observer(() => {
   const navigate = useNavigate();
+  const { can } = usePermissions();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deletingRoleName, setDeletingRoleName] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -190,7 +192,8 @@ const HatsList = observer(() => {
               </span>
             </div>
 
-            {/* New Role Button */}
+            {/* New Hat Button - solo si tiene permiso de crear */}
+            {can('roles', 'create') && (
             <Button onClick={() => navigate('/roles/new')}>
               <svg
                 className="mr-2"
@@ -208,8 +211,9 @@ const HatsList = observer(() => {
                   strokeLinejoin="round"
                 />
               </svg>
-              Nuevo Rol
+              Nuevo Hat
             </Button>
+            )}
           </div>
         </div>
 
@@ -237,7 +241,7 @@ const HatsList = observer(() => {
               />
             </svg>
             <p className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
-              No hay roles
+              No hay hats
             </p>
             <p className="mb-6 text-sm text-gray-500 dark:text-gray-400">
               {searchTerm ? "No se encontraron resultados para tu búsqueda" : "Comienza creando tu primer hat"}
@@ -260,7 +264,7 @@ const HatsList = observer(() => {
                     strokeLinejoin="round"
                   />
                 </svg>
-                Nuevo Rol
+                Nuevo Hat
               </Button>
             )}
           </div>
@@ -277,7 +281,7 @@ const HatsList = observer(() => {
                       isHeader
                       className="py-3 px-4 sm:px-6 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                     >
-                      Nombre del Rol
+                      Nombre del Hat
                     </TableCell>
                     <TableCell
                       isHeader
