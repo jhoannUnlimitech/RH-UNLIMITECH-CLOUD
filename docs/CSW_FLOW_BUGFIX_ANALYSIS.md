@@ -8,42 +8,38 @@
 
 **Actual:** `CSW-{objectId}`
 
-**Nuevo:** `CSW-{ABREVIACION_TIPO}-{FECHA}-{5 primeros dígitos del ObjectId}`
+**Nuevo:** `CSW-{nombre_categoria_snake_case}-{fecha}-{5 primeros dígitos del ObjectId}`
 
-**Ejemplo:** `CSW-PER-20260624-6a3c5`
+**Ejemplos:**
+- `CSW-PERMISO-20260624-6a3c5`
+- `CSW-VACACIONES-20260624-6a3c5`
+- `CSW-AUMENTO_SALARIAL-20260624-6a3c5`
+- `CSW-ORDEN_DE_ESTUDIO-20260701-6b4d2`
+- `CSW-PERMISO_PERSONAL-20260624-6a3c5`
 
 **Implementación:**
 
-- **Modelo CSWCategory:** Agregar campo `abbreviation: string` (requerido, max 5 chars, uppercase)
+- **Sin campo nuevo en BD** — Se genera en el frontend a partir de `category.name`
+- **Función helper:**
   ```typescript
-  { abbreviation: { type: String, required: true, uppercase: true, maxlength: 5 } }
+  const toUpperSnakeCase = (str: string) => 
+    str.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+       .replace(/[^A-Z0-9]+/g, '_').replace(/^_|_$/g, '');
+  
+  const formatCSWTitle = (csw: CSW) => {
+    const catName = toUpperSnakeCase(csw.category?.name || 'OTRO');
+    const date = new Date(csw.createdAt).toISOString().split('T')[0].replace(/-/g, '');
+    const idShort = csw._id.substring(0, 5);
+    return `CSW-${catName}-${date}-${idShort}`;
+  };
   ```
-- **Seed de categorías:** Asignar abreviaciones:
-  | Categoría | Abreviación |
-  |-----------|-------------|
-  | Permiso | PER |
-  | Vacaciones | VAC |
-  | Incapacidad | INC |
-  | Aumento Salarial | AUM |
-  | Cambio de Turno | CTU |
-  | Capacitación | CAP |
-  | Trabajo Remoto | REM |
-  | Horas Extra | HEX |
-  | Solicitud de Equipos | EQU |
-  | Queja o Reclamo | QUE |
-  | Orden de Estudio | EST |
-  | Otros | OTR |
-
-- **Frontend CSWList:** Formatear título como `CSW-${category.abbreviation}-${fecha}-${_id.substring(0,5)}`
-- **Backend:** No se guarda como campo — se genera al mostrar (virtual o en el frontend)
-- **UI CSWCategory form:** Agregar input "Abreviación" (3-5 chars, auto-uppercase)
 
 **Archivos a modificar:**
-- `backend/src/models/CSWCategory.ts` — agregar `abbreviation`
-- `backend/src/controllers/cswCategory.controller.ts` — aceptar abbreviation
-- `frontend/src/pages/CSW/CSWList.tsx` — formatear título
-- `frontend/src/components/cswCategories/CSWCategoryFormModal.tsx` — input abbreviation
-- Migración para agregar abbreviation a categorías existentes
+- `frontend/src/pages/CSW/CSWList.tsx` — usar `formatCSWTitle()` en vez de `CSW-{id}`
+- `frontend/src/pages/CSW/CSWView.tsx` — titulo formateado en header
+- `frontend/src/utils/csw.ts` — (crear) helper `formatCSWTitle` y `toSnakeCase`
+
+**Impacto:** Bajo — solo cambio de display, sin tocar BD ni backend.
 
 ---
 
@@ -202,26 +198,21 @@ if (category.useDefaultFlow) {
 ### Backend
 | Archivo | Cambio |
 |---------|--------|
-| `models/CSWCategory.ts` | + abbreviation field |
 | `models/CSW.ts` | + 'draft' status, history entry para status_changed |
 | `controllers/csw.controller.ts` | draft logic, submit endpoint, auto-history |
-| `controllers/cswCategory.controller.ts` | accept abbreviation |
 | `routes/csw.routes.ts` | POST /:id/submit |
 | `models/AppSettings.ts` | (crear) configuración global |
 
 ### Frontend
 | Archivo | Cambio |
 |---------|--------|
-| `pages/CSW/CSWList.tsx` | formato título, badge borrador, ocultar drafts ajenos |
+| `pages/CSW/CSWList.tsx` | formato título snake_case, badge borrador, ocultar drafts ajenos |
 | `pages/CSW/CSWForm.tsx` | draft/submit, autoguardado, banner rechazo, badge estado |
-| `pages/CSW/CSWView.tsx` | badge estado en header |
-| `components/cswCategories/CSWCategoryFormModal.tsx` | input abbreviation |
+| `pages/CSW/CSWView.tsx` | badge estado en header, título formateado |
+| `utils/csw.ts` | (crear) helpers formatCSWTitle, toSnakeCase |
 
 ### Migraciones
-| Migración | Descripción |
-|-----------|-------------|
-| 006-add-abbreviation-to-categories | Agregar abbreviation a categorías existentes |
-| 007-add-draft-status-to-csw | (No necesita migración — MongoDB flexible) |
+- No se requieren migraciones — MongoDB flexible, el campo `draft` se acepta automáticamente.
 
 ---
 
