@@ -105,12 +105,22 @@ const EventsList = observer(() => {
   const [editTitle, setEditTitle] = useState("");
   const [editLink, setEditLink] = useState("");
   const [editType, setEditType] = useState("other");
+  const [editStartDate, setEditStartDate] = useState("");
+  const [editEndDate, setEditEndDate] = useState("");
+  const [editStartTime, setEditStartTime] = useState("");
+  const [editEndTime, setEditEndTime] = useState("");
+  const [editDescription, setEditDescription] = useState("");
 
   const handleEdit = (event: CalEvent) => {
     setEditingEvent(event);
     setEditTitle(event.title);
     setEditLink(event.link || "");
     setEditType(event.type);
+    setEditStartDate(event.startDate?.split('T')[0] || "");
+    setEditEndDate(event.endDate?.split('T')[0] || "");
+    setEditStartTime(event.startTime || "");
+    setEditEndTime(event.endTime || "");
+    setEditDescription(event.description || "");
   };
 
   const handleSaveEdit = async () => {
@@ -118,8 +128,14 @@ const EventsList = observer(() => {
     try {
       await apiClient.put(`/calendar/events/${editingEvent._id}`, {
         title: editTitle,
+        description: editDescription || undefined,
         link: editLink || undefined,
         type: editType,
+        startDate: editStartDate,
+        endDate: editEndDate,
+        startTime: editStartTime || undefined,
+        endTime: editEndTime || undefined,
+        allDay: !editStartTime,
       });
       notify.success("Evento actualizado");
       setEditingEvent(null);
@@ -247,24 +263,48 @@ const EventsList = observer(() => {
         )}
       </div>
 
-      {/* Modal de edición rápida */}
+      {/* Modal de edición */}
       {editingEvent && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
           <div className="fixed inset-0 bg-black/50" onClick={() => setEditingEvent(null)}></div>
-          <div className="relative w-full max-w-[500px] rounded-2xl bg-white p-6 dark:bg-gray-900 shadow-xl">
-            <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Editar Evento</h4>
+          <div className="relative w-full max-w-[600px] max-h-[80vh] overflow-y-auto rounded-2xl bg-white p-6 dark:bg-gray-900 shadow-xl">
+            <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-5">Editar Evento</h4>
             <div className="space-y-4">
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Título</label>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Título *</label>
                 <input type="text" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Link</label>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Descripción</label>
+                <textarea value={editDescription} onChange={(e) => setEditDescription(e.target.value)} rows={2} className="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 resize-none" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Fecha inicio *</label>
+                  <input type="date" value={editStartDate} onChange={(e) => setEditStartDate(e.target.value)} className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Fecha fin *</label>
+                  <input type="date" value={editEndDate} onChange={(e) => setEditEndDate(e.target.value)} className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Hora inicio</label>
+                  <input type="time" value={editStartTime} onChange={(e) => setEditStartTime(e.target.value)} className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Hora fin</label>
+                  <input type="time" value={editEndTime} onChange={(e) => setEditEndTime(e.target.value)} className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                </div>
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Link (opcional)</label>
                 <input type="url" value={editLink} onChange={(e) => setEditLink(e.target.value)} placeholder="https://..." className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
               </div>
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Tipo</label>
-                <select value={editType} onChange={(e) => setEditType(e.target.value)} className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                <select value={editType} onChange={(e) => setEditType(e.target.value)} className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 appearance-none">
                   <option value="meeting">Reunión</option>
                   <option value="deadline">Fecha límite</option>
                   <option value="reminder">Recordatorio</option>
@@ -273,7 +313,7 @@ const EventsList = observer(() => {
                 </select>
               </div>
             </div>
-            <div className="flex items-center justify-end gap-3 mt-6">
+            <div className="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
               <button onClick={() => setEditingEvent(null)} className="px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">Cancelar</button>
               <button onClick={handleSaveEdit} className="px-4 py-2.5 rounded-lg bg-brand-500 text-sm font-medium text-white hover:bg-brand-600">Guardar</button>
             </div>
