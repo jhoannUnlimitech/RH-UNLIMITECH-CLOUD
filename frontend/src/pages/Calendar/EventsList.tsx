@@ -206,6 +206,7 @@ const EventsList = observer(() => {
                     <TableCell isHeader className="py-3 px-4 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Título</TableCell>
                     <TableCell isHeader className="py-3 px-4 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400">Tipo</TableCell>
                     <TableCell isHeader className="py-3 px-4 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400">Fecha</TableCell>
+                    <TableCell isHeader className="py-3 px-4 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400">Horario</TableCell>
                     <TableCell isHeader className="py-3 px-4 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400">Creado por</TableCell>
                     {canManage && <TableCell isHeader className="py-3 px-4 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400">Acciones</TableCell>}
                   </TableRow>
@@ -230,6 +231,11 @@ const EventsList = observer(() => {
                       </TableCell>
                       <TableCell className="py-3 px-4 text-center">
                         <span className="text-sm text-gray-700 dark:text-gray-300">{formatDate(event.startDate)}</span>
+                      </TableCell>
+                      <TableCell className="py-3 px-4 text-center">
+                        <span className="text-sm text-gray-700 dark:text-gray-300">
+                          {event.startTime && event.endTime ? `${event.startTime} - ${event.endTime}` : event.startTime || 'Todo el día'}
+                        </span>
                       </TableCell>
                       <TableCell className="py-3 px-4 text-center">
                         <span className="text-sm text-gray-600 dark:text-gray-400">{event.createdBy?.name || "—"}</span>
