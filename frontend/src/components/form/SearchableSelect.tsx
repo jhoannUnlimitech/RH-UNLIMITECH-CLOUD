@@ -59,8 +59,18 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
     if (!buttonRef.current) return;
     const rect = buttonRef.current.getBoundingClientRect();
     const spaceBelow = window.innerHeight - rect.bottom;
-    const dropdownHeight = 220; // altura aproximada del dropdown
-    setOpenDirection(spaceBelow < dropdownHeight ? "up" : "down");
+    const spaceAbove = rect.top;
+    const dropdownHeight = 220;
+    
+    // Si no hay espacio abajo pero sí arriba → abrir arriba
+    if (spaceBelow < dropdownHeight && spaceAbove > dropdownHeight) {
+      setOpenDirection("up");
+    } else if (spaceBelow < 150) {
+      // Respaldo: si queda muy poco espacio abajo, abrir arriba
+      setOpenDirection("up");
+    } else {
+      setOpenDirection("down");
+    }
   }, []);
 
   const handleToggle = () => {
