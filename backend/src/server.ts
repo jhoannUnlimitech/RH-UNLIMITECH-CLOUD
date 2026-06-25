@@ -11,6 +11,7 @@ import './models/ApprovalFlow';
 import './models/CSWCategory';
 import './models/CSW';
 import './models/Project';
+import './models/WeeklyReport';
 
 const startServer = async (): Promise<void> => {
   try {

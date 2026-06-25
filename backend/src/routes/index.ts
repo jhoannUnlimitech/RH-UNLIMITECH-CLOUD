@@ -8,6 +8,7 @@ import approvalFlowRoutes from './approvalFlow.routes';
 import cswCategoryRoutes from './cswCategory.routes';
 import cswRoutes from './csw.routes';
 import projectsRoutes from './projects.routes';
+import weeklyReportRoutes from './weeklyReport.routes';
 
 const router = Router();
 
@@ -37,6 +38,9 @@ router.use('/csw', cswRoutes);
 
 // Rutas de proyectos
 router.use('/projects', projectsRoutes);
+
+// Rutas de reportes semanales
+router.use('/reports/weekly', weeklyReportRoutes);
 
 // Rutas de capacitaciones (se agregarán después)
 // router.use('/training', trainingRoutes);

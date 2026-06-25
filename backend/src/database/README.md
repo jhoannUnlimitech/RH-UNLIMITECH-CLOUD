@@ -82,6 +82,8 @@ npx ts-node src/database/migrations/001-add-status-to-employees.ts
 | 001 | add-status-to-employees | Añade campo `status: 'active'` a empleados sin él | 2026-01-29 |
 | 002 | fix-divisions-managerId | Repara managerId corrupto en divisiones | 2026-02-15 |
 | 003 | add-permissions-module | Crea permisos CRUD del módulo permissions | 2026-02-20 |
+| 004 | add-approve-csw-to-employees | Añade `approve_csw: false` a empleados | 2026-06-24 |
+| 005 | setup-production | Asegura 38 permisos base + hat admin actualizado | 2026-06-24 |
 
 ---
 

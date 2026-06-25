@@ -6,6 +6,7 @@ import RHMetrics from '../../components/dashboard/RHMetrics';
 import TopDivisions from '../../components/dashboard/TopDivisions';
 import RecentEmployees from '../../components/dashboard/RecentEmployees';
 import EmployeesByStatus from '../../components/dashboard/EmployeesByStatus';
+import WeeklyProductivityChart from '../../components/dashboard/WeeklyProductivityChart';
 import { usePermissions } from '../../hooks/usePermissions';
 import { authStore } from '../../stores/views';
 import apiClient from '../../api/client';
@@ -79,26 +80,13 @@ const Home = observer(() => {
       
       <div className="space-y-6">
         {/* Header con saludo */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Hola, {authStore.user?.name?.split(' ')[0] || 'Usuario'} 👋
-            </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              {userHat} • {userDivision}
-            </p>
-          </div>
-          {canSeeCSW && (
-            <Link
-              to="/csw/new"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Nueva Solicitud CSW
-            </Link>
-          )}
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Hola, {authStore.user?.name?.split(' ')[0] || 'Usuario'} 👋
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            {userHat} • {userDivision}
+          </p>
         </div>
 
         {/* Métricas principales (Admin/HR) */}
@@ -161,6 +149,9 @@ const Home = observer(() => {
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
           {/* Columna Izquierda — 2/3 */}
           <div className="xl:col-span-2 space-y-6">
+            {/* Gráfica de productividad semanal */}
+            <WeeklyProductivityChart />
+            
             {canSeeDivisions && <TopDivisions />}
             {canSeeEmployees && <RecentEmployees />}
 
