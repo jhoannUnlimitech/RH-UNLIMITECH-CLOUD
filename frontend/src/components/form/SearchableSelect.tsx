@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Label from "./Label";
 
 interface SearchableSelectProps {
@@ -29,7 +29,9 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [openDirection, setOpenDirection] = useState<"down" | "up">("down");
   const containerRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   // Debounce para la búsqueda
   useEffect(() => {
@@ -51,6 +53,23 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Calcular dirección del dropdown al abrir
+  const calculateDirection = useCallback(() => {
+    if (!buttonRef.current) return;
+    const rect = buttonRef.current.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const dropdownHeight = 220; // altura aproximada del dropdown
+    setOpenDirection(spaceBelow < dropdownHeight ? "up" : "down");
+  }, []);
+
+  const handleToggle = () => {
+    if (disabled) return;
+    if (!isOpen) {
+      calculateDirection();
+    }
+    setIsOpen(!isOpen);
+  };
 
   // Filtrar opciones basado en la búsqueda con debounce
   const filteredOptions = options.filter((option) =>
@@ -78,8 +97,9 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
       <div className="relative">
         <button
           type="button"
+          ref={buttonRef}
           id={id}
-          onClick={() => !disabled && setIsOpen(!isOpen)}
+          onClick={handleToggle}
           disabled={disabled}
           className={`h-11 w-full rounded-lg border px-4 py-2.5 text-sm shadow-theme-xs text-left focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 ${
             error
@@ -106,7 +126,12 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg dark:bg-gray-900 dark:border-gray-700 max-h-60 overflow-hidden">
+        <div
+          className={`absolute z-50 w-full bg-white border border-gray-300 rounded-lg shadow-lg dark:bg-gray-900 dark:border-gray-700 overflow-hidden ${
+            openDirection === "up" ? "bottom-full mb-1" : "top-full mt-1"
+          }`}
+          style={{ maxHeight: "210px" }}
+        >
           {/* Search input */}
           <div className="p-2 border-b border-gray-200 dark:border-gray-700">
             <input
@@ -114,13 +139,13 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Buscar..."
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-hidden focus:border-brand-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+              className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-hidden focus:border-brand-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
               autoFocus
             />
           </div>
 
           {/* Options list */}
-          <div className="overflow-y-auto max-h-48">
+          <div className="overflow-y-auto" style={{ maxHeight: "160px" }}>
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option) => (
                 <button

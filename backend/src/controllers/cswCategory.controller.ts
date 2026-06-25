@@ -14,7 +14,9 @@ export const getCSWCategories = async (
     const categories = await CSWCategory.find({
       active: true,
       deleted: false
-    }).sort({ order: 1, name: 1 });
+    })
+      .populate('directApproverId', 'name email')
+      .sort({ order: 1, name: 1 });
     
     res.json({
       success: true,
@@ -37,7 +39,9 @@ export const getAllCSWCategories = async (
   try {
     const categories = await CSWCategory.find({
       deleted: false
-    }).sort({ order: 1, name: 1 });
+    })
+      .populate('directApproverId', 'name email')
+      .sort({ order: 1, name: 1 });
     
     res.json({
       success: true,
@@ -87,7 +91,7 @@ export const createCSWCategory = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { name, description, active } = req.body;
+    const { name, description, active, useDefaultFlow, directApproverId } = req.body;
     
     // Obtener el último order para asignar automáticamente la siguiente posición
     const lastCategory = await CSWCategory.findOne({ deleted: false })
@@ -96,16 +100,27 @@ export const createCSWCategory = async (
     
     const nextOrder = lastCategory ? lastCategory.order + 1 : 1;
     
-    const category = await CSWCategory.create({
+    const categoryData: any = {
       name,
       description,
       active: active !== undefined ? active : true,
-      order: nextOrder
-    });
+      order: nextOrder,
+      useDefaultFlow: useDefaultFlow !== undefined ? useDefaultFlow : true,
+    };
+
+    if (!categoryData.useDefaultFlow && directApproverId) {
+      categoryData.directApproverId = directApproverId;
+    }
+    
+    const category = await CSWCategory.create(categoryData);
+    
+    // Poblar directApproverId si existe
+    const populated = await CSWCategory.findById(category._id)
+      .populate('directApproverId', 'name email');
     
     res.status(201).json({
       success: true,
-      data: category,
+      data: populated,
       message: 'Categoría creada exitosamente'
     });
   } catch (error: any) {
@@ -130,7 +145,7 @@ export const updateCSWCategory = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    const { name, description, active, order } = req.body;
+    const { name, description, active, order, useDefaultFlow, directApproverId } = req.body;
     
     const category = await CSWCategory.findOne({ _id: id, deleted: false });
     
@@ -146,12 +161,21 @@ export const updateCSWCategory = async (
     if (description !== undefined) category.description = description;
     if (active !== undefined) category.active = active;
     if (order !== undefined) category.order = order;
+    if (useDefaultFlow !== undefined) category.useDefaultFlow = useDefaultFlow;
+    if (useDefaultFlow === false && directApproverId) {
+      category.directApproverId = directApproverId;
+    } else if (useDefaultFlow === true) {
+      category.directApproverId = undefined;
+    }
     
     await category.save();
     
+    const populated = await CSWCategory.findById(category._id)
+      .populate('directApproverId', 'name email');
+    
     res.json({
       success: true,
-      data: category,
+      data: populated,
       message: 'Categoría actualizada exitosamente'
     });
   } catch (error: any) {

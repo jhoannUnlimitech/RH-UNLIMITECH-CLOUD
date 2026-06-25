@@ -134,6 +134,42 @@ const ViewEmployeeModal: React.FC<ViewEmployeeModalProps> = ({
               {employee.division?.name || 'Sin división'}
             </p>
           </div>
+
+          {/* Status */}
+          <div className="space-y-1.5">
+            <label className="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Estado
+            </label>
+            <div className="flex items-center gap-2">
+              <div className={`w-9 h-5 rounded-full relative ${employee.status === 'active' ? 'bg-brand-600' : 'bg-gray-300 dark:bg-gray-600'}`}>
+                <div className={`absolute top-[2px] w-4 h-4 bg-white rounded-full transition-all ${employee.status === 'active' ? 'left-[18px]' : 'left-[2px]'}`}></div>
+              </div>
+              <span className="text-sm font-medium text-gray-800 dark:text-white/90">
+                {employee.status === 'active' ? 'Activo' : 'Inactivo'}
+              </span>
+            </div>
+          </div>
+
+          {/* Approve CSW */}
+          <div className="space-y-1.5">
+            <label className="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+              Puede aprobar CSW
+            </label>
+            <div className="flex items-center gap-2">
+              <div className={`w-9 h-5 rounded-full relative ${employee.approve_csw ? 'bg-brand-600' : 'bg-gray-300 dark:bg-gray-600'}`}>
+                <div className={`absolute top-[2px] w-4 h-4 bg-white rounded-full transition-all ${employee.approve_csw ? 'left-[18px]' : 'left-[2px]'}`}></div>
+              </div>
+              <span className="text-sm font-medium text-gray-800 dark:text-white/90">
+                {employee.approve_csw ? 'Sí' : 'No'}
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Footer */}

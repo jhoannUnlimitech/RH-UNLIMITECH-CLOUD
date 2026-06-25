@@ -26,7 +26,7 @@ const SignIn = observer(() => {
   return (
     <>
       <PageMeta
-        title="Sign In - RH UNLIMITECH"
+        title="Iniciar Sesión - RH UNLIMITECH"
         description="Inicia sesión en el sistema de gestión de RRHH"
       />
       <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 dark:bg-gray-900 sm:px-6 lg:px-8">

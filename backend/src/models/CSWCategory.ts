@@ -10,6 +10,8 @@ export interface ICSWCategory extends Document {
   description?: string;
   active: boolean;
   order: number; // Para ordenar en el combobox
+  useDefaultFlow: boolean; // Si usa el flujo de aprobación de la división
+  directApproverId?: Schema.Types.ObjectId; // Aprobador directo si useDefaultFlow=false
   
   // Soft delete
   deleted: boolean;
@@ -42,6 +44,19 @@ const CSWCategorySchema = new Schema<ICSWCategory>({
   order: {
     type: Number,
     default: 0
+  },
+  
+  useDefaultFlow: {
+    type: Boolean,
+    default: true
+  },
+  
+  directApproverId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Employee',
+    required: function(this: ICSWCategory) {
+      return !this.useDefaultFlow;
+    }
   },
   
   deleted: {
