@@ -3,6 +3,7 @@ import { observer } from "mobx-react-lite";
 import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 import flatpickr from "flatpickr";
+import { Spanish } from "flatpickr/dist/l10n/es.js";
 import apiClient from "../../api/client";
 import { authStore } from "../../stores/views";
 import { CalenderIcon } from "../../icons";
@@ -51,7 +52,8 @@ const WeeklyProductivityChart = observer(() => {
       mode: "range",
       static: true,
       monthSelectorType: "static",
-      dateFormat: "M d",
+      dateFormat: "d M",
+      locale: Spanish,
       defaultDate: [eightWeeksAgo, new Date()],
       prevArrow: '<svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M12.5 15L7.5 10L12.5 5" stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
       nextArrow: '<svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M7.5 15L12.5 10L7.5 5" stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -84,7 +86,8 @@ const WeeklyProductivityChart = observer(() => {
 
   const formatWeek = (dateStr: string) => {
     const d = new Date(dateStr);
-    return `${d.getDate()} ${d.toLocaleString('es', { month: 'short' })}`;
+    const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    return `${d.getDate()} ${months[d.getMonth()]}`;
   };
 
   const categories = reports.map(r => formatWeek(r.weekStart));

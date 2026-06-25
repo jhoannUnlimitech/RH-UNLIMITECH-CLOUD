@@ -10,6 +10,7 @@ import { useModal } from "../../hooks/useModal";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import PageMeta from "../../utils/PageMeta";
 import { usePermissions } from "../../hooks/usePermissions";
+import SearchableSelect from "../../components/form/SearchableSelect";
 import Holidays from "date-holidays";
 
 interface CalendarEvent extends EventInput {
@@ -276,18 +277,20 @@ const CalendarPage: React.FC = () => {
                 <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                   Tipo de evento
                 </label>
-                <select
+                <SearchableSelect
+                  id="event-type"
+                  options={[
+                    { value: "meeting", label: "Reunión" },
+                    { value: "deadline", label: "Fecha límite" },
+                    { value: "reminder", label: "Recordatorio" },
+                    { value: "training", label: "Capacitación" },
+                    { value: "holiday", label: "Festivo" },
+                    { value: "other", label: "Otro" },
+                  ]}
                   value={eventType}
-                  onChange={(e) => setEventType(e.target.value)}
-                  className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
-                >
-                  <option value="meeting">Reunión</option>
-                  <option value="deadline">Fecha límite</option>
-                  <option value="reminder">Recordatorio</option>
-                  <option value="training">Capacitación</option>
-                  <option value="holiday">Festivo</option>
-                  <option value="other">Otro</option>
-                </select>
+                  onChange={(v) => setEventType(v)}
+                  placeholder="Seleccionar tipo..."
+                />
               </div>
 
               {/* Fechas */}
