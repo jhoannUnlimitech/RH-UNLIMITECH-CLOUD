@@ -7,6 +7,7 @@ import TopDivisions from '../../components/dashboard/TopDivisions';
 import RecentEmployees from '../../components/dashboard/RecentEmployees';
 import EmployeesByStatus from '../../components/dashboard/EmployeesByStatus';
 import WeeklyProductivityChart from '../../components/dashboard/WeeklyProductivityChart';
+import CurrentWeekSummary from '../../components/dashboard/CurrentWeekSummary';
 import { usePermissions } from '../../hooks/usePermissions';
 import { authStore } from '../../stores/views';
 import apiClient from '../../api/client';
@@ -146,7 +147,7 @@ const Home = observer(() => {
         )}
 
         {/* Grid de contenido principal */}
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-3 items-start">
           {/* Columna Izquierda — 2/3 */}
           <div className="xl:col-span-2 space-y-6">
             {/* Gráfica de productividad semanal */}
@@ -175,40 +176,38 @@ const Home = observer(() => {
               </div>
             )}
 
+          </div>
+
+          {/* Columna Derecha — 1/3 */}
+          <div className="xl:col-span-1 space-y-6">
+            {/* Rendimiento esta semana */}
+            <CurrentWeekSummary />
+
             {/* Mis Proyectos */}
             {canAccessResource('projects') && myProjects.length > 0 && (
-              <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-base font-semibold text-gray-800 dark:text-white">
-                    Mis Proyectos
-                  </h4>
-                  <Link to="/projects" className="text-sm text-brand-600 hover:text-brand-700 dark:text-brand-400">
-                    Ver todos →
-                  </Link>
+              <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-semibold text-gray-800 dark:text-white">Mis Proyectos</h4>
+                  <Link to="/projects" className="text-xs text-brand-600 hover:text-brand-700 dark:text-brand-400">Ver todos →</Link>
                 </div>
-                <div className="space-y-3">
-                  {myProjects.slice(0, 4).map((project: any) => (
-                    <div key={project._id} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-white/[0.03]">
-                      <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">{project.name}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">{project.code}</p>
+                <div className="space-y-2">
+                  {myProjects.slice(0, 3).map((project: any) => (
+                    <div key={project._id} className="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-white/[0.03]">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{project.name}</p>
+                        <p className="text-xs text-gray-500 font-mono">{project.code}</p>
                       </div>
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${
                         project.status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
                         project.status === 'on_hold' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                        'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
-                      }`}>
-                        {project.status === 'active' ? 'Activo' : project.status === 'on_hold' ? 'Pausa' : project.status}
-                      </span>
+                        'bg-gray-100 text-gray-600'
+                      }`}>{project.status === 'active' ? 'Activo' : project.status === 'on_hold' ? 'Pausa' : project.status}</span>
                     </div>
                   ))}
                 </div>
               </div>
             )}
-          </div>
-
-          {/* Columna Derecha — 1/3 */}
-          <div className="xl:col-span-1 space-y-6">
+            
             {canSeeEmployees && <EmployeesByStatus />}
             
             {/* Acciones rápidas */}

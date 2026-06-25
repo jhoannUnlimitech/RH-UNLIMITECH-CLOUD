@@ -1,13 +1,17 @@
-feat(productivity): weekly reports model + charts + startup script
+feat(dashboard): productivity charts + current week summary + layout improvements
 
-- feat(backend): WeeklyReport model with qa_metrics and dev_metrics
-- feat(backend): /reports/weekly/me, /employee/:id, /division/:id endpoints
-- feat(backend): seed-weekly-reports.ts with 8 weeks data for QA and Dev
-- feat(frontend): WeeklyProductivityChart component (ApexCharts area)
-  - QA view: ACs validated vs automated + current week summary
-  - Dev view: Net insertions vs deletions + UIP/d, commits, self-churn
-- feat(dashboard): chart integrated for all users with reports
-- feat(ops): start.sh script to boot Docker + Backend + Frontend
-- feat(migrations): 005-setup-production ensures all 38 permissions exist
-- refactor(dashboard): remove "Nueva Solicitud CSW" button from header
-- docs: database README updated with migration 004 and 005
+- feat(dashboard): CurrentWeekSummary card in right column (QA: ACs/commits, Dev: UIP/d/commits)
+- feat(dashboard): WeeklyProductivityChart with flatpickr datepicker range
+- feat(dashboard): move Mis Proyectos to right column (compact, max 3 items)
+- fix(dashboard): add items-start to grid to eliminate empty space below right column
+- feat(docs): DASHBOARD_ENHANCEMENTS.md with full analysis and implementation plan
+- chore: solution/dashboard-enhancements branch created
+
+PENDIENTES para siguiente sesión:
+- Profile page (/profile) con datos del usuario y cambio de contraseña
+- Configuración general del sistema (settings)
+- Tabs Monthly/Quarterly/Annually en la gráfica (como StatisticsChart de TailAdmin)
+- Fix datepicker calendar dropdown styling
+- Mover "Validados/Auto" del header al footer de la gráfica
+- Calendario de festivos con date-holidays
+- DemographicCard (empleados por país)
