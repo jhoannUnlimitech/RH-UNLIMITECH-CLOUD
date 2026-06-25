@@ -101,6 +101,32 @@ const EventsList = observer(() => {
     } catch { notify.error("Error al eliminar"); }
   };
 
+  const [editingEvent, setEditingEvent] = useState<CalEvent | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editLink, setEditLink] = useState("");
+  const [editType, setEditType] = useState("other");
+
+  const handleEdit = (event: CalEvent) => {
+    setEditingEvent(event);
+    setEditTitle(event.title);
+    setEditLink(event.link || "");
+    setEditType(event.type);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingEvent) return;
+    try {
+      await apiClient.put(`/calendar/events/${editingEvent._id}`, {
+        title: editTitle,
+        link: editLink || undefined,
+        type: editType,
+      });
+      notify.success("Evento actualizado");
+      setEditingEvent(null);
+      loadEvents();
+    } catch { notify.error("Error al actualizar"); }
+  };
+
   const totalPages = Math.ceil(events.length / itemsPerPage);
   const startIdx = (currentPage - 1) * itemsPerPage;
   const currentData = events.slice(startIdx, startIdx + itemsPerPage);
@@ -200,9 +226,9 @@ const EventsList = observer(() => {
                                 <svg className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                               </a>
                             )}
-                            <Link to="/calendar" className="inline-flex items-center justify-center rounded-lg p-2 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-white/[0.05]" title="Editar en calendario">
+                            <button onClick={() => handleEdit(event)} className="inline-flex items-center justify-center rounded-lg p-2 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-white/[0.05]" title="Editar">
                               <PencilIcon className="h-[18px] w-[18px]" />
-                            </Link>
+                            </button>
                             <button onClick={() => handleDelete(event._id)} className="inline-flex items-center justify-center rounded-lg p-2 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-white/[0.05]" title="Eliminar">
                               <TrashBinIcon className="h-[18px] w-[18px]" />
                             </button>
@@ -220,6 +246,40 @@ const EventsList = observer(() => {
           </>
         )}
       </div>
+
+      {/* Modal de edición rápida */}
+      {editingEvent && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/50" onClick={() => setEditingEvent(null)}></div>
+          <div className="relative w-full max-w-[500px] rounded-2xl bg-white p-6 dark:bg-gray-900 shadow-xl">
+            <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Editar Evento</h4>
+            <div className="space-y-4">
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Título</label>
+                <input type="text" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Link</label>
+                <input type="url" value={editLink} onChange={(e) => setEditLink(e.target.value)} placeholder="https://..." className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Tipo</label>
+                <select value={editType} onChange={(e) => setEditType(e.target.value)} className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                  <option value="meeting">Reunión</option>
+                  <option value="deadline">Fecha límite</option>
+                  <option value="reminder">Recordatorio</option>
+                  <option value="training">Capacitación</option>
+                  <option value="other">Otro</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-3 mt-6">
+              <button onClick={() => setEditingEvent(null)} className="px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">Cancelar</button>
+              <button onClick={handleSaveEdit} className="px-4 py-2.5 rounded-lg bg-brand-500 text-sm font-medium text-white hover:bg-brand-600">Guardar</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 });
