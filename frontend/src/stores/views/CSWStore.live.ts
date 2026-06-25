@@ -238,6 +238,37 @@ export class CSWStoreLive implements ICSWStore {
     }
   }
 
+  async submitCSW(id: string): Promise<void> {
+    runInAction(() => {
+      this.isLoading = true;
+      this.error = null;
+    });
+
+    try {
+      const updatedCSW = await cswService.submit(id);
+      runInAction(() => {
+        const index = this.csws.findIndex((csw) => csw._id === id);
+        if (index !== -1) {
+          this.csws[index] = updatedCSW;
+        }
+        if (this.selectedCSW?._id === id) {
+          this.selectedCSW = updatedCSW;
+        }
+      });
+      notify.success('Solicitud enviada para aprobación');
+    } catch (err: any) {
+      runInAction(() => {
+        this.error = err.response?.data?.message || 'Error al enviar solicitud';
+      });
+      notify.error(err.response?.data?.message || 'Error al enviar solicitud');
+      throw err;
+    } finally {
+      runInAction(() => {
+        this.isLoading = false;
+      });
+    }
+  }
+
   clearError(): void {
     this.error = null;
   }

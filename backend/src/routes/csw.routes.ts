@@ -9,6 +9,7 @@ import {
   getCSWHistory,
   createCSW,
   updateCSW,
+  submitCSW,
   approveCSW,
   rejectCSW,
   cancelCSW,
@@ -637,6 +638,21 @@ router.delete(
   authMiddleware,
   requirePermission('csw', 'delete'),
   deleteCSW
+);
+
+/**
+ * @swagger
+ * /csw/{id}/submit:
+ *   post:
+ *     tags: [CSW]
+ *     summary: Enviar borrador para aprobación
+ *     description: Cambia estado de draft a pending y activa el flujo de aprobación
+ */
+router.post(
+  '/:id/submit',
+  authMiddleware,
+  requirePermission('csw', 'create'),
+  submitCSW
 );
 
 export default router;

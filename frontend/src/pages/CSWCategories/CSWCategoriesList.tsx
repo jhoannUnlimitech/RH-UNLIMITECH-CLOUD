@@ -48,7 +48,7 @@ const CSWCategoriesList = observer(() => {
 
   // Fetch categories on mount
   useEffect(() => {
-    cswCategoryStore.fetchCategories();
+    cswCategoryStore.fetchAllCategories();
   }, []);
 
   // Filtered data
@@ -323,7 +323,7 @@ const CSWCategoriesList = observer(() => {
         onClose={createModal.closeModal}
         onSuccess={() => {
           createModal.closeModal();
-          cswCategoryStore.fetchCategories();
+          cswCategoryStore.fetchAllCategories();
         }}
       />
 
@@ -334,7 +334,7 @@ const CSWCategoriesList = observer(() => {
           categoryId={editingCategoryId}
           onSuccess={() => {
             handleCloseEditModal();
-            cswCategoryStore.fetchCategories();
+            cswCategoryStore.fetchAllCategories();
           }}
         />
       )}

@@ -430,6 +430,35 @@ export class CSWStoreMock implements ICSWStore {
     });
   }
 
+  async submitCSW(id: string): Promise<void> {
+    runInAction(() => {
+      this.isLoading = true;
+      this.error = null;
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    runInAction(() => {
+      const index = this.csws.findIndex((csw) => csw._id === id);
+      if (index !== -1) {
+        const csw = this.csws[index];
+        csw.status = ICSWStore.CSWStatus.PENDING;
+        csw.history.push({
+          action: 'Solicitud enviada para aprobación',
+          performedBy: 'current-user',
+          performedByName: 'Usuario Actual',
+          performedAt: new Date().toISOString(),
+        });
+        csw.updatedAt = new Date().toISOString();
+        this.csws[index] = csw;
+        if (this.selectedCSW?._id === id) {
+          this.selectedCSW = csw;
+        }
+      }
+      this.isLoading = false;
+    });
+  }
+
   clearError(): void {
     this.error = null;
   }

@@ -1,11 +1,14 @@
 import { observer } from "mobx-react-lite";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate, useParams } from "react-router";
 import { cswStore, cswCategoryStore, authStore } from "../../stores/views";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import Button from "../../components/ui/button/Button";
 import Alert from "../../components/ui/alert/Alert";
+import Badge from "../../components/ui/badge/Badge";
 import SearchableSelect from "../../components/form/SearchableSelect";
+import { formatCSWTitle, cswStatusConfig } from "../../utils/csw";
+import { ICSWStore } from "../../stores/views/CSWStore.contract";
 
 const CSWForm = observer(() => {
   const navigate = useNavigate();
@@ -20,6 +23,10 @@ const CSWForm = observer(() => {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [lastAutoSave, setLastAutoSave] = useState<string | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
+  const autoSaveInterval = useRef<NodeJS.Timeout | null>(null);
+  const formDataRef = useRef(formData);
 
   // Límites de palabras para cada campo
   const WORD_LIMITS = {
@@ -32,6 +39,11 @@ const CSWForm = observer(() => {
   const countWords = (text: string): number => {
     return text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
   };
+
+  // Mantener ref actualizada
+  useEffect(() => {
+    formDataRef.current = formData;
+  }, [formData]);
 
   useEffect(() => {
     cswCategoryStore.fetchCategories();
@@ -53,11 +65,46 @@ const CSWForm = observer(() => {
     }
   }, [isEditing, cswStore.selectedCSW]);
 
+  // Autosave para borradores (cada 5 min)
+  const autoSave = useCallback(async () => {
+    if (!isDirty || !id) return;
+    const csw = cswStore.selectedCSW;
+    if (!csw || csw.status !== ICSWStore.CSWStatus.DRAFT) return;
+
+    try {
+      const data = formDataRef.current;
+      await cswStore.updateCSW(id, {
+        situation: data.situation,
+        information: data.information,
+        solution: data.solution,
+        category: data.category,
+      });
+      setIsDirty(false);
+      setLastAutoSave(new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" }));
+    } catch {
+      // Silencioso — no interrumpir al usuario
+    }
+  }, [isDirty, id]);
+
+  useEffect(() => {
+    // Solo activar autosave para borradores existentes
+    const csw = cswStore.selectedCSW;
+    if (isEditing && csw?.status === ICSWStore.CSWStatus.DRAFT) {
+      autoSaveInterval.current = setInterval(autoSave, 5 * 60 * 1000); // 5 min
+    }
+    return () => {
+      if (autoSaveInterval.current) {
+        clearInterval(autoSaveInterval.current);
+      }
+    };
+  }, [isEditing, cswStore.selectedCSW?.status, autoSave]);
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setIsDirty(true);
     // Clear error when user types
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
@@ -66,6 +113,7 @@ const CSWForm = observer(() => {
 
   const handleSelectChange = (name: string, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setIsDirty(true);
     // Clear error when user selects
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
@@ -112,27 +160,81 @@ const CSWForm = observer(() => {
       category: formData.category,
     };
 
-    console.log("Enviando datos CSW:", submitData);
-
     try {
       if (isEditing && id) {
         await cswStore.updateCSW(id, submitData);
-        console.log("CSW actualizado exitosamente");
       } else {
         await cswStore.createCSW(submitData);
-        console.log("CSW creado exitosamente");
       }
 
       // Solo navegar si no hubo error
       if (!cswStore.error) {
-        console.log("Navegando a /csw/my-requests");
+        await new Promise((resolve) => setTimeout(resolve, 600));
         navigate("/csw/my-requests");
-      } else {
-        console.error("Error en el store:", cswStore.error);
       }
     } catch (error) {
-      // Error is handled by the store, no navegar si hay error
-      console.error("Error capturado al guardar CSW:", error);
+      // Error is handled by the store
+      console.error("Error al guardar CSW:", error);
+    }
+  };
+
+  // Guardar como borrador (sin validación completa)
+  const handleSaveDraft = async () => {
+    if (!formData.category) {
+      setErrors({ category: "La categoría es requerida para guardar" });
+      return;
+    }
+
+    const submitData = {
+      situation: formData.situation,
+      information: formData.information,
+      solution: formData.solution,
+      category: formData.category,
+    };
+
+    try {
+      if (isEditing && id) {
+        await cswStore.updateCSW(id, submitData);
+      } else {
+        await cswStore.createCSW(submitData);
+      }
+
+      if (!cswStore.error) {
+        // Delay mínimo para feedback visual
+        await new Promise((resolve) => setTimeout(resolve, 600));
+        navigate("/csw/my-requests");
+      }
+    } catch (error) {
+      console.error("Error al guardar borrador:", error);
+    }
+  };
+
+  // Enviar borrador para aprobación
+  const handleSubmitForApproval = async () => {
+    if (!validateForm()) return;
+    if (!id) return;
+
+    // Guardar silenciosamente primero (sin toast)
+    const submitData = {
+      situation: formData.situation,
+      information: formData.information,
+      solution: formData.solution,
+      category: formData.category,
+    };
+
+    try {
+      // Update silencioso - usamos el service directamente para no disparar toast
+      const { cswService } = await import("../../api/services/csw");
+      await cswService.update(id, submitData);
+      
+      // Ahora sí enviar (esto muestra el toast)
+      await cswStore.submitCSW(id);
+      if (!cswStore.error) {
+        await new Promise((resolve) => setTimeout(resolve, 600));
+        navigate("/csw/my-requests");
+      }
+    } catch (error) {
+      console.error("Error al enviar solicitud:", error);
     }
   };
 
@@ -153,6 +255,16 @@ const CSWForm = observer(() => {
     day: "numeric",
   });
   const user = authStore.user;
+  const csw = cswStore.selectedCSW;
+
+  // Info de rechazo (para mostrar banner)
+  const lastRejection = isEditing && csw?.status === ICSWStore.CSWStatus.REJECTED
+    ? csw.approvalChain.find(a => a.status === ICSWStore.ApprovalStatus.REJECTED)
+    : null;
+
+  // Estado del CSW actual
+  const currentStatus = isEditing && csw ? csw.status : null;
+  const isDraft = currentStatus === ICSWStore.CSWStatus.DRAFT;
 
   return (
     <div className="flex flex-col gap-6">
@@ -169,6 +281,33 @@ const CSWForm = observer(() => {
         />
       )}
 
+      {/* Rejection Banner */}
+      {lastRejection && (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-5 dark:border-red-800 dark:bg-red-900/10">
+          <div className="flex items-start gap-3">
+            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
+              <svg className="h-4 w-4 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <h4 className="text-sm font-semibold text-red-800 dark:text-red-300">
+                Solicitud Rechazada
+              </h4>
+              <p className="mt-1 text-sm text-red-700 dark:text-red-400">
+                {lastRejection.comments || "Sin comentarios"}
+              </p>
+              <p className="mt-2 text-xs text-red-500 dark:text-red-500">
+                Rechazado por <span className="font-medium">{lastRejection.approverName}</span>
+                {lastRejection.approvedAt && (
+                  <> — {new Date(lastRejection.approvedAt).toLocaleString("es-ES")}</>
+                )}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Form Container */}
       <div className="rounded-xl bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card">
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
@@ -176,14 +315,27 @@ const CSWForm = observer(() => {
           <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-dark dark:text-white">
-                  {isEditing ? "Editar Solicitud CSW" : "Nueva Solicitud CSW"}
-                </h1>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-3xl font-bold text-dark dark:text-white">
+                    {isEditing ? "Editar Solicitud CSW" : "Nueva Solicitud CSW"}
+                  </h1>
+                  {currentStatus && (
+                    <Badge color={cswStatusConfig[currentStatus]?.color || "light"}>
+                      {cswStatusConfig[currentStatus]?.label || currentStatus}
+                    </Badge>
+                  )}
+                </div>
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                   {isEditing
                     ? "Actualiza la información de la solicitud"
                     : "Completa el formulario para crear una nueva solicitud"}
                 </p>
+                {/* Autosave indicator */}
+                {lastAutoSave && isDraft && (
+                  <p className="mt-1 text-xs text-green-600 dark:text-green-400">
+                    ✓ Guardado automáticamente a las {lastAutoSave}
+                  </p>
+                )}
               </div>
               {user && (
                 <div className="px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
@@ -336,18 +488,78 @@ const CSWForm = observer(() => {
             >
               Cancelar
             </Button>
-            <Button
-              type="submit"
-              disabled={cswStore.isLoading}
-            >
-              {cswStore.isLoading
-                ? isEditing
-                  ? "Actualizando..."
-                  : "Creando..."
-                : isEditing
-                ? "Actualizar Solicitud"
-                : "Crear Solicitud"}
-            </Button>
+
+            {/* Si es draft existente: Guardar Borrador + Enviar Solicitud */}
+            {isEditing && isDraft ? (
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleSaveDraft}
+                  disabled={cswStore.isLoading}
+                >
+                  {cswStore.isLoading ? (
+                    <span className="flex items-center gap-2">
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
+                      Guardando...
+                    </span>
+                  ) : "Guardar Borrador"}
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleSubmitForApproval}
+                  disabled={cswStore.isLoading}
+                >
+                  {cswStore.isLoading ? (
+                    <span className="flex items-center gap-2">
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                      Enviando...
+                    </span>
+                  ) : "Enviar Solicitud"}
+                </Button>
+              </>
+            ) : !isEditing ? (
+              /* Crear nuevo: Guardar como Borrador + Crear y Enviar */
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleSaveDraft}
+                  disabled={cswStore.isLoading}
+                >
+                  {cswStore.isLoading ? (
+                    <span className="flex items-center gap-2">
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
+                      Guardando...
+                    </span>
+                  ) : "Guardar Borrador"}
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={cswStore.isLoading}
+                >
+                  {cswStore.isLoading ? (
+                    <span className="flex items-center gap-2">
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                      Creando...
+                    </span>
+                  ) : "Crear y Enviar"}
+                </Button>
+              </>
+            ) : (
+              /* Editando rechazado u otro: Actualizar Solicitud */
+              <Button
+                type="submit"
+                disabled={cswStore.isLoading}
+              >
+                {cswStore.isLoading ? (
+                  <span className="flex items-center gap-2">
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                    Actualizando...
+                  </span>
+                ) : "Actualizar Solicitud"}
+              </Button>
+            )}
           </div>
         </form>
       </div>

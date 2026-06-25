@@ -222,6 +222,7 @@ const seedReal = async (): Promise<void> => {
       { name: 'Horas Extra', description: 'Reporte de horas extras', active: true, order: 8 },
       { name: 'Solicitud de Equipos', description: 'Equipos de cómputo o herramientas', active: true, order: 9 },
       { name: 'Queja o Reclamo', description: 'Inconformidad laboral', active: true, order: 10 },
+      { name: 'Orden de Estudio', description: 'Solicitud de cambio de horario para horas de estudio', active: true, order: 11, useDefaultFlow: false, directApproverId: employees[1]._id },
       { name: 'Otros', description: 'Solicitudes no categorizadas', active: true, order: 99 },
     ]);
     console.log(`✅ ${categories.length} categorías CSW`);

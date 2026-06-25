@@ -66,6 +66,16 @@ class CSWService {
   }
 
   /**
+   * Enviar borrador para aprobación (draft → pending)
+   */
+  async submit(id: string): Promise<ICSWStore.CSW> {
+    const response = await apiClient.post<{ success: boolean; data: ICSWStore.CSW }>(
+      `${this.baseURL}/${id}/submit`
+    );
+    return response.data.data;
+  }
+
+  /**
    * Cancelar una solicitud
    */
   async cancel(id: string, comments?: string): Promise<ICSWStore.CSW> {

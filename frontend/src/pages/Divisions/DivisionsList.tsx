@@ -130,6 +130,26 @@ const DivisionsList = observer(() => {
     <div className="flex flex-col gap-6">
       {/* Breadcrumb */}
       <PageBreadcrumb pageTitle="Divisiones" />
+
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+            Divisiones
+          </h1>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Estructura organizacional y equipos de la empresa
+          </p>
+        </div>
+        {can('divisions', 'create') && (
+          <Button onClick={createModal.openModal} className="flex items-center gap-2">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 5V15M5 10H15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Nueva División
+          </Button>
+        )}
+      </div>
       
       {/* Error Display */}
       {divisionsStore.error && (
@@ -207,27 +227,6 @@ const DivisionsList = observer(() => {
                 className="h-11 w-full rounded-lg border border-gray-300 bg-transparent py-2.5 pl-11 pr-4 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[300px]"
               />
             </div>
-            {can('divisions', 'create') && (
-            <Button onClick={createModal.openModal}>
-              <svg
-                className="mr-2"
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M10 5V15M5 10H15"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              Nueva División
-            </Button>
-            )}
           </div>
         </div>
 
