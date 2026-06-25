@@ -304,13 +304,19 @@ const EventsList = observer(() => {
               </div>
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Tipo</label>
-                <select value={editType} onChange={(e) => setEditType(e.target.value)} className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 appearance-none">
-                  <option value="meeting">Reunión</option>
-                  <option value="deadline">Fecha límite</option>
-                  <option value="reminder">Recordatorio</option>
-                  <option value="training">Capacitación</option>
-                  <option value="other">Otro</option>
-                </select>
+                <SearchableSelect
+                  id="edit-event-type"
+                  options={[
+                    { value: "meeting", label: "Reunión" },
+                    { value: "deadline", label: "Fecha límite" },
+                    { value: "reminder", label: "Recordatorio" },
+                    { value: "training", label: "Capacitación" },
+                    { value: "other", label: "Otro" },
+                  ]}
+                  value={editType}
+                  onChange={(v) => setEditType(v)}
+                  placeholder="Seleccionar tipo..."
+                />
               </div>
             </div>
             <div className="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
