@@ -6,6 +6,7 @@ import {
   UserCircleIcon,
   BoxCubeIcon,
   FolderIcon,
+  CalenderIcon,
   ChevronDownIcon,
   HorizontaLDots,
 } from "../icons";
@@ -67,6 +68,12 @@ const navItems: NavItem[] = [
       { name: "Pendientes de Aprobación", path: "/csw/pending", resource: "csw", requireApproveCSW: true },
       { name: "Todas las Solicitudes", path: "/csw/all", resource: "csw", adminOnly: true },
     ],
+  },
+  {
+    name: "Calendario",
+    icon: <CalenderIcon />,
+    path: "/calendar",
+    // Sin resource → visible para todos
   },
 ];
 

@@ -19,6 +19,7 @@ import CSWList from "./pages/CSW/CSWList";
 import CSWForm from "./pages/CSW/CSWForm";
 import CSWView from "./pages/CSW/CSWView";
 import NotFound from "./pages/Errors/NotFound";
+import CalendarPage from "./pages/Calendar/CalendarPage";
 
 export default function App() {
   // Verificar autenticación al cargar la aplicación
@@ -57,6 +58,7 @@ export default function App() {
           <Route path="/csw/my-requests" element={<PermissionRoute resource="csw"><CSWList /></PermissionRoute>} />
           <Route path="/csw/pending" element={<PermissionRoute resource="csw"><CSWList /></PermissionRoute>} />
           <Route path="/csw/all" element={<PermissionRoute resource="csw"><CSWList /></PermissionRoute>} />
+          <Route path="/calendar" element={<CalendarPage />} />
         </Route>
 
         {/* 404 */}
