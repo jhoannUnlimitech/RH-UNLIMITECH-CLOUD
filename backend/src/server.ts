@@ -12,6 +12,7 @@ import './models/CSWCategory';
 import './models/CSW';
 import './models/Project';
 import './models/WeeklyReport';
+import './models/CalendarEvent';
 
 const startServer = async (): Promise<void> => {
   try {

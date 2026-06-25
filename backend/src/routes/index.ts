@@ -9,6 +9,7 @@ import cswCategoryRoutes from './cswCategory.routes';
 import cswRoutes from './csw.routes';
 import projectsRoutes from './projects.routes';
 import weeklyReportRoutes from './weeklyReport.routes';
+import calendarEventRoutes from './calendarEvent.routes';
 
 const router = Router();
 
@@ -41,6 +42,9 @@ router.use('/projects', projectsRoutes);
 
 // Rutas de reportes semanales
 router.use('/reports/weekly', weeklyReportRoutes);
+
+// Rutas de calendario/eventos
+router.use('/calendar/events', calendarEventRoutes);
 
 // Rutas de capacitaciones (se agregarán después)
 // router.use('/training', trainingRoutes);

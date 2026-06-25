@@ -61,9 +61,10 @@ const DivisionsList: React.FC = observer(() => {
           </p>
         ) : (
           divisionsWithStats.map((division) => (
-            <div
+            <Link
               key={division._id}
-              className="flex items-center justify-between p-4 rounded-lg border border-gray-100 hover:border-brand-200 hover:bg-brand-50/30 dark:border-gray-800 dark:hover:border-brand-800 dark:hover:bg-brand-500/5 transition-all cursor-pointer"
+              to={`/divisions`}
+              className="flex items-center justify-between p-4 rounded-lg border border-gray-100 hover:border-brand-200 hover:bg-brand-50/30 dark:border-gray-800 dark:hover:border-brand-800 dark:hover:bg-brand-500/5 transition-all"
             >
               <div className="flex-1">
                 <h5 className="font-semibold text-gray-900 dark:text-white mb-1">
@@ -96,7 +97,7 @@ const DivisionsList: React.FC = observer(() => {
                   />
                 </svg>
               </div>
-            </div>
+            </Link>
           ))
         )}
       </div>
