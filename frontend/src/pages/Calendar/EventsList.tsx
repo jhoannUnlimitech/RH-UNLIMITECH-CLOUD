@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import { Link } from "react-router";
 import { observer } from "mobx-react-lite";
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "../../components/ui/table";
 import Badge from "../../components/ui/badge/Badge";
@@ -90,9 +91,9 @@ const EventsList = observer(() => {
             <span className="text-gray-500 text-sm">a</span>
             <input type="date" value={toDate} onChange={(e) => { setToDate(e.target.value); setCurrentPage(1); }} className="h-10 px-3 rounded-lg border border-gray-300 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white" />
           </div>
-          <Button onClick={() => window.location.href = '/calendar'} variant="outline">
-            ← Volver al Calendario
-          </Button>
+          <Link to="/calendar" className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03]">
+            ← Calendario
+          </Link>
         </div>
 
         {loading && (

@@ -5,10 +5,14 @@ export interface ICalendarEvent extends Document {
   description?: string;
   startDate: Date;
   endDate: Date;
+  startTime?: string;          // Hora inicio "09:00"
+  endTime?: string;            // Hora fin "10:00"
   color: 'primary' | 'success' | 'warning' | 'danger';
-  type: 'meeting' | 'holiday' | 'reminder' | 'deadline' | 'other';
+  type: 'meeting' | 'holiday' | 'reminder' | 'deadline' | 'training' | 'other';
   allDay: boolean;
+  link?: string;               // URL del evento (meet, zoom, docs, etc)
   createdBy: Types.ObjectId;
+  notifyBefore?: number;       // Minutos antes para notificar (0 = no notificar)
   createdAt: Date;
   updatedAt: Date;
 }

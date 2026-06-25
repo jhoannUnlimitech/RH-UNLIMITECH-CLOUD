@@ -1,11 +1,11 @@
-feat(calendar): persistent events CRUD + events list page with filters
+feat(calendar): fix navigation + flag images + notifications architecture doc
 
-- feat(backend): CalendarEvent model (title, dates, color, type, createdBy)
-- feat(backend): CRUD endpoints at /api/v1/calendar/events
-- feat(backend): filter by type and date range (from/to query params)
-- feat(frontend): CalendarPage now persists events to DB (create/update/delete)
-- feat(frontend): EventsList page with table, filters by type and date range, pagination
-- feat(frontend): link Ver lista de eventos in calendar header
-- feat(frontend): route /calendar/events registered in App.tsx
-- feat(permissions): only employees:update can manage events (HR/CEO/Founder)
-- feat(ui): holidays rendered with country flag emoji in custom eventContent
+- fix(dashboard): divisions clickable with Link (no page reload)
+- fix(calendar): Ver lista de eventos uses Link instead of anchor (no parpadeo)
+- fix(calendar): EventsList back button uses Link
+- fix(calendar): holiday flags use flagcdn.com images (works on Windows)
+- fix(calendar): removed duplicate country code in event title
+- feat(model): CalendarEvent schema extended with startTime, endTime, link, notifyBefore
+- feat(seed): 3 example events created in DB
+- docs: NOTIFICATIONS_ARCHITECTURE.md - full analysis of real-time notifications with Socket.io
+- docs: CalendarEvent DAO schema documented with all fields and indexes

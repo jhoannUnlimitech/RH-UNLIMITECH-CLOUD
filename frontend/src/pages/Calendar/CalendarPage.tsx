@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { Link } from "react-router";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -167,21 +168,21 @@ const CalendarPage: React.FC = () => {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-warning-500"></span>
+            <img src="https://flagcdn.com/16x12/co.png" alt="CO" className="w-4 h-3 rounded-sm" />
             <span className="text-sm text-gray-600 dark:text-gray-400">Festivos Colombia</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-brand-500"></span>
+            <img src="https://flagcdn.com/16x12/us.png" alt="US" className="w-4 h-3 rounded-sm" />
             <span className="text-sm text-gray-600 dark:text-gray-400">Festivos Estados Unidos</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-success-500"></span>
+            <span className="w-3 h-3 rounded-full bg-green-500"></span>
             <span className="text-sm text-gray-600 dark:text-gray-400">Eventos</span>
           </div>
         </div>
-        <a href="/calendar/events" className="text-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400">
-          Ver lista de eventos →
-        </a>
+        <Link to="/calendar/events" className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03]">
+          Ver lista de eventos
+        </Link>
       </div>
 
       <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
@@ -207,7 +208,7 @@ const CalendarPage: React.FC = () => {
               week: "Semana",
               day: "Día",
             }}
-            customButtons={canCreateEvent ? {
+            customButtons={{
               addEventButton: {
                 text: "+ Evento",
                 click: () => {
@@ -217,7 +218,7 @@ const CalendarPage: React.FC = () => {
                   openModal();
                 },
               },
-            } : undefined}
+            }}
           />
         </div>
 
@@ -336,25 +337,38 @@ const CalendarPage: React.FC = () => {
 };
 
 const renderEventContent = (eventInfo: any) => {
+  const calendar = eventInfo.event.extendedProps.calendar || 'Primary';
   const isHoliday = eventInfo.event.extendedProps.isHoliday;
-  const colorClass = `fc-bg-${eventInfo.event.extendedProps.calendar.toLowerCase()}`;
+  const country = eventInfo.event.extendedProps.country;
   
-  if (isHoliday) {
-    const country = eventInfo.event.extendedProps.country;
-    const flag = country === 'CO' ? '🇨🇴' : '🇺🇸';
-    return (
-      <div className={`event-fc-color flex fc-event-main ${colorClass} p-1 rounded-sm items-center gap-1`}>
-        <span className="text-base leading-none">{flag}</span>
-        <div className="fc-event-title text-xs truncate">{eventInfo.event.title.replace(/🇨🇴|🇺🇸/, '').trim()}</div>
-      </div>
-    );
-  }
+  const bgColors: Record<string, string> = {
+    Primary: 'bg-brand-100 text-brand-800 dark:bg-brand-900/30 dark:text-brand-300',
+    Success: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+    Warning: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
+    Danger: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+  };
+
+  const dotColors: Record<string, string> = {
+    Primary: 'bg-brand-500',
+    Success: 'bg-green-500',
+    Warning: 'bg-orange-500',
+    Danger: 'bg-red-500',
+  };
+
+  const colorClass = bgColors[calendar] || bgColors.Primary;
+  const dotClass = dotColors[calendar] || dotColors.Primary;
 
   return (
-    <div className={`event-fc-color flex fc-event-main ${colorClass} p-1 rounded-sm`}>
-      <div className="fc-daygrid-event-dot"></div>
-      <div className="fc-event-time">{eventInfo.timeText}</div>
-      <div className="fc-event-title">{eventInfo.event.title}</div>
+    <div className={`${colorClass} px-2 py-1 rounded text-xs font-medium truncate w-full flex items-center gap-1.5`}>
+      {isHoliday && country && (
+        <img 
+          src={`https://flagcdn.com/16x12/${country.toLowerCase()}.png`} 
+          alt={country} 
+          className="w-4 h-3 shrink-0 rounded-sm"
+        />
+      )}
+      {!isHoliday && <span className={`w-2 h-2 rounded-full shrink-0 ${dotClass}`}></span>}
+      <span className="truncate">{eventInfo.event.title}</span>
     </div>
   );
 };
