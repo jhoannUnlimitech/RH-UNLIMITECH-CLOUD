@@ -35,7 +35,11 @@ const CalendarPage: React.FC = () => {
   const [eventTitle, setEventTitle] = useState("");
   const [eventStartDate, setEventStartDate] = useState("");
   const [eventEndDate, setEventEndDate] = useState("");
+  const [eventStartTime, setEventStartTime] = useState("");
+  const [eventEndTime, setEventEndTime] = useState("");
   const [eventLevel, setEventLevel] = useState("Primary");
+  const [eventType, setEventType] = useState("other");
+  const [eventLink, setEventLink] = useState("");
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const calendarRef = useRef<FullCalendar>(null);
   const { isOpen, openModal, closeModal } = useModal();
@@ -55,7 +59,14 @@ const CalendarPage: React.FC = () => {
         start: e.startDate?.split('T')[0],
         end: e.endDate?.split('T')[0],
         allDay: e.allDay,
-        extendedProps: { calendar: e.color === 'primary' ? 'Primary' : e.color === 'success' ? 'Success' : e.color === 'warning' ? 'Warning' : 'Danger', isHoliday: false, type: e.type },
+        extendedProps: {
+          calendar: e.color === 'primary' ? 'Primary' : e.color === 'success' ? 'Success' : e.color === 'warning' ? 'Warning' : 'Danger',
+          isHoliday: false,
+          type: e.type,
+          startTime: e.startTime || '',
+          endTime: e.endTime || '',
+          link: e.link || '',
+        },
       }));
       setEvents(prev => [...prev.filter(e => e.extendedProps.isHoliday), ...dbEvents]);
     } catch { /* silent */ }
@@ -101,14 +112,18 @@ const CalendarPage: React.FC = () => {
 
   const handleEventClick = (clickInfo: EventClickArg) => {
     const event = clickInfo.event;
-    // No permitir editar festivos
     if (event.extendedProps.isHoliday) return;
+    if (!canCreateEvent) return;
 
     setSelectedEvent(event as unknown as CalendarEvent);
     setEventTitle(event.title);
     setEventStartDate(event.start?.toISOString().split("T")[0] || "");
-    setEventEndDate(event.end?.toISOString().split("T")[0] || "");
-    setEventLevel(event.extendedProps.calendar);
+    setEventEndDate(event.end?.toISOString().split("T")[0] || event.start?.toISOString().split("T")[0] || "");
+    setEventLevel(event.extendedProps.calendar || "Primary");
+    setEventType(event.extendedProps.type || "other");
+    setEventStartTime(event.extendedProps.startTime || "");
+    setEventEndTime(event.extendedProps.endTime || "");
+    setEventLink(event.extendedProps.link || "");
     openModal();
   };
 
@@ -121,9 +136,12 @@ const CalendarPage: React.FC = () => {
       title: eventTitle,
       startDate: eventStartDate,
       endDate: eventEndDate,
+      startTime: eventStartTime || undefined,
+      endTime: eventEndTime || undefined,
       color: colorMap[eventLevel] || 'primary',
-      type: 'other',
-      allDay: true,
+      type: eventType,
+      link: eventLink || undefined,
+      allDay: !eventStartTime,
     };
 
     try {
@@ -155,7 +173,11 @@ const CalendarPage: React.FC = () => {
     setEventTitle("");
     setEventStartDate("");
     setEventEndDate("");
+    setEventStartTime("");
+    setEventEndTime("");
     setEventLevel("Primary");
+    setEventType("other");
+    setEventLink("");
     setSelectedEvent(null);
   };
 
@@ -224,7 +246,7 @@ const CalendarPage: React.FC = () => {
 
         {/* Modal crear/editar evento */}
         <Modal isOpen={isOpen} onClose={closeModal} className="max-w-[700px] p-6 lg:p-10">
-          <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar">
+          <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar max-h-[75vh]">
             <div>
               <h5 className="mb-2 font-semibold text-gray-800 text-xl dark:text-white/90 lg:text-2xl">
                 {selectedEvent ? "Editar Evento" : "Nuevo Evento"}
@@ -238,7 +260,7 @@ const CalendarPage: React.FC = () => {
               {/* Título */}
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                  Título del evento
+                  Título del evento *
                 </label>
                 <input
                   type="text"
@@ -249,23 +271,71 @@ const CalendarPage: React.FC = () => {
                 />
               </div>
 
+              {/* Tipo de evento */}
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                  Tipo de evento
+                </label>
+                <select
+                  value={eventType}
+                  onChange={(e) => setEventType(e.target.value)}
+                  className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                >
+                  <option value="meeting">Reunión</option>
+                  <option value="deadline">Fecha límite</option>
+                  <option value="reminder">Recordatorio</option>
+                  <option value="training">Capacitación</option>
+                  <option value="holiday">Festivo</option>
+                  <option value="other">Otro</option>
+                </select>
+              </div>
+
+              {/* Fechas */}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Fecha inicio *</label>
+                  <input type="date" value={eventStartDate} onChange={(e) => setEventStartDate(e.target.value)} className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Fecha fin *</label>
+                  <input type="date" value={eventEndDate} onChange={(e) => setEventEndDate(e.target.value)} className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                </div>
+              </div>
+
+              {/* Horas */}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Hora inicio</label>
+                  <input type="time" value={eventStartTime} onChange={(e) => setEventStartTime(e.target.value)} className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Hora fin</label>
+                  <input type="time" value={eventEndTime} onChange={(e) => setEventEndTime(e.target.value)} className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                </div>
+              </div>
+
+              {/* Link */}
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                  Link del evento (opcional)
+                </label>
+                <input
+                  type="url"
+                  value={eventLink}
+                  onChange={(e) => setEventLink(e.target.value)}
+                  placeholder="https://meet.google.com/..."
+                  className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                />
+              </div>
+
               {/* Color */}
               <div>
-                <label className="block mb-3 text-sm font-medium text-gray-700 dark:text-gray-400">
-                  Color del evento
-                </label>
+                <label className="block mb-3 text-sm font-medium text-gray-700 dark:text-gray-400">Color</label>
                 <div className="flex flex-wrap items-center gap-4">
                   {Object.entries(eventColors).map(([key]) => (
                     <label key={key} className="flex items-center text-sm text-gray-700 dark:text-gray-400 cursor-pointer">
                       <span className="relative mr-2">
-                        <input
-                          type="radio"
-                          name="event-level"
-                          value={key}
-                          checked={eventLevel === key}
-                          onChange={() => setEventLevel(key)}
-                          className="sr-only"
-                        />
+                        <input type="radio" name="event-level" value={key} checked={eventLevel === key} onChange={() => setEventLevel(key)} className="sr-only" />
                         <span className={`rounded-full flex items-center justify-center w-5 h-5 border ${eventLevel === key ? 'border-brand-500 bg-brand-500' : 'border-gray-300 dark:border-gray-700'}`}>
                           {eventLevel === key && <span className="h-2 w-2 rounded-full bg-white"></span>}
                         </span>
@@ -275,57 +345,19 @@ const CalendarPage: React.FC = () => {
                   ))}
                 </div>
               </div>
-
-              {/* Fechas */}
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                    Fecha inicio
-                  </label>
-                  <input
-                    type="date"
-                    value={eventStartDate}
-                    onChange={(e) => setEventStartDate(e.target.value)}
-                    className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                    Fecha fin
-                  </label>
-                  <input
-                    type="date"
-                    value={eventEndDate}
-                    onChange={(e) => setEventEndDate(e.target.value)}
-                    className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
-                  />
-                </div>
-              </div>
             </div>
 
             {/* Actions */}
             <div className="flex items-center gap-3 mt-6 sm:justify-end">
               {selectedEvent && (
-                <button
-                  onClick={handleDeleteEvent}
-                  type="button"
-                  className="flex w-full justify-center rounded-lg border border-red-300 bg-white px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:border-red-700 dark:bg-gray-800 dark:text-red-400 sm:w-auto"
-                >
+                <button onClick={handleDeleteEvent} type="button" className="flex w-full justify-center rounded-lg border border-red-300 bg-white px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:border-red-700 dark:bg-gray-800 dark:text-red-400 sm:w-auto">
                   Eliminar
                 </button>
               )}
-              <button
-                onClick={closeModal}
-                type="button"
-                className="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 sm:w-auto"
-              >
+              <button onClick={closeModal} type="button" className="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 sm:w-auto">
                 Cancelar
               </button>
-              <button
-                onClick={handleAddOrUpdateEvent}
-                type="button"
-                className="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto"
-              >
+              <button onClick={handleAddOrUpdateEvent} type="button" className="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
                 {selectedEvent ? "Actualizar" : "Crear Evento"}
               </button>
             </div>

@@ -47,16 +47,20 @@ export const getEventById = async (req: AuthRequest, res: Response, next: NextFu
  */
 export const createEvent = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { title, description, startDate, endDate, color, type, allDay } = req.body;
+    const { title, description, startDate, endDate, startTime, endTime, color, type, allDay, link, notifyBefore } = req.body;
 
     const event = new CalendarEvent({
       title,
       description,
       startDate,
       endDate,
+      startTime,
+      endTime,
       color: color || 'primary',
       type: type || 'other',
       allDay: allDay !== undefined ? allDay : true,
+      link,
+      notifyBefore: notifyBefore || 0,
       createdBy: req.user!.id,
     });
 
@@ -75,14 +79,18 @@ export const updateEvent = async (req: AuthRequest, res: Response, next: NextFun
     const event = await CalendarEvent.findById(req.params.id);
     if (!event) throw new AppError('Evento no encontrado', 404);
 
-    const { title, description, startDate, endDate, color, type, allDay } = req.body;
+    const { title, description, startDate, endDate, startTime, endTime, color, type, allDay, link, notifyBefore } = req.body;
     if (title) event.title = title;
     if (description !== undefined) event.description = description;
     if (startDate) event.startDate = startDate;
     if (endDate) event.endDate = endDate;
+    if (startTime !== undefined) event.startTime = startTime;
+    if (endTime !== undefined) event.endTime = endTime;
     if (color) event.color = color;
     if (type) event.type = type;
     if (allDay !== undefined) event.allDay = allDay;
+    if (link !== undefined) event.link = link;
+    if (notifyBefore !== undefined) event.notifyBefore = notifyBefore;
 
     await event.save();
     await event.populate('createdBy', 'name email');
