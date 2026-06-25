@@ -275,6 +275,22 @@ const EventsList = observer(() => {
                 <input type="text" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
               </div>
               <div>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Tipo</label>
+                <SearchableSelect
+                  id="edit-event-type"
+                  options={[
+                    { value: "meeting", label: "Reunión" },
+                    { value: "deadline", label: "Fecha límite" },
+                    { value: "reminder", label: "Recordatorio" },
+                    { value: "training", label: "Capacitación" },
+                    { value: "other", label: "Otro" },
+                  ]}
+                  value={editType}
+                  onChange={(v) => setEditType(v)}
+                  placeholder="Seleccionar tipo..."
+                />
+              </div>
+              <div>
                 <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Descripción</label>
                 <textarea value={editDescription} onChange={(e) => setEditDescription(e.target.value)} rows={2} className="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 resize-none" />
               </div>
@@ -301,22 +317,6 @@ const EventsList = observer(() => {
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Link (opcional)</label>
                 <input type="url" value={editLink} onChange={(e) => setEditLink(e.target.value)} placeholder="https://..." className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
-              </div>
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Tipo</label>
-                <SearchableSelect
-                  id="edit-event-type"
-                  options={[
-                    { value: "meeting", label: "Reunión" },
-                    { value: "deadline", label: "Fecha límite" },
-                    { value: "reminder", label: "Recordatorio" },
-                    { value: "training", label: "Capacitación" },
-                    { value: "other", label: "Otro" },
-                  ]}
-                  value={editType}
-                  onChange={(v) => setEditType(v)}
-                  placeholder="Seleccionar tipo..."
-                />
               </div>
             </div>
             <div className="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
