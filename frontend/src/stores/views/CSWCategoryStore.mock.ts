@@ -79,6 +79,11 @@ export class CSWCategoryStoreMock implements ICSWCategoryStore {
     // Los datos ya están en this.categories
   }
 
+  async fetchAllCategories(): Promise<void> {
+    this.isLoading = false;
+    // Los datos ya están en this.categories
+  }
+
   async fetchCategoryById(id: string): Promise<void> {
     this.isLoading = true;
     this.error = null;

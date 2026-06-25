@@ -13,6 +13,7 @@ export interface ICSWStore {
   fetchCSWById(id: string): Promise<void>;
   createCSW(data: ICSWStore.CSWInput): Promise<void>;
   updateCSW(id: string, data: ICSWStore.CSWInput): Promise<void>;
+  submitCSW(id: string): Promise<void>;
   deleteCSW(id: string): Promise<void>;
   approveCSW(id: string, level: number, comments?: string): Promise<void>;
   rejectCSW(id: string, level: number, comments: string): Promise<void>;
@@ -22,6 +23,7 @@ export interface ICSWStore {
 
 export namespace ICSWStore {
   export enum CSWStatus {
+    DRAFT = 'draft',
     PENDING = 'pending',
     APPROVED = 'approved',
     REJECTED = 'rejected',

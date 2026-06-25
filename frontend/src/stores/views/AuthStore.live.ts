@@ -11,7 +11,7 @@ export class AuthStoreLive implements IAuthStore {
   user: IAuthStore.User | null = null;
   token: string | null = null;
   isAuthenticated = false;
-  isLoading = false;
+  isLoading = true; // Inicia en true para evitar flash de redirect antes de checkAuth
   error: string | null = null;
 
   constructor() {
@@ -92,8 +92,24 @@ export class AuthStoreLive implements IAuthStore {
         localStorage.setItem('auth_user', JSON.stringify(user));
       }
     } catch (err) {
-      // Token inválido o expirado
-      await this.logout();
+      // Si falla la verificación pero tenemos datos en localStorage, usarlos como fallback
+      const token = localStorage.getItem('auth_token');
+      const cachedUser = localStorage.getItem('auth_user');
+      
+      if (token && cachedUser) {
+        try {
+          const user = JSON.parse(cachedUser);
+          runInAction(() => {
+            this.token = token;
+            this.user = user;
+            this.isAuthenticated = true;
+          });
+        } catch {
+          await this.logout();
+        }
+      } else {
+        await this.logout();
+      }
     } finally {
       runInAction(() => {
         this.isLoading = false;

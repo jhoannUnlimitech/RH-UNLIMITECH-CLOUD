@@ -115,6 +115,26 @@ const HatsList = observer(() => {
     <div className="flex flex-col gap-6">
       {/* Breadcrumb */}
       <PageBreadcrumb pageTitle="Lista de Hats" />
+
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+            Lista de Hats
+          </h1>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Roles y responsabilidades asignadas en la organización
+          </p>
+        </div>
+        {can('roles', 'create') && (
+          <Button onClick={() => navigate('/roles/new')} className="flex items-center gap-2">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 5V15M5 10H15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Nuevo Hat
+          </Button>
+        )}
+      </div>
       
       {/* Error Display */}
       {hatsStore.error && (
@@ -191,29 +211,6 @@ const HatsList = observer(() => {
                 </svg>
               </span>
             </div>
-
-            {/* New Hat Button - solo si tiene permiso de crear */}
-            {can('roles', 'create') && (
-            <Button onClick={() => navigate('/roles/new')}>
-              <svg
-                className="mr-2"
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M10 5V15M5 10H15"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              Nuevo Hat
-            </Button>
-            )}
           </div>
         </div>
 

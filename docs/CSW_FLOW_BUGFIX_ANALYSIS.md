@@ -218,21 +218,17 @@ if (category.useDefaultFlow) {
 
 ## Orden de Implementación
 
-| # | Tarea | Estimado |
-|---|-------|----------|
-| 1 | Modelo CSWCategory + abbreviation + migración | 15 min |
-| 2 | UI CSWCategory form con input abbreviation | 10 min |
-| 3 | Formato título CSW en lista | 10 min |
-| 4 | Estado draft en modelo + controller | 20 min |
-| 5 | Endpoint POST /:id/submit | 10 min |
-| 6 | Frontend: draft/submit buttons + autoguardado | 30 min |
-| 7 | Historial automático de status_changed | 15 min |
-| 8 | Banner de rechazo en form edición | 15 min |
-| 9 | Badge de estado en header de CSW view/edit | 10 min |
-| 10 | Categoría "Orden de Estudio" + aprobación Oscar | 10 min |
+| # | Tarea | Estado |
+|---|-------|--------|
+| 1 | Formato título CSW en lista y vista | ✅ Implementado |
+| 2 | Estado draft en modelo + controller | ✅ Implementado |
+| 3 | Endpoint POST /:id/submit | ✅ Implementado |
+| 4 | Frontend: draft/submit buttons + autoguardado | ✅ Implementado |
+| 5 | Historial automático de status_changed | ✅ Implementado |
+| 6 | Banner de rechazo en form edición | ✅ Implementado |
+| 7 | Badge de estado en header de CSW view/edit | ✅ Implementado |
+| 8 | Fix word-wrap en CSWView | ✅ Implementado |
+| 9 | Icono cancelar en CSW list actions | ✅ Implementado |
+| 10 | Categoría "Orden de Estudio" + aprobación Oscar | ⏳ Pendiente (seed/migration) |
 
-**Total estimado: ~2.5 horas**
-
----
-
-**Última actualización:** Junio 24, 2026
+**Implementación completada:** Junio 25, 2026

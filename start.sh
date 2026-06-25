@@ -1,61 +1,67 @@
 #!/bin/bash
+# ============================================
+# RH Unlimitech Cloud — Startup Script
+# ============================================
+# Levanta backend (puerto 9050) y frontend (puerto 5173)
+# Uso: ./start.sh
+# ============================================
 
-# =============================================================
-# RH Unlimitech Cloud — Script de inicio completo
-# Levanta Docker (MongoDB), Backend y Frontend
-# =============================================================
-
-set -e
-
-PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 echo "🚀 Iniciando RH Unlimitech Cloud..."
-echo "📁 Directorio: $PROJECT_DIR"
 echo ""
 
-# 1. Docker (MongoDB + Mongo Express)
-echo "🐳 Levantando Docker..."
-cd "$PROJECT_DIR"
-docker compose up -d
-echo "✅ MongoDB: localhost:27017"
-echo "✅ Mongo Express: http://localhost:8081"
-echo ""
+# Colores
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
 
-# 2. Backend
-echo "🔧 Iniciando Backend..."
-cd "$PROJECT_DIR/backend"
-if [ ! -d "node_modules" ]; then
-  echo "   📦 Instalando dependencias backend..."
-  npm install
+# Directorio base
+BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# Verificar que MongoDB esté corriendo
+echo -e "${BLUE}📦 Verificando MongoDB...${NC}"
+if mongosh --quiet --eval "db.runCommand({ping:1})" > /dev/null 2>&1; then
+  echo -e "${GREEN}✅ MongoDB corriendo${NC}"
+else
+  echo "⚠️  MongoDB no detectado. Asegúrate de que esté corriendo en localhost:27017"
 fi
-npm run dev &
+
+echo ""
+
+# Iniciar Backend
+echo -e "${BLUE}🔧 Iniciando Backend (puerto 9050)...${NC}"
+cd "$BASE_DIR/backend"
+npx ts-node --transpile-only src/server.ts &
 BACKEND_PID=$!
-echo "✅ Backend: http://localhost:9050 (PID: $BACKEND_PID)"
-echo ""
+echo -e "${GREEN}✅ Backend PID: $BACKEND_PID${NC}"
 
-# 3. Frontend
-echo "🎨 Iniciando Frontend..."
-cd "$PROJECT_DIR/frontend"
-if [ ! -d "node_modules" ]; then
-  echo "   📦 Instalando dependencias frontend..."
-  npm install
-fi
+# Esperar un momento para que el backend inicie
+sleep 3
+
+# Iniciar Frontend
+echo -e "${BLUE}🎨 Iniciando Frontend (puerto 5173)...${NC}"
+cd "$BASE_DIR/frontend"
 npm run dev &
 FRONTEND_PID=$!
-echo "✅ Frontend: http://localhost:5173 (PID: $FRONTEND_PID)"
-echo ""
+echo -e "${GREEN}✅ Frontend PID: $FRONTEND_PID${NC}"
 
-# Resumen
-echo "==========================================================="
-echo "🎉 Todos los servicios corriendo:"
-echo "   🐳 MongoDB:       localhost:27017"
-echo "   📊 Mongo Express: http://localhost:8081"
-echo "   🔧 Backend API:   http://localhost:9050"
-echo "   📚 Swagger:       http://localhost:9050/api-docs"
-echo "   🎨 Frontend:      http://localhost:5173"
 echo ""
-echo "   Para detener: Ctrl+C"
-echo "==========================================================="
+echo "============================================"
+echo -e "${GREEN}🚀 Servicios iniciados:${NC}"
+echo "   Backend:       http://localhost:9050"
+echo "   Frontend:      http://localhost:5173"
+echo "   Mongo Express: http://localhost:8081"
+echo "   Swagger:       http://localhost:9050/api-docs"
+echo ""
+echo "   Credenciales:"
+echo "   admin@unlimitech.cloud / Pass2014!"
+echo "   jhoann@unlimitech.cloud / Pass2014!"
+echo "   talent@unlimitech.cloud / Pass2014!"
+echo "============================================"
+echo ""
+echo "Presiona Ctrl+C para detener todos los servicios"
 
-# Esperar a que se cierre con Ctrl+C
-trap "echo ''; echo '🛑 Deteniendo servicios...'; kill $BACKEND_PID $FRONTEND_PID 2>/dev/null; docker compose down; echo '✅ Servicios detenidos.'" EXIT
+# Trap para matar ambos procesos al salir
+trap "echo ''; echo '🛑 Deteniendo servicios...'; kill $BACKEND_PID $FRONTEND_PID 2>/dev/null; exit 0" SIGINT SIGTERM
+
+# Esperar
 wait

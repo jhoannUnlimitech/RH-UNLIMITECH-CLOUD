@@ -153,6 +153,18 @@ const EventsList = observer(() => {
     <div className="flex flex-col gap-6">
       <PageBreadcrumb pageTitle="Lista de Eventos" />
 
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+            Lista de Eventos
+          </h1>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Consulta y filtra los eventos del calendario
+          </p>
+        </div>
+      </div>
+
       <div className="overflow-hidden rounded-xl bg-white dark:bg-white/[0.03]">
         {/* Filtros */}
         <div className="flex flex-col gap-3 px-4 py-4 border border-b-0 border-gray-100 dark:border-white/[0.05] rounded-t-xl sm:flex-row sm:items-center sm:justify-between">

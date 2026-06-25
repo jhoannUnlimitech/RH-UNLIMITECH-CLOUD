@@ -9,6 +9,7 @@ import { Modal } from "../../components/ui/modal";
 import { useModal } from "../../hooks/useModal";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import PageMeta from "../../utils/PageMeta";
+import Button from "../../components/ui/button/Button";
 import { usePermissions } from "../../hooks/usePermissions";
 import SearchableSelect from "../../components/form/SearchableSelect";
 import Holidays from "date-holidays";
@@ -187,8 +188,44 @@ const CalendarPage: React.FC = () => {
       <PageMeta title="Calendario - RH UNLIMITECH" description="Calendario con festivos y eventos" />
       <PageBreadcrumb pageTitle="Calendario" />
 
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+            Calendario
+          </h1>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Festivos y eventos de la organización
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Link to="/calendar/events" className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03]">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+            </svg>
+            Ver Eventos
+          </Link>
+          {canCreateEvent && (
+            <Button
+              onClick={() => {
+                resetModalFields();
+                setEventStartDate(new Date().toISOString().split("T")[0]);
+                setEventEndDate(new Date().toISOString().split("T")[0]);
+                openModal();
+              }}
+              className="flex items-center gap-2"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M10 5V15M5 10H15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Crear Evento
+            </Button>
+          )}
+        </div>
+      </div>
+
       {/* Leyenda */}
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+      <div className="mb-4 flex flex-wrap items-center gap-4">
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2">
             <img src="https://flagcdn.com/16x12/co.png" alt="CO" className="w-4 h-3 rounded-sm" />
@@ -203,9 +240,6 @@ const CalendarPage: React.FC = () => {
             <span className="text-sm text-gray-600 dark:text-gray-400">Eventos</span>
           </div>
         </div>
-        <Link to="/calendar/events" className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03]">
-          Ver lista de eventos
-        </Link>
       </div>
 
       <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
@@ -215,7 +249,7 @@ const CalendarPage: React.FC = () => {
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             initialView="dayGridMonth"
             headerToolbar={{
-              left: canCreateEvent ? "prev,next addEventButton" : "prev,next",
+              left: "prev,next",
               center: "title",
               right: "dayGridMonth,timeGridWeek,timeGridDay",
             }}
@@ -230,17 +264,6 @@ const CalendarPage: React.FC = () => {
               month: "Mes",
               week: "Semana",
               day: "Día",
-            }}
-            customButtons={{
-              addEventButton: {
-                text: "+ Evento",
-                click: () => {
-                  resetModalFields();
-                  setEventStartDate(new Date().toISOString().split("T")[0]);
-                  setEventEndDate(new Date().toISOString().split("T")[0]);
-                  openModal();
-                },
-              },
             }}
           />
         </div>

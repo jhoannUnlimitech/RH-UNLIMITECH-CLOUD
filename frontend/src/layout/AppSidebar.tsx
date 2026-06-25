@@ -4,13 +4,14 @@ import { observer } from "mobx-react-lite";
 import {
   GridIcon,
   UserCircleIcon,
-  BoxCubeIcon,
+  DocsIcon,
   FolderIcon,
   CalenderIcon,
   ChevronDownIcon,
   HorizontaLDots,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
+import { useTheme } from "../context/ThemeContext";
 import { authStore } from "../stores/views";
 import { hasAnyPermissionInResource } from "../utils/permissions";
 import type { PermissionResource } from "../utils/permissions";
@@ -61,7 +62,7 @@ const navItems: NavItem[] = [
   },
   {
     name: "CSW",
-    icon: <BoxCubeIcon />,
+    icon: <DocsIcon />,
     subItems: [
       { name: "Categorías", path: "/csw-categories", resource: "csw_categories", action: "update" },
       { name: "Mis Solicitudes", path: "/csw/my-requests", resource: "csw" },
@@ -80,6 +81,7 @@ const navItems: NavItem[] = [
 const AppSidebar: React.FC = observer(() => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered, setIsMobileOpen } =
     useSidebar();
+  const { theme } = useTheme();
   const location = useLocation();
 
   // Permisos del usuario actual
@@ -307,7 +309,19 @@ const AppSidebar: React.FC = observer(() => {
         <Link to="/">
           {isExpanded || isHovered || isMobileOpen ? (
             <div className="flex items-center gap-3">
-              <img src="/images/logo.webp" alt="Unlimitech Cloud" className="h-18" />
+              {theme === "dark" ? (
+                <img
+                  src="/images/logo/logo-1.webp"
+                  alt="Unlimitech Cloud"
+                  className="h-8"
+                />
+              ) : (
+                <img
+                  src="/images/logo.webp"
+                  alt="Unlimitech Cloud"
+                  className="h-18"
+                />
+              )}
             </div>
           ) : (
             <img src="/favicon.png" alt="UC" className="h-10 w-10 rounded-lg" />

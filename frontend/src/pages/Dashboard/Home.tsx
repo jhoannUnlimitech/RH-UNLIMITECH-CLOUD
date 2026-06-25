@@ -30,6 +30,9 @@ const Home = observer(() => {
   const canSeeCSW = canAccessResource('csw');
   const canApproveCSW = can('csw', 'approve');
   const canManageHats = canAccessResource('roles');
+  const isApprover = authStore.user?.approve_csw === true;
+  const [pendingApprovals, setPendingApprovals] = useState(0);
+  const [loadingPendingApprovals, setLoadingPendingApprovals] = useState(false);
 
   // Cargar stats de CSW
   useEffect(() => {
@@ -37,6 +40,13 @@ const Home = observer(() => {
       loadCSWStats();
     }
   }, [canSeeCSW]);
+
+  // Cargar solicitudes pendientes de mi aprobación
+  useEffect(() => {
+    if (isApprover) {
+      loadPendingApprovals();
+    }
+  }, [isApprover]);
 
   // Cargar mis proyectos
   useEffect(() => {
@@ -54,10 +64,23 @@ const Home = observer(() => {
     }
   };
 
+  const loadPendingApprovals = async () => {
+    setLoadingPendingApprovals(true);
+    try {
+      const response = await apiClient.get('/csw/my-pending');
+      const pending = response.data?.data || [];
+      setPendingApprovals(pending.length);
+    } catch {
+      // silenciar
+    } finally {
+      setLoadingPendingApprovals(false);
+    }
+  };
+
   const loadCSWStats = async () => {
     setLoadingCSW(true);
     try {
-      const response = await apiClient.get('/csw');
+      const response = await apiClient.get('/csw/my-requests');
       const csws = response.data?.data || [];
       setCswStats({
         total: csws.length,
@@ -95,7 +118,7 @@ const Home = observer(() => {
 
         {/* Cards de CSW — Visible para todos los que tienen acceso a CSW */}
         {canSeeCSW && (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className={`grid grid-cols-1 gap-4 sm:grid-cols-2 ${isApprover ? 'xl:grid-cols-5' : 'xl:grid-cols-4'}`}>
             <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-sm text-gray-500 dark:text-gray-400">Total Solicitudes</p>
@@ -143,6 +166,33 @@ const Home = observer(() => {
               </div>
               <h4 className="text-2xl font-bold text-error-600 dark:text-error-400">{loadingCSW ? '...' : cswStats.rejected}</h4>
             </div>
+
+            {/* Pendientes de mi firma — solo aprobadores */}
+            {isApprover && (
+              <Link to="/csw/pending" className={`rounded-2xl border p-5 transition-colors ${
+                pendingApprovals > 0
+                  ? 'border-orange-200 bg-orange-50 hover:bg-orange-100 dark:border-orange-800 dark:bg-orange-900/10 dark:hover:bg-orange-900/20'
+                  : 'border-gray-200 bg-white hover:bg-gray-50 dark:border-gray-800 dark:bg-white/[0.03] dark:hover:bg-white/[0.05]'
+              }`}>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Por Firmar</p>
+                  <div className={`p-2 rounded-lg ${
+                    pendingApprovals > 0
+                      ? 'bg-orange-100 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400'
+                      : 'bg-green-50 text-green-600 dark:bg-green-500/15 dark:text-green-400'
+                  }`}>
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    </svg>
+                  </div>
+                </div>
+                <h4 className={`text-2xl font-bold ${
+                  pendingApprovals > 0
+                    ? 'text-orange-600 dark:text-orange-400'
+                    : 'text-green-600 dark:text-green-400'
+                }`}>{loadingPendingApprovals ? '...' : pendingApprovals}</h4>
+              </Link>
+            )}
           </div>
         )}
 

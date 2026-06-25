@@ -184,21 +184,21 @@ const HistorySchema = new Schema<ICSWHistory>({
 const CSWSchema = new Schema<ICSW>({
   situation: {
     type: String,
-    required: true,
+    required: false,
     trim: true,
-    maxlength: 1500  // 200 palabras ≈ 1500 caracteres
+    maxlength: 10000
   },
   information: {
     type: String,
-    required: true,
+    required: false,
     trim: true,
-    maxlength: 1500  // 200 palabras ≈ 1500 caracteres
+    maxlength: 10000
   },
   solution: {
     type: String,
-    required: true,
+    required: false,
     trim: true,
-    maxlength: 1500  // 200 palabras ≈ 1500 caracteres
+    maxlength: 10000
   },
   requester: {
     type: Schema.Types.ObjectId,
@@ -233,7 +233,7 @@ const CSWSchema = new Schema<ICSW>({
   approvalFlowId: {
     type: Schema.Types.ObjectId,
     ref: 'ApprovalFlow',
-    required: true
+    required: false
   },
   approvalChain: {
     type: [ApprovalSchema],
@@ -242,7 +242,7 @@ const CSWSchema = new Schema<ICSW>({
   status: {
     type: String,
     enum: Object.values(CSWStatus),
-    default: CSWStatus.PENDING,
+    default: CSWStatus.DRAFT,
     index: true
   },
   currentLevel: {
@@ -316,6 +316,15 @@ CSWSchema.methods.initializeApprovalChain = async function(): Promise<ICSW> {
           deleted: false
         }).populate('role', 'name');
       }
+      
+      // Fallback: si no hay nadie con ese rol, usar el manager de la división
+      if (!approver) {
+        const Division = mongoose.model('Division');
+        const division = await Division.findById(this.requesterDivision);
+        if (division && (division as any).managerId) {
+          approver = await Employee.findById((division as any).managerId).populate('role', 'name');
+        }
+      }
     } else {
       // Usuario específico
       approver = await Employee.findById(level.approverUserId).populate('role', 'name');
@@ -337,12 +346,6 @@ CSWSchema.methods.initializeApprovalChain = async function(): Promise<ICSW> {
   
   this.approvalChain = approvalChain;
   this.currentLevel = 1;
-  
-  // Agregar al historial
-  this.addToHistory('created', this.requester, this.requesterName, {
-    newStatus: CSWStatus.PENDING,
-    comments: 'Solicitud creada'
-  });
   
   return await this.save();
 };
@@ -488,6 +491,11 @@ CSWSchema.methods.cancel = async function(
   // Validar que no esté aprobada
   if (this.status === CSWStatus.APPROVED) {
     throw new Error('No se puede cancelar una solicitud ya aprobada');
+  }
+  
+  // Validar que no esté ya cancelada
+  if (this.status === CSWStatus.CANCELLED) {
+    throw new Error('La solicitud ya está cancelada');
   }
   
   const previousStatus = this.status;

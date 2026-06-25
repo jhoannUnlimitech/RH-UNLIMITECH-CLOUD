@@ -204,12 +204,17 @@ interface ICSWCategory {
 |--------|------|---------|-------------|
 | GET | /api/v1/csw | csw:read | Listar CSWs (filtros: status, category, requester) |
 | GET | /api/v1/csw/:id | csw:read | Detalle de un CSW |
+| GET | /api/v1/csw/:id/history | csw:read | Historial de acciones de un CSW |
+| GET | /api/v1/csw/my-pending | csw:approve | Solicitudes pendientes de mi aprobación |
+| GET | /api/v1/csw/my-requests | csw:read | Mis solicitudes creadas |
+| GET | /api/v1/csw/stats | csw:read | Estadísticas generales |
 | POST | /api/v1/csw | csw:create | Crear CSW (estado: draft) |
 | PUT | /api/v1/csw/:id | csw:update | Actualizar CSW (autoguardado o edición) |
-| DELETE | /api/v1/csw/:id | csw:delete | Cancelar/eliminar CSW |
+| DELETE | /api/v1/csw/:id | csw:delete | Eliminar CSW (soft delete) |
 | **POST** | **/api/v1/csw/:id/submit** | **csw:create** | **Enviar borrador → pending (activa flujo)** |
 | POST | /api/v1/csw/:id/approve | csw:approve | Aprobar nivel actual |
-| POST | /api/v1/csw/:id/reject | csw:approve | Rechazar con comentario |
+| POST | /api/v1/csw/:id/reject | csw:approve | Rechazar con comentario obligatorio |
+| POST | /api/v1/csw/:id/cancel | csw:cancel | Cancelar solicitud (solo creador) |
 
 ---
 
@@ -344,4 +349,4 @@ Cada acción queda registrada:
 
 ---
 
-**Última actualización:** Junio 24, 2026
+**Última actualización:** Junio 25, 2026

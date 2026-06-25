@@ -19,6 +19,7 @@ import TableSkeleton from "../../components/ui/skeleton/TableSkeleton";
 import Alert from "../../components/ui/alert/Alert";
 import Pagination from "../../components/ui/pagination/Pagination";
 // import { useModal } from "../../hooks/useModal";
+import { formatCSWTitle } from "../../utils/csw";
 import { PencilIcon, TrashBinIcon } from "../../icons";
 
 const CSWList = observer(() => {
@@ -73,21 +74,16 @@ const CSWList = observer(() => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // Fetch data on mount
+  // Fetch data on mount and when route changes
   useEffect(() => {
-    const loadData = async () => {
-      // Verificar autenticación primero y esperar
-      await authStore.checkAuth();
-      // Luego cargar los datos
-      cswStore.fetchCSWs();
-      cswCategoryStore.fetchCategories();
-    };
-    loadData();
-  }, []);
+    cswStore.fetchCSWs();
+    cswCategoryStore.fetchCategories();
+  }, [location.pathname]);
 
   // Status badge configuration
   const getStatusBadge = (status: ICSWStore.CSWStatus) => {
     const statusConfig = {
+      [ICSWStore.CSWStatus.DRAFT]: { text: "Borrador", color: "light" as const },
       [ICSWStore.CSWStatus.PENDING]: { text: "Pendiente", color: "warning" as const },
       [ICSWStore.CSWStatus.APPROVED]: { text: "Aprobada", color: "success" as const },
       [ICSWStore.CSWStatus.REJECTED]: { text: "Rechazada", color: "error" as const },
@@ -101,18 +97,22 @@ const CSWList = observer(() => {
     const csws = Array.isArray(cswStore.csws) ? cswStore.csws : [];
     const currentUserId = authStore.user?._id;
     
-    // Si authStore está cargando, retornar array vacío (se mostrará loading)
-    if (authStore.isLoading) {
-      return [];
-    }
-    
-    // Si no hay usuario autenticado después de cargar, retornar array vacío
+    // Si no hay usuario autenticado, retornar array vacío
     if (!currentUserId && (routeConfig.filterType === "my-requests" || routeConfig.filterType === "pending")) {
       return [];
     }
     
     // Crear una copia del array para evitar mutaciones en MobX
     let filtered = csws.slice();
+
+    // Ocultar borradores de otros usuarios (solo ver los propios)
+    filtered = filtered.filter((csw) => {
+      if (csw.status === ICSWStore.CSWStatus.DRAFT) {
+        const requesterId = typeof csw.requester === 'string' ? csw.requester : csw.requester?._id;
+        return requesterId === currentUserId;
+      }
+      return true;
+    });
 
     // Filtro automático por ruta
     if (routeConfig.filterType === "my-requests") {
@@ -210,6 +210,14 @@ const CSWList = observer(() => {
 
   const handleEdit = (id: string) => {
     navigate(`/csw/edit/${id}`);
+  };
+
+  const handleCancel = (id: string) => {
+    if (window.confirm("¿Estás seguro de cancelar esta solicitud? Podrás volver a enviarla después.")) {
+      cswStore.cancelCSW(id).then(() => {
+        cswStore.fetchCSWs();
+      });
+    }
   };
 
   const handleDelete = (id: string, requesterName: string) => {
@@ -324,6 +332,7 @@ const CSWList = observer(() => {
                       label="Estado"
                       options={[
                         { value: "all", label: "Todos los estados" },
+                        { value: ICSWStore.CSWStatus.DRAFT, label: "Borrador" },
                         { value: ICSWStore.CSWStatus.PENDING, label: "Pendiente" },
                         { value: ICSWStore.CSWStatus.APPROVED, label: "Aprobada" },
                         { value: ICSWStore.CSWStatus.REJECTED, label: "Rechazada" },
@@ -402,7 +411,7 @@ const CSWList = observer(() => {
             </div>
 
             {/* Table or Loading */}
-            {(cswStore.isLoading || authStore.isLoading) ? (
+            {cswStore.isLoading ? (
               <TableSkeleton rows={itemsPerPage} columns={7} />
             ) : (
               <>
@@ -476,7 +485,9 @@ const CSWList = observer(() => {
 
                           return (
                             <TableRow key={csw._id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors dark:border-white/[0.05] dark:hover:bg-gray-800/30">
-                              <TableCell className="px-6 py-4 font-medium text-gray-900 dark:text-white">CSW-{csw._id}</TableCell>
+                              <TableCell className="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                                <span className="text-xs font-mono">{formatCSWTitle(csw)}</span>
+                              </TableCell>
                               <TableCell className="px-6 py-4">
                                 <div className="space-y-1.5">
                                   <div className="font-medium text-gray-900 dark:text-white">{csw.requesterName}</div>
@@ -497,23 +508,27 @@ const CSWList = observer(() => {
                                 })}
                               </TableCell>
                               <TableCell className="px-6 py-4">
-                                <div className="flex items-center gap-2">
-                                  <div className="text-sm text-gray-600 dark:text-gray-400">
-                                    {approved}/{total}
+                                {csw.status === ICSWStore.CSWStatus.DRAFT || total === 0 ? (
+                                  <span className="text-sm text-gray-400 dark:text-gray-500">Sin enviar</span>
+                                ) : (
+                                  <div className="flex items-center gap-2">
+                                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                                      {approved}/{total}
+                                    </div>
+                                    <div className="h-2 w-20 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                                      <div
+                                        className={`h-full rounded-full transition-all ${
+                                          csw.status === ICSWStore.CSWStatus.APPROVED 
+                                            ? 'bg-green-500' 
+                                            : csw.status === ICSWStore.CSWStatus.REJECTED 
+                                            ? 'bg-red-500'
+                                            : 'bg-blue-500'
+                                        }`}
+                                        style={{ width: `${progressPercent}%` }}
+                                      />
+                                    </div>
                                   </div>
-                                  <div className="h-2 w-20 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
-                                    <div
-                                      className={`h-full transition-all ${
-                                        csw.status === ICSWStore.CSWStatus.APPROVED 
-                                          ? 'bg-green-500' 
-                                          : csw.status === ICSWStore.CSWStatus.REJECTED 
-                                          ? 'bg-red-500'
-                                          : 'bg-primary'
-                                      }`}
-                                      style={{ width: `${progressPercent}%` }}
-                                    />
-                                  </div>
-                                </div>
+                                )}
                               </TableCell>
                               <TableCell className="px-6 py-4">
                                 <div className="flex items-center justify-center gap-3">
@@ -527,24 +542,39 @@ const CSWList = observer(() => {
                                     </svg>
                                   </button>
                                   
-                                  {/* Botones de edición/eliminación para mis solicitudes (solo si NO está aprobada) */}
-                                  {routeConfig.filterType === "my-requests" && csw.status !== ICSWStore.CSWStatus.APPROVED && (
-                                    <>
-                                      <button
-                                        onClick={() => handleEdit(csw._id)}
-                                        className="inline-flex items-center justify-center rounded-lg p-2 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-white/[0.05]"
-                                        title="Editar"
-                                      >
-                                        <PencilIcon className="h-[18px] w-[18px]" />
-                                      </button>
-                                      <button
-                                        onClick={() => handleDelete(csw._id, csw.requesterName)}
-                                        className="inline-flex items-center justify-center rounded-lg p-2 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-white/[0.05]"
-                                        title="Eliminar"
-                                      >
-                                        <TrashBinIcon className="h-[18px] w-[18px]" />
-                                      </button>
-                                    </>
+                                  {/* Editar: solo en draft o rejected */}
+                                  {routeConfig.filterType === "my-requests" && (csw.status === ICSWStore.CSWStatus.DRAFT || csw.status === ICSWStore.CSWStatus.REJECTED) && (
+                                    <button
+                                      onClick={() => handleEdit(csw._id)}
+                                      className="inline-flex items-center justify-center rounded-lg p-2 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-white/[0.05]"
+                                      title="Editar"
+                                    >
+                                      <PencilIcon className="h-[18px] w-[18px]" />
+                                    </button>
+                                  )}
+
+                                  {/* Cancelar: solo en draft o pending */}
+                                  {routeConfig.filterType === "my-requests" && (csw.status === ICSWStore.CSWStatus.DRAFT || csw.status === ICSWStore.CSWStatus.PENDING) && (
+                                    <button
+                                      onClick={() => handleCancel(csw._id)}
+                                      className="inline-flex items-center justify-center rounded-lg p-2 text-orange-600 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-white/[0.05]"
+                                      title="Cancelar solicitud"
+                                    >
+                                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                      </svg>
+                                    </button>
+                                  )}
+
+                                  {/* Eliminar: solo en draft */}
+                                  {routeConfig.filterType === "my-requests" && csw.status === ICSWStore.CSWStatus.DRAFT && (
+                                    <button
+                                      onClick={() => handleDelete(csw._id, csw.requesterName)}
+                                      className="inline-flex items-center justify-center rounded-lg p-2 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-white/[0.05]"
+                                      title="Eliminar"
+                                    >
+                                      <TrashBinIcon className="h-[18px] w-[18px]" />
+                                    </button>
                                   )}
                                 </div>
                               </TableCell>

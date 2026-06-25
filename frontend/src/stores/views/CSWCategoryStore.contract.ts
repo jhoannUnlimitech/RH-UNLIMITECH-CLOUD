@@ -14,6 +14,7 @@ export interface ICSWCategoryStore {
 
   // Acciones
   fetchCategories(): Promise<void>;
+  fetchAllCategories(): Promise<void>;
   fetchCategoryById(id: string): Promise<void>;
   createCategory(input: ICSWCategoryStore.CategoryInput): Promise<void>;
   updateCategory(id: string, input: ICSWCategoryStore.CategoryInput): Promise<void>;

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import CSW, { CSWStatus, ApprovalStatus } from '../models/CSW';
-import { AuthRequest } from '../middleware/authMiddleware';
+import { AuthRequest } from '../middleware/auth';
 import mongoose from 'mongoose';
 
 /**
@@ -21,8 +21,25 @@ export const getCSWs = async (
       limit = 10
     } = req.query;
     
+    const userId = req.user?.id;
     const filter: any = { deleted: false };
-    if (status) filter.status = status;
+    
+    // No mostrar borradores de otros usuarios (excepto si filtran explícitamente por draft)
+    if (status && status === 'draft') {
+      // Si filtra por draft, solo mostrar los propios
+      filter.status = CSWStatus.DRAFT;
+      filter.requester = userId;
+    } else if (status) {
+      // Filtro por otro estado específico
+      filter.status = status;
+    } else {
+      // Sin filtro de estado: excluir drafts ajenos
+      filter.$or = [
+        { status: { $ne: CSWStatus.DRAFT } },
+        { status: CSWStatus.DRAFT, requester: userId }
+      ];
+    }
+    
     if (category) filter.category = category;
     if (requester) filter.requester = requester;
     if (division) filter.requesterDivision = division;
@@ -91,7 +108,11 @@ export const getMyPendingApprovals = async (
       const currentApproval = csw.approvalChain.find(
         a => a.level === csw.currentLevel
       );
-      return currentApproval?.approverId.toString() === userId;
+      // approverId puede ser un objeto poblado o un ObjectId
+      const approverId = typeof currentApproval?.approverId === 'object' && currentApproval?.approverId !== null
+        ? (currentApproval.approverId as any)._id?.toString()
+        : currentApproval?.approverId?.toString();
+      return approverId === userId;
     });
     
     res.json({
@@ -265,19 +286,24 @@ export const createCSW = async (
       requesterName: (employee as any).name,
       requesterPosition: (employee as any).role?.name || 'Sin cargo',
       requesterDivision: (employee as any).division._id,
-      category
+      category,
+      status: CSWStatus.DRAFT
     });
     
-    // Inicializar la cadena de aprobación
-    await csw.initializeApprovalChain();
+    // Agregar al historial de creación
+    csw.addToHistory('created', new mongoose.Types.ObjectId(userId), (employee as any).name, {
+      newStatus: CSWStatus.DRAFT,
+      comments: 'Solicitud creada como borrador'
+    });
+    
+    await csw.save();
     
     await csw.populate('category', 'name');
-    await csw.populate('approvalChain.approverId', 'name email');
     
     res.status(201).json({
       success: true,
       data: csw,
-      message: 'Solicitud CSW creada exitosamente'
+      message: 'Solicitud CSW creada como borrador'
     });
   } catch (error: any) {
     if (error.message) {
@@ -292,7 +318,7 @@ export const createCSW = async (
 };
 
 /**
- * Editar una solicitud CSW (solo si está rechazada)
+ * Editar una solicitud CSW (solo si está en draft o rechazada)
  */
 export const updateCSW = async (
   req: AuthRequest,
@@ -302,7 +328,7 @@ export const updateCSW = async (
   try {
     const userId = req.user?.id;
     const { id } = req.params;
-    const { situation, information, solution } = req.body;
+    const { situation, information, solution, category } = req.body;
     
     if (!userId) {
       res.status(401).json({
@@ -334,26 +360,60 @@ export const updateCSW = async (
       return;
     }
     
-    // Actualizar campos
-    if (situation) csw.situation = situation;
-    if (information) csw.information = information;
-    if (solution) csw.solution = solution;
+    // Si está en draft, se puede editar libremente
+    if (csw.status === CSWStatus.DRAFT) {
+      if (situation) csw.situation = situation;
+      if (information) csw.information = information;
+      if (solution) csw.solution = solution;
+      if (category) csw.category = category;
+      
+      await csw.save();
+      await csw.populate('category', 'name');
+      
+      res.json({
+        success: true,
+        data: csw,
+        message: 'Borrador actualizado'
+      });
+      return;
+    }
     
-    // Resetear aprobaciones
-    await csw.resetApprovals(
-      new mongoose.Types.ObjectId(userId),
-      (employee as any).name
-    );
+    // Si está rechazado, resetear aprobaciones y cambiar a pending
+    if (csw.status === CSWStatus.REJECTED) {
+      // Actualizar campos
+      if (situation) csw.situation = situation;
+      if (information) csw.information = information;
+      if (solution) csw.solution = solution;
+      
+      // Agregar historial de cambio de estado automático
+      csw.addToHistory('status_changed', new mongoose.Types.ObjectId(userId), (employee as any).name, {
+        previousStatus: CSWStatus.REJECTED,
+        newStatus: CSWStatus.PENDING,
+        comments: 'Estado cambiado automáticamente al editar la solicitud rechazada'
+      });
+      
+      // Resetear aprobaciones
+      await csw.resetApprovals(
+        new mongoose.Types.ObjectId(userId),
+        (employee as any).name
+      );
+      
+      await csw.save();
+      await csw.populate('category', 'name');
+      await csw.populate('approvalChain.approverId', 'name email');
+      
+      res.json({
+        success: true,
+        data: csw,
+        message: 'Solicitud actualizada. Todas las aprobaciones fueron reseteadas.'
+      });
+      return;
+    }
     
-    await csw.save();
-    
-    await csw.populate('category', 'name');
-    await csw.populate('approvalChain.approverId', 'name email');
-    
-    res.json({
-      success: true,
-      data: csw,
-      message: 'Solicitud actualizada. Todas las aprobaciones fueron reseteadas.'
+    // Cualquier otro estado no permite edición
+    res.status(400).json({
+      success: false,
+      message: 'Solo se pueden editar solicitudes en borrador o rechazadas'
     });
   } catch (error: any) {
     if (error.message) {
@@ -651,6 +711,12 @@ export const submitCSW = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
+    const userId = req.user?.id;
+    
+    if (!userId) {
+      res.status(401).json({ success: false, message: 'Usuario no autenticado' });
+      return;
+    }
     
     const csw = await CSW.findOne({ _id: id, deleted: false });
     
@@ -660,13 +726,13 @@ export const submitCSW = async (
     }
 
     // Solo el creador puede enviar
-    if (csw.requester.toString() !== req.user!.id) {
+    if (csw.requester.toString() !== userId) {
       res.status(403).json({ success: false, message: 'Solo el creador puede enviar la solicitud' });
       return;
     }
 
     // Solo se puede enviar si está en draft
-    if (csw.status !== 'draft') {
+    if (csw.status !== CSWStatus.DRAFT) {
       res.status(400).json({ success: false, message: 'Solo se pueden enviar solicitudes en borrador' });
       return;
     }
@@ -677,7 +743,7 @@ export const submitCSW = async (
       return;
     }
 
-    // Inicializar cadena de aprobación si no existe
+    // Inicializar cadena de aprobación
     if (!csw.approvalChain || csw.approvalChain.length === 0) {
       await csw.initializeApprovalChain();
     }
@@ -687,20 +753,27 @@ export const submitCSW = async (
     csw.currentLevel = 1;
 
     // Agregar al historial
-    csw.addToHistory('submitted', req.user!.id as any, req.user!.roleName || 'Usuario', {
-      previousStatus: 'draft',
-      newStatus: 'pending',
+    csw.addToHistory('submitted', new mongoose.Types.ObjectId(userId), csw.requesterName, {
+      previousStatus: CSWStatus.DRAFT,
+      newStatus: CSWStatus.PENDING,
       comments: 'Solicitud enviada para aprobación'
     });
 
     await csw.save();
+    
+    await csw.populate('category', 'name');
+    await csw.populate('approvalChain.approverId', 'name email');
 
     res.json({
       success: true,
       data: csw,
       message: 'Solicitud enviada para aprobación exitosamente'
     });
-  } catch (error) {
+  } catch (error: any) {
+    if (error.message) {
+      res.status(400).json({ success: false, message: error.message });
+      return;
+    }
     next(error);
   }
 };

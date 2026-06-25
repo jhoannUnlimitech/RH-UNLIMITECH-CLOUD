@@ -85,7 +85,7 @@ const router = Router();
 router.get(
   '/',
   authMiddleware,
-  requirePermission('csw_categories', 'read'),
+  requirePermission('csw', 'read'),
   getCSWCategories
 );
 

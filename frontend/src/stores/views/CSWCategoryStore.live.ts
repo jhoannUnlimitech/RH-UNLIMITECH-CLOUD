@@ -21,6 +21,23 @@ export class CSWCategoryStoreLive implements ICSWCategoryStore {
     this.isLoading = true;
     this.error = null;
     try {
+      const data = await cswCategoryService.getAll();
+      runInAction(() => {
+        this.categories = data;
+        this.isLoading = false;
+      });
+    } catch (error: any) {
+      runInAction(() => {
+        this.error = error.response?.data?.message || 'Error al cargar las categorías';
+        this.isLoading = false;
+      });
+    }
+  }
+
+  async fetchAllCategories() {
+    this.isLoading = true;
+    this.error = null;
+    try {
       const data = await cswCategoryService.getAllIncludingInactive();
       runInAction(() => {
         this.categories = data;
