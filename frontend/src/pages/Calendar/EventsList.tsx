@@ -1,0 +1,165 @@
+import { useEffect, useState, useMemo } from "react";
+import { observer } from "mobx-react-lite";
+import { Table, TableBody, TableCell, TableHeader, TableRow } from "../../components/ui/table";
+import Badge from "../../components/ui/badge/Badge";
+import Button from "../../components/ui/button/Button";
+import PageBreadcrumb from "../../components/common/PageBreadCrumb";
+import SearchableSelect from "../../components/form/SearchableSelect";
+import Pagination from "../../components/ui/pagination/Pagination";
+import apiClient from "../../api/client";
+import { usePermissions } from "../../hooks/usePermissions";
+import { PencilIcon, TrashBinIcon } from "../../icons";
+import { notify } from "../../utils/toast";
+
+interface CalEvent {
+  _id: string;
+  title: string;
+  description?: string;
+  startDate: string;
+  endDate: string;
+  color: string;
+  type: string;
+  allDay: boolean;
+  createdBy?: { _id: string; name: string; email: string };
+}
+
+const typeLabels: Record<string, string> = { meeting: "Reunión", holiday: "Festivo", reminder: "Recordatorio", deadline: "Fecha límite", other: "Otro" };
+const colorBadges: Record<string, "info" | "success" | "warning" | "error"> = { primary: "info", success: "success", warning: "warning", danger: "error" };
+const typeOptions = [
+  { value: "", label: "Todos los tipos" },
+  { value: "meeting", label: "Reunión" },
+  { value: "holiday", label: "Festivo" },
+  { value: "reminder", label: "Recordatorio" },
+  { value: "deadline", label: "Fecha límite" },
+  { value: "other", label: "Otro" },
+];
+
+const EventsList = observer(() => {
+  const { can } = usePermissions();
+  const canManage = can("employees", "update");
+  const [events, setEvents] = useState<CalEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [typeFilter, setTypeFilter] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  useEffect(() => { loadEvents(); }, [typeFilter, fromDate, toDate]);
+
+  const loadEvents = async () => {
+    setLoading(true);
+    try {
+      const params: any = {};
+      if (typeFilter) params.type = typeFilter;
+      if (fromDate) params.from = fromDate;
+      if (toDate) params.to = toDate;
+      const res = await apiClient.get("/calendar/events", { params });
+      setEvents(res.data?.data || []);
+    } catch { setEvents([]); }
+    finally { setLoading(false); }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("¿Eliminar este evento?")) return;
+    try {
+      await apiClient.delete(`/calendar/events/${id}`);
+      notify.success("Evento eliminado");
+      loadEvents();
+    } catch { notify.error("Error al eliminar"); }
+  };
+
+  const totalPages = Math.ceil(events.length / itemsPerPage);
+  const startIdx = (currentPage - 1) * itemsPerPage;
+  const currentData = events.slice(startIdx, startIdx + itemsPerPage);
+
+  const formatDate = (d: string) => new Date(d).toLocaleDateString("es", { day: "numeric", month: "short", year: "numeric" });
+
+  return (
+    <div className="flex flex-col gap-6">
+      <PageBreadcrumb pageTitle="Lista de Eventos" />
+
+      <div className="overflow-hidden rounded-xl bg-white dark:bg-white/[0.03]">
+        {/* Filtros */}
+        <div className="flex flex-col gap-3 px-4 py-4 border border-b-0 border-gray-100 dark:border-white/[0.05] rounded-t-xl sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="w-[180px]">
+              <SearchableSelect id="type-filter" options={typeOptions} value={typeFilter} onChange={(v) => { setTypeFilter(v); setCurrentPage(1); }} placeholder="Tipo..." />
+            </div>
+            <input type="date" value={fromDate} onChange={(e) => { setFromDate(e.target.value); setCurrentPage(1); }} className="h-10 px-3 rounded-lg border border-gray-300 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white" />
+            <span className="text-gray-500 text-sm">a</span>
+            <input type="date" value={toDate} onChange={(e) => { setToDate(e.target.value); setCurrentPage(1); }} className="h-10 px-3 rounded-lg border border-gray-300 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white" />
+          </div>
+          <Button onClick={() => window.location.href = '/calendar'} variant="outline">
+            ← Volver al Calendario
+          </Button>
+        </div>
+
+        {loading && (
+          <div className="p-8 text-center border border-gray-100 dark:border-white/[0.05]">
+            <div className="w-8 h-8 border-4 border-gray-300 rounded-full border-t-brand-600 animate-spin mx-auto"></div>
+          </div>
+        )}
+
+        {!loading && events.length === 0 && (
+          <div className="p-12 text-center border border-gray-100 dark:border-white/[0.05]">
+            <p className="text-gray-500">No hay eventos con esos filtros</p>
+          </div>
+        )}
+
+        {!loading && events.length > 0 && (
+          <>
+            <div className="max-w-full overflow-x-auto border border-gray-100 dark:border-white/[0.05]">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableCell isHeader className="py-3 px-4 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Título</TableCell>
+                    <TableCell isHeader className="py-3 px-4 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400">Tipo</TableCell>
+                    <TableCell isHeader className="py-3 px-4 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400">Fecha</TableCell>
+                    <TableCell isHeader className="py-3 px-4 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400">Creado por</TableCell>
+                    {canManage && <TableCell isHeader className="py-3 px-4 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400">Acciones</TableCell>}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {currentData.map((event) => (
+                    <TableRow key={event._id} className="border-b border-gray-100 dark:border-gray-800">
+                      <TableCell className="py-3 px-4">
+                        <div>
+                          <p className="font-medium text-sm text-gray-900 dark:text-white">{event.title}</p>
+                          {event.description && <p className="text-xs text-gray-500 truncate max-w-[200px]">{event.description}</p>}
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-3 px-4 text-center">
+                        <Badge color={colorBadges[event.color] || "info"}>{typeLabels[event.type] || event.type}</Badge>
+                      </TableCell>
+                      <TableCell className="py-3 px-4 text-center">
+                        <span className="text-sm text-gray-700 dark:text-gray-300">{formatDate(event.startDate)}</span>
+                      </TableCell>
+                      <TableCell className="py-3 px-4 text-center">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">{event.createdBy?.name || "—"}</span>
+                      </TableCell>
+                      {canManage && (
+                        <TableCell className="py-3 px-4">
+                          <div className="flex items-center justify-center gap-2">
+                            <button onClick={() => handleDelete(event._id)} className="inline-flex items-center justify-center rounded-lg p-2 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-white/[0.05]" title="Eliminar">
+                              <TrashBinIcon className="h-[18px] w-[18px]" />
+                            </button>
+                          </div>
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            <div className="border border-t-0 border-gray-100 dark:border-white/[0.05] rounded-b-xl">
+              <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={(p) => setCurrentPage(p)} startIndex={startIdx + 1} endIndex={Math.min(startIdx + itemsPerPage, events.length)} totalItems={events.length} />
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+});
+
+export default EventsList;

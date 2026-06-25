@@ -39,10 +39,26 @@ const CalendarPage: React.FC = () => {
   const calendarRef = useRef<FullCalendar>(null);
   const { isOpen, openModal, closeModal } = useModal();
 
-  // Cargar festivos al montar
+  // Cargar festivos y eventos al montar
   useEffect(() => {
     loadHolidays();
+    loadEvents();
   }, []);
+
+  const loadEvents = async () => {
+    try {
+      const res = await (await import('../../api/client')).default.get('/calendar/events');
+      const dbEvents: CalendarEvent[] = (res.data?.data || []).map((e: any) => ({
+        id: e._id,
+        title: e.title,
+        start: e.startDate?.split('T')[0],
+        end: e.endDate?.split('T')[0],
+        allDay: e.allDay,
+        extendedProps: { calendar: e.color === 'primary' ? 'Primary' : e.color === 'success' ? 'Success' : e.color === 'warning' ? 'Warning' : 'Danger', isHoliday: false, type: e.type },
+      }));
+      setEvents(prev => [...prev.filter(e => e.extendedProps.isHoliday), ...dbEvents]);
+    } catch { /* silent */ }
+  };
 
   const loadHolidays = () => {
     const hd = new Holidays();
@@ -95,35 +111,40 @@ const CalendarPage: React.FC = () => {
     openModal();
   };
 
-  const handleAddOrUpdateEvent = () => {
+  const handleAddOrUpdateEvent = async () => {
     if (!eventTitle.trim()) return;
 
-    if (selectedEvent) {
-      setEvents(prev =>
-        prev.map(event =>
-          event.id === selectedEvent.id
-            ? { ...event, title: eventTitle, start: eventStartDate, end: eventEndDate, extendedProps: { calendar: eventLevel } }
-            : event
-        )
-      );
-    } else {
-      const newEvent: CalendarEvent = {
-        id: Date.now().toString(),
-        title: eventTitle,
-        start: eventStartDate,
-        end: eventEndDate,
-        allDay: true,
-        extendedProps: { calendar: eventLevel },
-      };
-      setEvents(prev => [...prev, newEvent]);
-    }
+    const apiClient = (await import('../../api/client')).default;
+    const colorMap: Record<string, string> = { Primary: 'primary', Success: 'success', Warning: 'warning', Danger: 'danger' };
+    const payload = {
+      title: eventTitle,
+      startDate: eventStartDate,
+      endDate: eventEndDate,
+      color: colorMap[eventLevel] || 'primary',
+      type: 'other',
+      allDay: true,
+    };
+
+    try {
+      if (selectedEvent && !selectedEvent.extendedProps?.isHoliday) {
+        await apiClient.put(`/calendar/events/${selectedEvent.id}`, payload);
+      } else {
+        await apiClient.post('/calendar/events', payload);
+      }
+      await loadEvents();
+    } catch { /* silent */ }
+
     closeModal();
     resetModalFields();
   };
 
-  const handleDeleteEvent = () => {
+  const handleDeleteEvent = async () => {
     if (selectedEvent) {
-      setEvents(prev => prev.filter(event => event.id !== selectedEvent.id));
+      try {
+        const apiClient = (await import('../../api/client')).default;
+        await apiClient.delete(`/calendar/events/${selectedEvent.id}`);
+        await loadEvents();
+      } catch { /* silent */ }
       closeModal();
       resetModalFields();
     }
@@ -143,19 +164,24 @@ const CalendarPage: React.FC = () => {
       <PageBreadcrumb pageTitle="Calendario" />
 
       {/* Leyenda */}
-      <div className="mb-4 flex flex-wrap items-center gap-4">
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-warning-500"></span>
-          <span className="text-sm text-gray-600 dark:text-gray-400">Festivos Colombia</span>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-warning-500"></span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">Festivos Colombia</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-brand-500"></span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">Festivos Estados Unidos</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-success-500"></span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">Eventos</span>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-brand-500"></span>
-          <span className="text-sm text-gray-600 dark:text-gray-400">Festivos Estados Unidos</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-success-500"></span>
-          <span className="text-sm text-gray-600 dark:text-gray-400">Eventos personales</span>
-        </div>
+        <a href="/calendar/events" className="text-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400">
+          Ver lista de eventos →
+        </a>
       </div>
 
       <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">

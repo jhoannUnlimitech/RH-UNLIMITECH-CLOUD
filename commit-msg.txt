@@ -1,0 +1,11 @@
+feat(calendar): persistent events CRUD + events list page with filters
+
+- feat(backend): CalendarEvent model (title, dates, color, type, createdBy)
+- feat(backend): CRUD endpoints at /api/v1/calendar/events
+- feat(backend): filter by type and date range (from/to query params)
+- feat(frontend): CalendarPage now persists events to DB (create/update/delete)
+- feat(frontend): EventsList page with table, filters by type and date range, pagination
+- feat(frontend): link Ver lista de eventos in calendar header
+- feat(frontend): route /calendar/events registered in App.tsx
+- feat(permissions): only employees:update can manage events (HR/CEO/Founder)
+- feat(ui): holidays rendered with country flag emoji in custom eventContent
