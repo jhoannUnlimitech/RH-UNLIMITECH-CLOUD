@@ -6,7 +6,7 @@ import {
   updateRole,
   deleteRole,
   getAllPermissions
-} from '../controllers/roles.controller';
+} from '../controllers/hats.controller';
 import { authMiddleware } from '../middleware/auth';
 import { requirePermission } from '../middleware/permission';
 

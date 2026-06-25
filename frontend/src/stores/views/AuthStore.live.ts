@@ -1,6 +1,7 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import { IAuthStore } from './AuthStore.contract';
 import { authService } from '../../api/services/auth';
+import { notify } from '../../utils/toast';
 
 /**
  * AuthStore Live Implementation
@@ -32,6 +33,8 @@ export class AuthStoreLive implements IAuthStore {
         this.isAuthenticated = true;
       });
       
+      notify.success(`Bienvenido, ${response.user.name}`);
+      
       // Guardar en localStorage
       localStorage.setItem('auth_token', response.token);
       localStorage.setItem('auth_user', JSON.stringify(response.user));
@@ -39,6 +42,7 @@ export class AuthStoreLive implements IAuthStore {
       runInAction(() => {
         this.error = err.response?.data?.message || 'Error al iniciar sesión';
       });
+      notify.error(err.response?.data?.message || 'Error al iniciar sesión');
       throw err;
     } finally {
       runInAction(() => {

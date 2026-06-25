@@ -1,6 +1,7 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import { ICSWStore } from './CSWStore.contract';
 import { cswService } from '../../api/services/csw';
+import { notify } from '../../utils/toast';
 
 /**
  * CSWStore Live Implementation
@@ -71,10 +72,12 @@ export class CSWStoreLive implements ICSWStore {
       runInAction(() => {
         this.csws.unshift(newCSW);
       });
+      notify.success('Solicitud CSW creada exitosamente');
     } catch (err: any) {
       runInAction(() => {
         this.error = err.response?.data?.message || 'Error al crear solicitud CSW';
       });
+      notify.error(err.response?.data?.message || 'Error al crear solicitud CSW');
       throw err;
     } finally {
       runInAction(() => {
@@ -100,10 +103,12 @@ export class CSWStoreLive implements ICSWStore {
           this.selectedCSW = updatedCSW;
         }
       });
+      notify.success('Solicitud CSW actualizada exitosamente');
     } catch (err: any) {
       runInAction(() => {
         this.error = err.response?.data?.message || 'Error al actualizar solicitud CSW';
       });
+      notify.error(err.response?.data?.message || 'Error al actualizar solicitud CSW');
       throw err;
     } finally {
       runInAction(() => {
@@ -126,10 +131,12 @@ export class CSWStoreLive implements ICSWStore {
           this.selectedCSW = null;
         }
       });
+      notify.success('Solicitud CSW eliminada');
     } catch (err: any) {
       runInAction(() => {
         this.error = err.response?.data?.message || 'Error al eliminar solicitud CSW';
       });
+      notify.error(err.response?.data?.message || 'Error al eliminar solicitud CSW');
       throw err;
     } finally {
       runInAction(() => {
@@ -155,10 +162,12 @@ export class CSWStoreLive implements ICSWStore {
           this.selectedCSW = updatedCSW;
         }
       });
+      notify.success('Solicitud aprobada exitosamente');
     } catch (err: any) {
       runInAction(() => {
         this.error = err.response?.data?.message || 'Error al aprobar solicitud CSW';
       });
+      notify.error(err.response?.data?.message || 'Error al aprobar solicitud');
       throw err;
     } finally {
       runInAction(() => {
@@ -184,10 +193,12 @@ export class CSWStoreLive implements ICSWStore {
           this.selectedCSW = updatedCSW;
         }
       });
+      notify.success('Solicitud rechazada');
     } catch (err: any) {
       runInAction(() => {
         this.error = err.response?.data?.message || 'Error al rechazar solicitud CSW';
       });
+      notify.error(err.response?.data?.message || 'Error al rechazar solicitud');
       throw err;
     } finally {
       runInAction(() => {
@@ -213,10 +224,12 @@ export class CSWStoreLive implements ICSWStore {
           this.selectedCSW = updatedCSW;
         }
       });
+      notify.success('Solicitud cancelada');
     } catch (err: any) {
       runInAction(() => {
         this.error = err.response?.data?.message || 'Error al cancelar solicitud CSW';
       });
+      notify.error(err.response?.data?.message || 'Error al cancelar solicitud');
       throw err;
     } finally {
       runInAction(() => {

@@ -1,12 +1,12 @@
 import { makeAutoObservable } from 'mobx';
-import { IRolesStore } from './RolesStore.contract';
+import { IHatsStore } from './HatsStore.contract';
 
 /**
- * RolesStore Mock Implementation
+ * HatsStore Mock Implementation
  * Store con datos de ejemplo para desarrollo y prototipado
  */
-export class RolesStoreMock implements IRolesStore {
-  roles: IRolesStore.Role[] = [
+export class HatsStoreMock implements IHatsStore {
+  roles: IHatsStore.Role[] = [
     {
       _id: '1',
       name: 'ARCHITECT SOLUTIONS',
@@ -59,10 +59,10 @@ export class RolesStoreMock implements IRolesStore {
     },
   ];
 
-  selectedRole: IRolesStore.Role | null = null;
+  selectedHat: IHatsStore.Role | null = null;
   isLoading = false;
   error: string | null = null;
-  pagination: IRolesStore.Pagination = {
+  pagination: IHatsStore.Pagination = {
     page: 1,
     limit: 10,
     total: 3,
@@ -73,7 +73,7 @@ export class RolesStoreMock implements IRolesStore {
     makeAutoObservable(this, {}, { autoBind: true });
   }
 
-  async fetchRoles(_params?: IRolesStore.FetchParams): Promise<void> {
+  async fetchHats(_params?: IHatsStore.FetchParams): Promise<void> {
     this.isLoading = true;
     this.error = null;
 
@@ -81,10 +81,9 @@ export class RolesStoreMock implements IRolesStore {
     await new Promise(resolve => setTimeout(resolve, 500));
 
     this.isLoading = false;
-    // Los datos ya están en this.roles
   }
 
-  async fetchRoleById(id: string): Promise<void> {
+  async fetchHatById(id: string): Promise<void> {
     this.isLoading = true;
     this.error = null;
 
@@ -93,22 +92,22 @@ export class RolesStoreMock implements IRolesStore {
 
     const role = this.roles.find(r => r._id === id);
     if (role) {
-      this.selectedRole = role;
+      this.selectedHat = role;
     } else {
-      this.error = 'Rol no encontrado';
+      this.error = 'Hat no encontrado';
     }
 
     this.isLoading = false;
   }
 
-  async createRole(data: IRolesStore.RoleInput): Promise<void> {
+  async createHat(data: IHatsStore.RoleInput): Promise<void> {
     this.isLoading = true;
     this.error = null;
 
     // Simular delay de red
     await new Promise(resolve => setTimeout(resolve, 400));
 
-    const newRole: IRolesStore.Role = {
+    const newRole: IHatsStore.Role = {
       _id: `mock-${Date.now()}`,
       name: data.name,
       permissions: data.permissions.map((permId) => ({
@@ -126,7 +125,7 @@ export class RolesStoreMock implements IRolesStore {
     this.isLoading = false;
   }
 
-  async updateRole(id: string, data: IRolesStore.RoleUpdateInput): Promise<void> {
+  async updateHat(id: string, data: IHatsStore.RoleUpdateInput): Promise<void> {
     this.isLoading = true;
     this.error = null;
 
@@ -147,14 +146,14 @@ export class RolesStoreMock implements IRolesStore {
       }
       this.roles[roleIndex].updatedAt = new Date().toISOString();
     } else {
-      this.error = 'Rol no encontrado';
-      throw new Error('Rol no encontrado');
+      this.error = 'Hat no encontrado';
+      throw new Error('Hat no encontrado');
     }
 
     this.isLoading = false;
   }
 
-  async deleteRole(id: string): Promise<void> {
+  async deleteHat(id: string): Promise<void> {
     this.isLoading = true;
     this.error = null;
 
@@ -169,7 +168,7 @@ export class RolesStoreMock implements IRolesStore {
     this.error = null;
   }
 
-  setSelectedRole(role: IRolesStore.Role | null): void {
-    this.selectedRole = role;
+  setSelectedHat(role: IHatsStore.Role | null): void {
+    this.selectedHat = role;
   }
 }

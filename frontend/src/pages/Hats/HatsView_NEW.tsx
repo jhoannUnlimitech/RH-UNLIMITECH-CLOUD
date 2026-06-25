@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { rolesStore } from "../../stores/views";
+import { hatsStore } from "../../stores/views";
 import apiClient from "../../api/client";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import Button from "../../components/ui/button/Button";
@@ -29,7 +29,7 @@ const resourceNames: Record<string, string> = {
   csw: "Solicitudes CSW",
   employees: "Empleados",
   divisions: "Divisiones",
-  roles: "Roles",
+  roles: "Hats",
   permissions: "Permisos",
   csw_categories: "Categorías CSW",
   approval_flows: "Flujos de Aprobación",
@@ -59,7 +59,7 @@ const moduleIcons: Record<string, React.ReactNode> = {
   training: <DocsIcon className="w-6 h-6 text-brand-600 dark:text-brand-400" />,
 };
 
-const RolesView = observer(() => {
+const HatsView_NEW = observer(() => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [loadingPermissions, setLoadingPermissions] = useState(false);
@@ -96,11 +96,11 @@ const RolesView = observer(() => {
     if (!id) return;
 
     try {
-      let role = rolesStore.roles.find((r) => r._id === id);
+      let role = hatsStore.roles.find((r) => r._id === id);
 
       if (!role) {
-        await rolesStore.fetchRoleById(id);
-        role = rolesStore.selectedRole || undefined;
+        await hatsStore.fetchHatById(id);
+        role = hatsStore.selectedHat || undefined;
       }
 
       if (role) {
@@ -111,7 +111,7 @@ const RolesView = observer(() => {
         setSelectedPermissions(permissionIds);
       }
     } catch (err) {
-      console.error("Error al cargar datos del rol:", err);
+      console.error("Error al cargar datos del hat:", err);
     }
   };
 
@@ -135,11 +135,11 @@ const RolesView = observer(() => {
     (module) => !Object.values(moduleHierarchy).flat().includes(module)
   );
 
-  const role = rolesStore.roles.find((r) => r._id === id);
+  const role = hatsStore.roles.find((r) => r._id === id);
 
   return (
     <div className="space-y-6">
-      <PageBreadcrumb pageTitle={`Ver Rol: ${roleName}`} />
+      <PageBreadcrumb pageTitle={`Ver Hat: ${roleName}`} />
 
       {/* Form Container */}
       <div className="rounded-xl bg-white dark:bg-white/[0.03] p-6 lg:p-8">
@@ -152,7 +152,7 @@ const RolesView = observer(() => {
                   {roleName}
                 </h2>
                 <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                  Vista de solo lectura de los permisos del rol
+                  Vista de solo lectura de los permisos del hat
                 </p>
               </div>
               <Button onClick={() => navigate(`/roles/edit/${id}`)}>
@@ -344,4 +344,4 @@ const RolesView = observer(() => {
   );
 });
 
-export default RolesView;
+export default HatsView_NEW;

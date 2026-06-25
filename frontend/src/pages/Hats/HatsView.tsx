@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { rolesStore } from "../../stores/views";
+import { hatsStore } from "../../stores/views";
 import apiClient from "../../api/client";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import Button from "../../components/ui/button/Button";
@@ -59,7 +59,7 @@ const moduleIcons: Record<string, React.ReactNode> = {
   training: <DocsIcon className="w-6 h-6 text-brand-600 dark:text-brand-400" />,
 };
 
-const RolesView = observer(() => {
+const HatsView = observer(() => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [loadingPermissions, setLoadingPermissions] = useState(false);
@@ -96,11 +96,11 @@ const RolesView = observer(() => {
     if (!id) return;
 
     try {
-      let role = rolesStore.roles.find((r) => r._id === id);
+      let role = hatsStore.roles.find((r) => r._id === id);
 
       if (!role) {
-        await rolesStore.fetchRoleById(id);
-        role = rolesStore.selectedRole || undefined;
+        await hatsStore.fetchHatById(id);
+        role = hatsStore.selectedHat || undefined;
       }
 
       if (role) {
@@ -137,7 +137,7 @@ const RolesView = observer(() => {
     (module) => groupedPermissions[module] || moduleHierarchy[module].length > 0
   );
 
-  const role = rolesStore.roles.find((r) => r._id === id);
+  const role = hatsStore.roles.find((r) => r._id === id);
 
   return (
     <div className="space-y-6">
@@ -346,4 +346,4 @@ const RolesView = observer(() => {
   );
 });
 
-export default RolesView;
+export default HatsView;

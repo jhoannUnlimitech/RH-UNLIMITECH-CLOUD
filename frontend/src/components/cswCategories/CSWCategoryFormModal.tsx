@@ -1,10 +1,20 @@
 import { observer } from "mobx-react-lite";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
 import Alert from "../ui/alert/Alert";
+import SearchableSelect from "../form/SearchableSelect";
 import { cswCategoryStore } from "../../stores/views";
+import { employeesService } from "../../api/services/employees";
 import type { ICSWCategoryStore } from "../../stores/views/CSWCategoryStore.contract";
+
+interface Approver {
+  _id: string;
+  name: string;
+  email: string;
+  role?: { name: string };
+  division?: { name: string };
+}
 
 interface Props {
   isOpen: boolean;
@@ -18,10 +28,14 @@ const CSWCategoryFormModal = observer(({ isOpen, onClose, onSuccess, categoryId 
     name: "",
     description: "",
     active: true,
+    useDefaultFlow: true,
+    directApproverId: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [approvers, setApprovers] = useState<Approver[]>([]);
+  const [loadingApprovers, setLoadingApprovers] = useState(false);
 
   const isEditMode = !!categoryId;
 
@@ -32,6 +46,33 @@ const CSWCategoryFormModal = observer(({ isOpen, onClose, onSuccess, categoryId 
     }
   }, [isOpen, categoryId]);
 
+  // Load CSW approvers
+  useEffect(() => {
+    if (isOpen) {
+      loadApprovers();
+    }
+  }, [isOpen]);
+
+  const loadApprovers = async () => {
+    setLoadingApprovers(true);
+    try {
+      const response = await employeesService.getCSWApprovers();
+      setApprovers(Array.isArray(response.data) ? response.data : []);
+    } catch (error) {
+      console.error("Error al cargar aprobadores:", error);
+      setApprovers([]);
+    } finally {
+      setLoadingApprovers(false);
+    }
+  };
+
+  const approverOptions = useMemo(() => {
+    return approvers.map((a) => ({
+      value: a._id,
+      label: `${a.name}${a.role?.name ? ` (${a.role.name})` : ""}`,
+    }));
+  }, [approvers]);
+
   // Populate form when selectedCategory changes
   useEffect(() => {
     if (isEditMode && cswCategoryStore.selectedCategory) {
@@ -40,6 +81,8 @@ const CSWCategoryFormModal = observer(({ isOpen, onClose, onSuccess, categoryId 
         name: category.name,
         description: category.description || "",
         active: category.active,
+        useDefaultFlow: category.useDefaultFlow !== undefined ? category.useDefaultFlow : true,
+        directApproverId: category.directApproverId?._id || category.directApproverId || "",
       });
     }
   }, [cswCategoryStore.selectedCategory, isEditMode]);
@@ -51,6 +94,8 @@ const CSWCategoryFormModal = observer(({ isOpen, onClose, onSuccess, categoryId 
         name: "",
         description: "",
         active: true,
+        useDefaultFlow: true,
+        directApproverId: "",
       });
       setErrors({});
       setSubmitError("");
@@ -91,6 +136,10 @@ const CSWCategoryFormModal = observer(({ isOpen, onClose, onSuccess, categoryId 
 
     if (formData.description && formData.description.length > 250) {
       newErrors.description = "La descripción no puede exceder 250 caracteres";
+    }
+
+    if (!formData.useDefaultFlow && !formData.directApproverId) {
+      newErrors.directApproverId = "Debe seleccionar un aprobador directo";
     }
 
     setErrors(newErrors);
@@ -197,6 +246,55 @@ const CSWCategoryFormModal = observer(({ isOpen, onClose, onSuccess, categoryId 
           <label htmlFor="active" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
             Categoría activa
           </label>
+        </div>
+
+        {/* Approval Flow Configuration */}
+        <div className="space-y-4 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="useDefaultFlow"
+              checked={formData.useDefaultFlow}
+              onChange={(e) => setFormData((prev) => ({ 
+                ...prev, 
+                useDefaultFlow: e.target.checked,
+                directApproverId: e.target.checked ? "" : prev.directApproverId 
+              }))}
+              className="h-4 w-4 text-brand-600 focus:ring-brand-500 border-gray-300 rounded"
+            />
+            <label htmlFor="useDefaultFlow" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+              Usar flujo de división predeterminado
+            </label>
+          </div>
+          
+          <p className="text-xs text-gray-500 dark:text-gray-400 ml-6">
+            {formData.useDefaultFlow 
+              ? "Se usará el flujo de aprobación configurado en la división del solicitante."
+              : "La solicitud será aprobada directamente por la persona seleccionada."}
+          </p>
+
+          {/* Direct Approver dropdown - only visible when useDefaultFlow is unchecked */}
+          {!formData.useDefaultFlow && (
+            <div className="ml-6">
+              {loadingApprovers ? (
+                <div className="h-11 w-full animate-pulse rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+              ) : (
+                <SearchableSelect
+                  id="directApproverId"
+                  label="Aprobador directo"
+                  options={[
+                    { value: "", label: "Seleccionar aprobador" },
+                    ...approverOptions,
+                  ]}
+                  value={formData.directApproverId || ""}
+                  onChange={(value) => setFormData((prev) => ({ ...prev, directApproverId: value }))}
+                  placeholder="Buscar aprobador..."
+                  error={errors.directApproverId}
+                  disabled={isSubmitting}
+                />
+              )}
+            </div>
+          )}
         </div>
 
         {/* Form Actions */}

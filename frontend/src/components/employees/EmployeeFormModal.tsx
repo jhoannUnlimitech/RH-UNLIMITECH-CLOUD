@@ -10,7 +10,7 @@ import Alert from "../ui/alert/Alert";
 import { Modal } from "../ui/modal";
 import { IEmployeesStore } from "../../stores/views/EmployeesStore.contract";
 import { divisionsService } from "../../api/services/divisions";
-import { rolesService, Role } from "../../api/services/roles";
+import { hatsService, Hat } from "../../api/services/hats";
 import { employeesService, Employee } from "../../api/services/employees";
 import { IDivisionsStore } from "../../stores/views/DivisionsStore.contract";
 import { countries } from "../../utils/countries";
@@ -42,12 +42,13 @@ const EmployeeFormModal = observer(
       techLeadId: "",
       status: "active" as 'active' | 'inactive',
       forcePasswordChange: true,
+      approve_csw: false,
     });
 
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [divisions, setDivisions] = useState<IDivisionsStore.Division[]>([]);
-    const [roles, setRoles] = useState<Role[]>([]);
+    const [roles, setRoles] = useState<Hat[]>([]);
     const [employees, setEmployees] = useState<Employee[]>([]);
     const [loadingData, setLoadingData] = useState(false);
     const [passwordStrength, setPasswordStrength] = useState<"weak" | "medium" | "strong">("weak");
@@ -91,7 +92,7 @@ const EmployeeFormModal = observer(
       try {
         const [divisionsData, rolesData, employeesData] = await Promise.all([
           divisionsService.getAll(),
-          rolesService.getAll(),
+          hatsService.getAll(),
           employeesService.getAll({ limit: 1000 }),
         ]);
         
@@ -166,6 +167,7 @@ const EmployeeFormModal = observer(
           techLeadId: employee.techLeadId || employee.techLead?._id || "",
           status: employee.status || "active",
           forcePasswordChange: employee.forcePasswordChange || false,
+          approve_csw: employee.approve_csw || false,
         });
       }
     }, [isEdit, employeesStore.selectedEmployee]);
@@ -265,7 +267,7 @@ const EmployeeFormModal = observer(
       }
 
       if (!formData.role) {
-        newErrors.role = "Debe seleccionar un rol";
+        newErrors.role = "Debe seleccionar un hat";
       }
 
       if (!formData.division) {
@@ -319,6 +321,7 @@ const EmployeeFormModal = observer(
             techLeadId: formData.techLeadId || undefined,
             status: formData.status,
             forcePasswordChange: formData.forcePasswordChange,
+            approve_csw: formData.approve_csw,
           };
 
           if (formData.password) {
@@ -342,6 +345,7 @@ const EmployeeFormModal = observer(
             techLeadId: formData.techLeadId || undefined,
             status: formData.status,
             forcePasswordChange: formData.forcePasswordChange,
+            approve_csw: formData.approve_csw,
           };
           await employeesStore.createEmployee(createData);
         }
@@ -593,48 +597,56 @@ const EmployeeFormModal = observer(
 
               {/* Estado del empleado */}
               {isEdit && (
-                <div className="md:col-span-2">
-                  <Label htmlFor="status">Estado</Label>
-                  <div className="flex items-center gap-4 mt-2">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="status"
-                        value="active"
-                        checked={formData.status === 'active'}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            status: e.target.value as 'active' | 'inactive',
-                          }))
-                        }
-                        className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-800"
-                      />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">
-                        Activo
-                      </span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="status"
-                        value="inactive"
-                        checked={formData.status === 'inactive'}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            status: e.target.value as 'active' | 'inactive',
-                          }))
-                        }
-                        className="w-4 h-4 text-gray-600 border-gray-300 focus:ring-gray-500 dark:border-gray-600 dark:bg-gray-800"
-                      />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">
-                        Inactivo
-                      </span>
-                    </label>
+                <div className="md:col-span-2 flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+                  <div>
+                    <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                      Estado de la cuenta
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                      {formData.status === 'active' ? 'La cuenta está activa' : 'La cuenta está inactiva'}
+                    </p>
                   </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={formData.status === 'active'}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          status: e.target.checked ? 'active' : 'inactive',
+                        }))
+                      }
+                      disabled={isSubmitting}
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-300 dark:peer-focus:ring-brand-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:after:border-gray-600 peer-checked:bg-brand-600"></div>
+                  </label>
                 </div>
               )}
+
+              {/* Puede aprobar solicitudes CSW */}
+              <div className="md:col-span-2 flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                    Puede aprobar solicitudes CSW
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    {formData.approve_csw ? 'Aparece como aprobador en flujos CSW' : 'No puede aprobar solicitudes'}
+                  </p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={formData.approve_csw || false}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, approve_csw: e.target.checked }))
+                    }
+                    disabled={isSubmitting}
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-300 dark:peer-focus:ring-brand-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:after:border-gray-600 peer-checked:bg-brand-600"></div>
+                </label>
+              </div>
 
               {/* Teléfono */}
               <div>
@@ -701,9 +713,9 @@ const EmployeeFormModal = observer(
               <div>
                 <SearchableSelect
                   id="role"
-                  label="Rol"
+                  label="Hat"
                   options={[
-                    { value: "", label: "Seleccionar rol" },
+                    { value: "", label: "Seleccionar hat" },
                     ...roleOptions,
                   ]}
                   value={formData.role}
@@ -735,25 +747,8 @@ const EmployeeFormModal = observer(
                 />
               </div>
 
-              {/* Manager (opcional) */}
-              <div>
-                <SearchableSelect
-                  id="managerId"
-                  label="Jefe de División (opcional)"
-                  options={[
-                    { value: "", label: "Sin jefe asignado" },
-                    ...employeeOptions,
-                  ]}
-                  value={formData.managerId}
-                  onChange={(value) => handleSelectChange("managerId", value)}
-                  placeholder="Buscar empleado..."
-                  disabled={loadingData}
-                  debounceMs={500}
-                />
-              </div>
-
               {/* Tech Lead con búsqueda y debounce de 500ms */}
-              <div>
+              <div className="md:col-span-2">
                 <SearchableSelect
                   id="techLeadId"
                   label="Jefe Inmediato / Tech Lead (opcional)"

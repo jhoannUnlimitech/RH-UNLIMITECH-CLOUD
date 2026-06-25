@@ -34,10 +34,14 @@ export interface Employee {
     photo?: string;
   };
   status: 'active' | 'inactive';
+  approve_csw?: boolean;
   deleted: boolean;
   createdAt: string;
   updatedAt: string;
 }
+
+// Alias for backward compatibility
+export type IEmployee = Employee;
 
 export interface CreateEmployeeInput {
   name: string;
@@ -124,5 +128,13 @@ export const employeesService = {
    */
   async delete(id: string): Promise<void> {
     await apiClient.delete(`/employees/${id}`);
+  },
+
+  /**
+   * Obtener empleados que pueden aprobar CSW (approve_csw: true)
+   */
+  async getCSWApprovers() {
+    const response = await apiClient.get('/employees/csw-approvers');
+    return response.data;
   },
 };

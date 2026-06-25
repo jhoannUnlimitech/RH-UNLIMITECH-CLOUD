@@ -58,6 +58,7 @@ export namespace IEmployeesStore {
     };
     status: 'active' | 'inactive';
     forcePasswordChange: boolean;
+    approve_csw: boolean;
     deleted: boolean;
     createdAt: string;
     updatedAt: string;
@@ -78,6 +79,7 @@ export namespace IEmployeesStore {
     techLeadId?: string;
     status?: 'active' | 'inactive';
     forcePasswordChange?: boolean;
+    approve_csw?: boolean;
   }
 
   export interface EmployeeUpdateInput {
@@ -93,7 +95,8 @@ export namespace IEmployeesStore {
     managerId?: string;
     techLeadId?: string;
     status?: 'active' | 'inactive';
-    forcePasswordChange?: boolean
+    forcePasswordChange?: boolean;
+    approve_csw?: boolean;
     techLeadId?: string;
   }
 

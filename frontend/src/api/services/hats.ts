@@ -1,7 +1,7 @@
 import apiClient from '../client';
-import { IRolesStore } from '../../stores/views/RolesStore.contract';
+import { IHatsStore } from '../../stores/views/HatsStore.contract';
 
-export interface Role {
+export interface Hat {
   _id: string;
   name: string;
   permissions: Array<{
@@ -14,17 +14,17 @@ export interface Role {
   updatedAt: string;
 }
 
-export const rolesService = {
+export const hatsService = {
   /**
-   * Obtener todos los roles
+   * Obtener todos los hats
    */
-  async getAll(params?: IRolesStore.FetchParams): Promise<any> {
+  async getAll(params?: IHatsStore.FetchParams): Promise<any> {
     const response = await apiClient.get('/roles', { params });
     return response.data.data || response.data;
   },
 
   /**
-   * Obtener un rol por ID
+   * Obtener un hat por ID
    */
   async getById(id: string): Promise<any> {
     const response = await apiClient.get(`/roles/${id}`);
@@ -32,23 +32,23 @@ export const rolesService = {
   },
 
   /**
-   * Crear un nuevo rol
+   * Crear un nuevo hat
    */
-  async create(data: IRolesStore.RoleInput): Promise<any> {
+  async create(data: IHatsStore.RoleInput): Promise<any> {
     const response = await apiClient.post('/roles', data);
     return response.data.data || response.data;
   },
 
   /**
-   * Actualizar un rol existente
+   * Actualizar un hat existente
    */
-  async update(id: string, data: IRolesStore.RoleUpdateInput): Promise<any> {
+  async update(id: string, data: IHatsStore.RoleUpdateInput): Promise<any> {
     const response = await apiClient.put(`/roles/${id}`, data);
     return response.data.data || response.data;
   },
 
   /**
-   * Eliminar un rol
+   * Eliminar un hat
    */
   async delete(id: string): Promise<void> {
     await apiClient.delete(`/roles/${id}`);

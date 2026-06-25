@@ -132,7 +132,8 @@ export const createEmployee = async (
       emergencyContact,
       emergencyPhone,
       photo,
-      managerId
+      managerId,
+      approve_csw
     } = req.body;
 
     // Verificar que el email no esté en uso
@@ -162,7 +163,8 @@ export const createEmployee = async (
       emergencyContact,
       emergencyPhone,
       photo,
-      managerId
+      managerId,
+      approve_csw: approve_csw || false
     });
 
     // Obtener empleado con relaciones pobladas
@@ -396,6 +398,32 @@ export const getEmployeeStats = async (
         byDivision,
         byRole
       }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Obtener empleados que pueden aprobar CSW (approve_csw: true)
+ * @route   GET /api/v1/employees/csw-approvers
+ * @access  Private (employees:read)
+ */
+export const getCSWApprovers = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const approvers = await Employee.find({ approve_csw: true })
+      .select('name email photo role division')
+      .populate('role', 'name')
+      .populate('division', 'name')
+      .sort('name');
+
+    res.status(200).json({
+      success: true,
+      data: approvers
     });
   } catch (error) {
     next(error);

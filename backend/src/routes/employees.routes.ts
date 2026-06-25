@@ -7,7 +7,8 @@ import {
   updateEmployeePhoto,
   deleteEmployee,
   restoreEmployee,
-  getEmployeeStats
+  getEmployeeStats,
+  getCSWApprovers
 } from '../controllers/employees.controller';
 import { authMiddleware } from '../middleware/auth';
 import { requirePermission } from '../middleware/permission';
@@ -63,6 +64,21 @@ router.use(authMiddleware);
  *                             type: number
  */
 router.get('/stats', requirePermission('employees', 'read'), getEmployeeStats);
+
+/**
+ * @swagger
+ * /employees/csw-approvers:
+ *   get:
+ *     tags: [Employees]
+ *     summary: Obtener empleados que pueden aprobar CSW
+ *     description: Lista empleados con approve_csw=true
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de aprobadores CSW
+ */
+router.get('/csw-approvers', requirePermission('employees', 'read'), getCSWApprovers);
 
 /**
  * @swagger

@@ -28,7 +28,7 @@ const navItems: NavItem[] = [
     subItems: [
       { name: "Lista de Empleados", path: "/employees" },
       { name: "Divisiones", path: "/divisions" },
-      { name: "Roles", path: "/roles" },
+      { name: "Hats", path: "/roles" },
     ],
   },
   {
@@ -226,17 +226,10 @@ const AppSidebar: React.FC = () => {
         <Link to="/">
           {isExpanded || isHovered || isMobileOpen ? (
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-white">
-                <GridIcon />
-              </div>
-              <span className="text-xl font-bold text-dark dark:text-white">
-                RH UNLIMITECH
-              </span>
+              <img src="/images/logo.webp" alt="Unlimitech Cloud" className="h-18" />
             </div>
           ) : (
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-white">
-              <GridIcon />
-            </div>
+            <img src="/favicon.png" alt="UC" className="h-10 w-10 rounded-lg" />
           )}
         </Link>
       </div>

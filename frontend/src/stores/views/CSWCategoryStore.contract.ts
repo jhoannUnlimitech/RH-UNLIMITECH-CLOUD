@@ -35,6 +35,8 @@ export namespace ICSWCategoryStore {
     description?: string;
     active: boolean;
     order: number;
+    useDefaultFlow: boolean;
+    directApproverId?: string | { _id: string; name: string; email: string };
     deleted: boolean;
     createdAt: string;
     updatedAt: string;
@@ -47,6 +49,8 @@ export namespace ICSWCategoryStore {
     name: string;
     description?: string;
     active?: boolean;
+    useDefaultFlow?: boolean;
+    directApproverId?: string;
   }
 
   /**

@@ -137,7 +137,7 @@ export default function DropdownWithIcon() {
                   fill=""
                 />
               </svg>
-              Sign out
+              Cerrar sesión
             </DropdownItem>
           </li>
         </ul>
