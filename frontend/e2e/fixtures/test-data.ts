@@ -161,3 +161,33 @@ export const LOGIN_OSCAR: LoginData = {
   email: 'training@unlimitech.cloud',
   password: 'Pass2014!',
 };
+
+
+// ─── Employees ──────────────────────────────────────────────────────────────
+
+export interface EmployeeFormData {
+  name: string;
+  email: string;
+  password: string;
+  phone: string;
+  nationalId: string;
+  nationality: string;
+  birthDate: string;
+  hat: string;
+  division: string;
+  forcePasswordChange: boolean;
+}
+
+/** Employee to create during e2e test */
+export const EMPLOYEE_CREATE: EmployeeFormData = {
+  name: 'QA Test Employee',
+  email: `qa-employee-${Date.now().toString().slice(-8)}@emxeecta.mailosaur.net`,
+  password: 'TestPass2024!',
+  phone: '+573109876543',
+  nationalId: `${Date.now().toString().slice(-10)}`,
+  nationality: 'Colombia',
+  birthDate: '1990-05-15',
+  hat: 'DEVELOPER',
+  division: 'Infraestructura',
+  forcePasswordChange: true,
+};

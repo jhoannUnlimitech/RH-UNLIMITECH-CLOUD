@@ -389,8 +389,8 @@ const EmployeeFormModal = observer(
         onClose={onClose}
         className="relative w-full max-w-[900px] m-5 sm:m-0 rounded-3xl bg-white p-6 lg:p-10 dark:bg-gray-900"
       >
-        <div className="mb-6">
-          <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
+        <div className="mb-6" data-test-context="employee-form-modal">
+          <h3 className="text-2xl font-semibold text-gray-900 dark:text-white" data-test-key="modal-title">
             {isEdit ? "Editar Empleado" : "Nuevo Empleado"}
           </h3>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">

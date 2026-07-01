@@ -24,7 +24,7 @@ const ViewEmployeeModal: React.FC<ViewEmployeeModalProps> = ({
       className="relative w-full max-w-[600px] m-5 sm:m-0 rounded-3xl bg-white p-6 lg:p-8 dark:bg-gray-900"
       showCloseButton={true}
     >
-      <div>
+      <div data-test-context="employee-view-modal">
         {/* Header */}
         <div className="mb-6 flex items-start justify-between border-b border-gray-100 pb-4 dark:border-gray-800">
           <div className="flex items-center gap-4">
