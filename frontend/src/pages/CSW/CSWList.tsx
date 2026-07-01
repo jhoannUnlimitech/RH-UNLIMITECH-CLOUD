@@ -235,12 +235,12 @@ const CSWList = observer(() => {
       {/* Breadcrumb */}
       <PageBreadcrumb pageTitle={routeConfig.breadcrumb} />
 
-      <div className="flex flex-col gap-7.5">
+      <div className="flex flex-col gap-7.5" data-test-context="csw-list" data-test-state={cswStore.isLoading ? "loading" : "loaded"}>
         <div className="rounded-[10px] bg-white shadow-1 dark:bg-gray-dark dark:shadow-card">
           <div className="flex flex-col gap-5.5 px-6.5 py-6">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-dark dark:text-white">
+                <h1 className="text-3xl font-bold text-dark dark:text-white" data-test-key="page-title">
                   {routeConfig.title}
                 </h1>
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -252,7 +252,7 @@ const CSWList = observer(() => {
                 </p>
               </div>
               {routeConfig.showCreateButton && (
-                <Button onClick={() => navigate("/csw/new")}>
+                <Button onClick={() => navigate("/csw/new")} data-test-key="create-button">
                   Crear Solicitud
                 </Button>
               )}
@@ -298,6 +298,7 @@ const CSWList = observer(() => {
                     value={searchTerm}
                     onChange={handleSearchChange}
                     placeholder="Buscar por número, solicitante o descripción..."
+                    data-test-key="search-input"
                     className="w-full rounded-lg border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm text-gray-900 placeholder-gray-400 transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 dark:focus:border-primary"
                   />
                 </div>
@@ -416,7 +417,7 @@ const CSWList = observer(() => {
             ) : (
               <>
 
-                <div className="overflow-x-auto border border-gray-100 dark:border-white/[0.05] rounded-b-xl">
+                <div className="overflow-x-auto border border-gray-100 dark:border-white/[0.05] rounded-b-xl" data-test-context="csw-table">
                   <Table className="border-collapse">
                     <TableHeader>
                       <TableRow className="border-b border-gray-100 bg-gray-50 dark:border-white/[0.05] dark:bg-gray-800/50">

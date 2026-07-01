@@ -194,7 +194,8 @@ export const login = async (
             name: (employee.division as any).name
           },
           photo: employee.photo,
-          approve_csw: employee.approve_csw
+          approve_csw: employee.approve_csw,
+          forcePasswordChange: employee.forcePasswordChange
         },
         session: {
           expiresAt: new Date(decoded.exp * 1000).toISOString(),
@@ -433,6 +434,62 @@ export const debugToken = async (
           now: new Date().toISOString()
         }
       }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Cambiar contraseña del usuario autenticado
+ * PUT /api/v1/auth/change-password
+ */
+export const changePassword = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      throw new AppError('No autenticado', 401);
+    }
+
+    // Validaciones básicas
+    if (!currentPassword || !newPassword) {
+      throw new AppError('La contraseña actual y la nueva contraseña son requeridas', 400);
+    }
+
+    if (newPassword.length < 6) {
+      throw new AppError('La nueva contraseña debe tener al menos 6 caracteres', 400);
+    }
+
+    if (currentPassword === newPassword) {
+      throw new AppError('La nueva contraseña debe ser diferente a la actual', 400);
+    }
+
+    // Obtener empleado con password
+    const employee = await Employee.findById(userId).select('+password');
+    if (!employee) {
+      throw new AppError('Usuario no encontrado', 404);
+    }
+
+    // Verificar contraseña actual
+    const isMatch = await employee.comparePassword(currentPassword);
+    if (!isMatch) {
+      throw new AppError('La contraseña actual es incorrecta', 400);
+    }
+
+    // Actualizar contraseña y desactivar forcePasswordChange
+    employee.password = newPassword; // Se hashea en el pre-save hook
+    employee.forcePasswordChange = false;
+    await employee.save();
+
+    res.json({
+      status: 'success',
+      message: 'Contraseña actualizada exitosamente'
     });
   } catch (error) {
     next(error);

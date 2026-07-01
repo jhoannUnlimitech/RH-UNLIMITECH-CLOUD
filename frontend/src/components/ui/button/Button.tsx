@@ -10,6 +10,8 @@ interface ButtonProps {
   disabled?: boolean; // Disabled state
   className?: string; // Additional classes
   type?: "button" | "submit" | "reset"; // Button type
+  "data-test-key"?: string; // Test annotation
+  "data-test-state"?: string; // Test state annotation
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -22,6 +24,8 @@ const Button: React.FC<ButtonProps> = ({
   className = "",
   disabled = false,
   type = "button",
+  "data-test-key": dataTestKey,
+  "data-test-state": dataTestState,
 }) => {
   // Size Classes
   const sizeClasses = {
@@ -47,6 +51,8 @@ const Button: React.FC<ButtonProps> = ({
       }`}
       onClick={onClick}
       disabled={disabled}
+      data-test-key={dataTestKey}
+      data-test-state={dataTestState}
     >
       {startIcon && <span className="flex items-center">{startIcon}</span>}
       {children}

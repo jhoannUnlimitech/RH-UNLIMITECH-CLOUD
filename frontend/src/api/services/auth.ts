@@ -38,7 +38,8 @@ export const authService = {
           permissions: employee.role?.permissions || []
         },
         photo: employee.photo,
-        approve_csw: employee.approve_csw || false
+        approve_csw: employee.approve_csw || false,
+        forcePasswordChange: employee.forcePasswordChange || false
       }
     };
   },
@@ -78,7 +79,19 @@ export const authService = {
         permissions: employee.role?.permissions || []
       },
       photo: employee.photo,
-      approve_csw: employee.approve_csw || false
+      approve_csw: employee.approve_csw || false,
+      forcePasswordChange: employee.forcePasswordChange || false,
+      phone: employee.phone || '',
+      nationalId: employee.nationalId || '',
+      nationality: employee.nationality || '',
+      birthDate: employee.birthDate || '',
     };
+  },
+
+  /**
+   * Change Password - Cambia la contraseña del usuario autenticado
+   */
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    await apiClient.put('/auth/change-password', { currentPassword, newPassword });
   },
 };

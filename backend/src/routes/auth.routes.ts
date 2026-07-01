@@ -5,7 +5,8 @@ import {
   logout, 
   getMe,
   refreshToken,
-  debugToken
+  debugToken,
+  changePassword
 } from '../controllers/auth.controller';
 import { authMiddleware } from '../middleware/auth';
 import { validate } from '../middleware/validate';
@@ -261,5 +262,8 @@ router.post('/refresh', authMiddleware, refreshToken);
  *         description: Solo disponible en desarrollo
  */
 router.get('/debug/token', authMiddleware, debugToken);
+
+// Cambiar contraseña (usuario autenticado)
+router.put('/change-password', authMiddleware, changePassword);
 
 export default router;

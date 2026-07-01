@@ -111,19 +111,19 @@ const CSWView = observer(() => {
     <>
       <PageBreadcrumb pageTitle={formattedTitle} />
 
-      <div className="rounded-lg border border-stroke bg-white shadow-default dark:border-dark-3 dark:bg-dark-2">
+      <div className="rounded-lg border border-stroke bg-white shadow-default dark:border-dark-3 dark:bg-dark-2" data-test-context="csw-view">
         {/* Header */}
         <div className="border-b border-stroke px-6 py-4 dark:border-dark-3 sm:px-8">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white" data-test-key="csw-title">
                 Solicitud {formattedTitle}
               </h2>
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 Creada el {new Date(csw.createdAt).toLocaleString("es-ES")}
               </p>
             </div>
-            <Badge color={statusBadge.color}>{statusBadge.text}</Badge>
+            <Badge color={statusBadge.color} data-test-key="status-badge" data-test-state={csw.status}>{statusBadge.text}</Badge>
           </div>
         </div>
 
@@ -131,18 +131,18 @@ const CSWView = observer(() => {
         <div className="px-6 py-8 sm:px-8">
           <div className="space-y-8">
             {/* Requester Information */}
-            <div className="rounded-lg border border-stroke bg-gray-2 p-4 dark:border-dark-3 dark:bg-dark-2">
+            <div className="rounded-lg border border-stroke bg-gray-2 p-4 dark:border-dark-3 dark:bg-dark-2" data-test-context="requester-info">
               <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
                 Información del Solicitante
               </h3>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Nombre</p>
-                  <p className="font-medium text-dark dark:text-white">{csw.requesterName}</p>
+                  <p className="font-medium text-dark dark:text-white" data-test-key="requester-name">{csw.requesterName}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Posición</p>
-                  <p className="font-medium text-dark dark:text-white">{csw.requesterPosition}</p>
+                  <p className="font-medium text-dark dark:text-white" data-test-key="requester-position">{csw.requesterPosition}</p>
                 </div>
               </div>
             </div>
@@ -180,12 +180,12 @@ const CSWView = observer(() => {
             </div>
 
             {/* Situation, Information, Solution */}
-            <div className="space-y-6">
+            <div className="space-y-6" data-test-context="csw-content">
               <div>
                 <h3 className="mb-2 text-lg font-semibold text-dark dark:text-white">
                   Situación
                 </h3>
-                <p className="whitespace-pre-wrap break-words text-base text-gray-700 dark:text-gray-300 leading-relaxed overflow-hidden">
+                <p className="whitespace-pre-wrap break-words text-base text-gray-700 dark:text-gray-300 leading-relaxed overflow-hidden" data-test-key="situation-text">
                   {csw.situation}
                 </p>
               </div>
@@ -194,7 +194,7 @@ const CSWView = observer(() => {
                 <h3 className="mb-2 text-lg font-semibold text-dark dark:text-white">
                   Información
                 </h3>
-                <p className="whitespace-pre-wrap break-words text-base text-gray-700 dark:text-gray-300 leading-relaxed overflow-hidden">
+                <p className="whitespace-pre-wrap break-words text-base text-gray-700 dark:text-gray-300 leading-relaxed overflow-hidden" data-test-key="information-text">
                   {csw.information}
                 </p>
               </div>
@@ -203,14 +203,14 @@ const CSWView = observer(() => {
                 <h3 className="mb-2 text-lg font-semibold text-dark dark:text-white">
                   Solución Propuesta
                 </h3>
-                <p className="whitespace-pre-wrap break-words text-base text-gray-700 dark:text-gray-300 leading-relaxed overflow-hidden">
+                <p className="whitespace-pre-wrap break-words text-base text-gray-700 dark:text-gray-300 leading-relaxed overflow-hidden" data-test-key="solution-text">
                   {csw.solution}
                 </p>
               </div>
             </div>
 
             {/* Approval Chain */}
-            <div>
+            <div data-test-context="approval-chain">
               <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
                 Cadena de Aprobación
               </h3>
@@ -261,6 +261,8 @@ const CSWView = observer(() => {
                     <div
                       key={approval.level}
                       className={`rounded-lg border p-4 ${style.border} ${style.bg}`}
+                      data-test-key={`approval-level-${approval.level}`}
+                      data-test-state={approval.status}
                     >
                       <div className="flex items-center justify-between gap-4">
                         <div className="flex items-center gap-3">
@@ -430,7 +432,7 @@ const CSWView = observer(() => {
         {/* Footer with Actions */}
         <div className="border-t border-stroke px-6 py-4 dark:border-dark-3 sm:px-8">
           {isCurrentUserApprover && csw.status === ICSWStore.CSWStatus.PENDING ? (
-            <div className="space-y-4">
+            <div className="space-y-4" data-test-context="approval-actions">
               <div>
                 <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
                   Comentarios
@@ -446,6 +448,7 @@ const CSWView = observer(() => {
                   }}
                   placeholder="Añade tus comentarios sobre esta solicitud..."
                   rows={4}
+                  data-test-key="comments-textarea"
                   className={`w-full rounded-lg border px-4 py-3 text-sm text-dark outline-none transition focus:border-primary disabled:bg-gray-2 disabled:text-gray-4 dark:bg-dark-2 dark:text-white dark:disabled:bg-dark-3 ${
                     commentsError 
                       ? "border-red-500 dark:border-red-400" 
@@ -454,7 +457,7 @@ const CSWView = observer(() => {
                   disabled={isSubmitting}
                 />
                 {commentsError && (
-                  <p className="mt-2 text-sm text-red-500 dark:text-red-400">
+                  <p className="mt-2 text-sm text-red-500 dark:text-red-400" data-test-key="comments-error">
                     {commentsError}
                   </p>
                 )}
@@ -471,6 +474,8 @@ const CSWView = observer(() => {
                   className="bg-red-600 hover:bg-red-700"
                   onClick={handleReject}
                   disabled={isSubmitting}
+                  data-test-key="reject-button"
+                  data-test-state={isSubmitting ? "loading" : "ready"}
                 >
                   {isSubmitting ? "Rechazando..." : "Rechazar"}
                 </Button>
@@ -478,6 +483,8 @@ const CSWView = observer(() => {
                   className="bg-green-600 hover:bg-green-700"
                   onClick={handleApprove}
                   disabled={isSubmitting}
+                  data-test-key="approve-button"
+                  data-test-state={isSubmitting ? "loading" : "ready"}
                 >
                   {isSubmitting ? "Aprobando..." : "Aprobar"}
                 </Button>

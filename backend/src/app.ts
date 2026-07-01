@@ -22,20 +22,27 @@ app.use(helmet({
 // Compression
 app.use(compression());
 
-// Rate limiting global
+// ─── Rate Limiting ──────────────────────────────────────────────────────────
+// En development: límites más altos para permitir e2e tests sin interrupciones.
+// En production: límites estrictos para proteger contra abuse.
+// Ventana de 5 minutos en dev (recuperación rápida), 15 minutos en prod.
+
+const isDev = process.env.NODE_ENV === 'development';
+
+// Global: protege todos los endpoints contra DDoS/abuse
 const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 500, // 500 requests por ventana por IP
+  windowMs: isDev ? 5 * 60 * 1000 : 15 * 60 * 1000,  // 5 min dev, 15 min prod
+  max: isDev ? 1000 : 500,                             // 1000 dev, 500 prod
   standardHeaders: true,
   legacyHeaders: false,
   message: { success: false, message: 'Demasiadas solicitudes. Intente más tarde.' },
 });
 app.use(globalLimiter);
 
-// Rate limiting estricto para auth
+// Auth: protege login contra brute-force
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 10, // 10 intentos de login por ventana
+  windowMs: isDev ? 5 * 60 * 1000 : 15 * 60 * 1000,  // 5 min dev, 15 min prod
+  max: isDev ? 50 : 10,                                // 50 dev, 10 prod
   standardHeaders: true,
   legacyHeaders: false,
   message: { success: false, message: 'Demasiados intentos de inicio de sesión. Intente en 15 minutos.' },

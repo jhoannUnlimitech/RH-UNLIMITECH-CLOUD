@@ -15,6 +15,7 @@ export interface IAuthStore {
   login(email: string, password: string): Promise<void>;
   logout(): Promise<void>;
   checkAuth(): Promise<void>;
+  changePassword(currentPassword: string, newPassword: string): Promise<void>;
   clearError(): void;
 
   // Computed
@@ -39,6 +40,11 @@ export namespace IAuthStore {
     };
     photo?: string;
     approve_csw?: boolean;
+    forcePasswordChange?: boolean;
+    phone?: string;
+    nationalId?: string;
+    nationality?: string;
+    birthDate?: string;
   }
 
   export interface Permission {

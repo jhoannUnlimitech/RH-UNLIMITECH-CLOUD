@@ -267,7 +267,7 @@ const CSWForm = observer(() => {
   const isDraft = currentStatus === ICSWStore.CSWStatus.DRAFT;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6" data-test-context="csw-form" data-test-state={cswStore.isLoading ? "loading" : "ready"}>
       {/* Breadcrumb */}
       <PageBreadcrumb pageTitle={isEditing ? "Editar Solicitud CSW" : "Nueva Solicitud CSW"} />
 
@@ -278,12 +278,13 @@ const CSWForm = observer(() => {
           title="Error"
           message={cswStore.error}
           onClose={() => cswStore.clearError()}
+          data-test-key="error-alert"
         />
       )}
 
       {/* Rejection Banner */}
       {lastRejection && (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-5 dark:border-red-800 dark:bg-red-900/10">
+        <div className="rounded-xl border border-red-200 bg-red-50 p-5 dark:border-red-800 dark:bg-red-900/10" data-test-context="rejection-banner" data-test-state="visible">
           <div className="flex items-start gap-3">
             <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
               <svg className="h-4 w-4 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -294,13 +295,13 @@ const CSWForm = observer(() => {
               <h4 className="text-sm font-semibold text-red-800 dark:text-red-300">
                 Solicitud Rechazada
               </h4>
-              <p className="mt-1 text-sm text-red-700 dark:text-red-400">
+              <p className="mt-1 text-sm text-red-700 dark:text-red-400" data-test-key="rejection-reason">
                 {lastRejection.comments || "Sin comentarios"}
               </p>
-              <p className="mt-2 text-xs text-red-500 dark:text-red-500">
+              <p className="mt-2 text-xs text-red-500 dark:text-red-500" data-test-key="rejection-by">
                 Rechazado por <span className="font-medium">{lastRejection.approverName}</span>
                 {lastRejection.approvedAt && (
-                  <> — {new Date(lastRejection.approvedAt).toLocaleString("es-ES")}</>
+                  <span data-test-key="rejection-date"> — {new Date(lastRejection.approvedAt).toLocaleString("es-ES")}</span>
                 )}
               </p>
             </div>
@@ -316,11 +317,11 @@ const CSWForm = observer(() => {
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
               <div>
                 <div className="flex items-center gap-3">
-                  <h1 className="text-3xl font-bold text-dark dark:text-white">
+                  <h1 className="text-3xl font-bold text-dark dark:text-white" data-test-key="form-title">
                     {isEditing ? "Editar Solicitud CSW" : "Nueva Solicitud CSW"}
                   </h1>
                   {currentStatus && (
-                    <Badge color={cswStatusConfig[currentStatus]?.color || "light"}>
+                    <Badge color={cswStatusConfig[currentStatus]?.color || "light"} data-test-key="status-badge" data-test-state={currentStatus}>
                       {cswStatusConfig[currentStatus]?.label || currentStatus}
                     </Badge>
                   )}
@@ -332,7 +333,7 @@ const CSWForm = observer(() => {
                 </p>
                 {/* Autosave indicator */}
                 {lastAutoSave && isDraft && (
-                  <p className="mt-1 text-xs text-green-600 dark:text-green-400">
+                  <p className="mt-1 text-xs text-green-600 dark:text-green-400" data-test-key="autosave-indicator">
                     ✓ Guardado automáticamente a las {lastAutoSave}
                   </p>
                 )}
@@ -356,7 +357,7 @@ const CSWForm = observer(() => {
           </div>
 
           {/* Categoría */}
-          <div>
+          <div data-test-context="category-field">
             <SearchableSelect
               id="category"
               label="Categoría"
@@ -373,11 +374,12 @@ const CSWForm = observer(() => {
               error={errors.category}
               required
               debounceMs={300}
+              data-test-key="category-select"
             />
           </div>
 
           {/* Situación */}
-          <div>
+          <div data-test-context="situation-field">
             <label className="mb-2.5 block text-sm font-medium text-dark dark:text-white">
               Situación <span className="text-red">*</span>
             </label>
@@ -390,17 +392,18 @@ const CSWForm = observer(() => {
               onChange={handleInputChange}
               rows={4}
               placeholder="Describe la situación actual que requiere atención..."
+              data-test-key="situation-textarea"
               className={`w-full rounded-[7px] border-[1.5px] bg-transparent px-5.5 py-3 text-dark outline-none transition placeholder:text-dark-6 focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary ${
                 errors.situation ? "border-red" : "border-stroke"
               }`}
             />
             <div className="flex items-center justify-between mt-1">
               {errors.situation ? (
-                <p className="text-sm text-red">{errors.situation}</p>
+                <p className="text-sm text-red" data-test-key="situation-error">{errors.situation}</p>
               ) : (
                 <span></span>
               )}
-              <p className={`text-xs ${
+              <p data-test-key="situation-word-count" className={`text-xs ${
                 countWords(formData.situation) > WORD_LIMITS.situation
                   ? "text-red font-medium"
                   : "text-gray-500 dark:text-gray-400"
@@ -411,7 +414,7 @@ const CSWForm = observer(() => {
           </div>
 
           {/* Información */}
-          <div>
+          <div data-test-context="information-field">
             <label className="mb-2.5 block text-sm font-medium text-dark dark:text-white">
               Información <span className="text-red">*</span>
             </label>
@@ -424,17 +427,18 @@ const CSWForm = observer(() => {
               onChange={handleInputChange}
               rows={4}
               placeholder="Proporciona información detallada: razón, cantidades, fechas, estadísticas..."
+              data-test-key="information-textarea"
               className={`w-full rounded-[7px] border-[1.5px] bg-transparent px-5.5 py-3 text-dark outline-none transition placeholder:text-dark-6 focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary ${
                 errors.information ? "border-red" : "border-stroke"
               }`}
             />
             <div className="flex items-center justify-between mt-1">
               {errors.information ? (
-                <p className="text-sm text-red">{errors.information}</p>
+                <p className="text-sm text-red" data-test-key="information-error">{errors.information}</p>
               ) : (
                 <span></span>
               )}
-              <p className={`text-xs ${
+              <p data-test-key="information-word-count" className={`text-xs ${
                 countWords(formData.information) > WORD_LIMITS.information
                   ? "text-red font-medium"
                   : "text-gray-500 dark:text-gray-400"
@@ -445,7 +449,7 @@ const CSWForm = observer(() => {
           </div>
 
           {/* Solución */}
-          <div>
+          <div data-test-context="solution-field">
             <label className="mb-2.5 block text-sm font-medium text-dark dark:text-white">
               Solución <span className="text-red">*</span>
             </label>
@@ -458,17 +462,18 @@ const CSWForm = observer(() => {
               onChange={handleInputChange}
               rows={5}
               placeholder="Describe cómo se resolverá o manejará la situación, quién se hará cargo, cómo quedará cubierta la producción..."
+              data-test-key="solution-textarea"
               className={`w-full rounded-[7px] border-[1.5px] bg-transparent px-5.5 py-3 text-dark outline-none transition placeholder:text-dark-6 focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary ${
                 errors.solution ? "border-red" : "border-stroke"
               }`}
             />
             <div className="flex items-center justify-between mt-1">
               {errors.solution ? (
-                <p className="text-sm text-red">{errors.solution}</p>
+                <p className="text-sm text-red" data-test-key="solution-error">{errors.solution}</p>
               ) : (
                 <span></span>
               )}
-              <p className={`text-xs ${
+              <p data-test-key="solution-word-count" className={`text-xs ${
                 countWords(formData.solution) > WORD_LIMITS.solution
                   ? "text-red font-medium"
                   : "text-gray-500 dark:text-gray-400"
@@ -479,12 +484,13 @@ const CSWForm = observer(() => {
           </div>
 
           {/* Form Actions */}
-          <div className="flex items-center justify-end gap-4 border-t border-stroke pt-6 dark:border-dark-3">
+          <div className="flex items-center justify-end gap-4 border-t border-stroke pt-6 dark:border-dark-3" data-test-context="form-actions">
             <Button
               type="button"
               variant="outline"
               onClick={handleCancel}
               disabled={cswStore.isLoading}
+              data-test-key="cancel-button"
             >
               Cancelar
             </Button>
@@ -497,6 +503,8 @@ const CSWForm = observer(() => {
                   variant="outline"
                   onClick={handleSaveDraft}
                   disabled={cswStore.isLoading}
+                  data-test-key="save-draft-button"
+                  data-test-state={cswStore.isLoading ? "loading" : "ready"}
                 >
                   {cswStore.isLoading ? (
                     <span className="flex items-center gap-2">
@@ -509,6 +517,8 @@ const CSWForm = observer(() => {
                   type="button"
                   onClick={handleSubmitForApproval}
                   disabled={cswStore.isLoading}
+                  data-test-key="submit-button"
+                  data-test-state={cswStore.isLoading ? "loading" : "ready"}
                 >
                   {cswStore.isLoading ? (
                     <span className="flex items-center gap-2">
@@ -526,6 +536,8 @@ const CSWForm = observer(() => {
                   variant="outline"
                   onClick={handleSaveDraft}
                   disabled={cswStore.isLoading}
+                  data-test-key="save-draft-button"
+                  data-test-state={cswStore.isLoading ? "loading" : "ready"}
                 >
                   {cswStore.isLoading ? (
                     <span className="flex items-center gap-2">
@@ -537,6 +549,8 @@ const CSWForm = observer(() => {
                 <Button
                   type="submit"
                   disabled={cswStore.isLoading}
+                  data-test-key="submit-button"
+                  data-test-state={cswStore.isLoading ? "loading" : "ready"}
                 >
                   {cswStore.isLoading ? (
                     <span className="flex items-center gap-2">
@@ -551,6 +565,8 @@ const CSWForm = observer(() => {
               <Button
                 type="submit"
                 disabled={cswStore.isLoading}
+                data-test-key="update-button"
+                data-test-state={cswStore.isLoading ? "loading" : "ready"}
               >
                 {cswStore.isLoading ? (
                   <span className="flex items-center gap-2">

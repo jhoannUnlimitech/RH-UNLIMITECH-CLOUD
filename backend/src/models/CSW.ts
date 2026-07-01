@@ -277,12 +277,40 @@ CSWSchema.index({ deleted: 1, status: 1, createdAt: -1 });
 
 /**
  * Inicializar la cadena de aprobación basada en el flujo de la división
+ * o en el aprobador directo de la categoría (si useDefaultFlow = false)
  */
 CSWSchema.methods.initializeApprovalChain = async function(): Promise<ICSW> {
   const ApprovalFlow = mongoose.model('ApprovalFlow');
   const Employee = mongoose.model('Employee');
+  const CSWCategory = mongoose.model('CSWCategory');
   
-  // Obtener el flujo activo de la división
+  // Verificar si la categoría tiene un aprobador directo (omite flujo de división)
+  const category = await CSWCategory.findById(this.category)
+    .populate('directApproverId', 'name email role');
+  
+  if (category && !category.useDefaultFlow && category.directApproverId) {
+    // Aprobador directo: crear cadena de 1 solo nivel
+    const directApprover = await Employee.findById(category.directApproverId._id || category.directApproverId)
+      .populate('role', 'name');
+    
+    if (!directApprover) {
+      throw new Error(`No se encontró el aprobador directo configurado para la categoría "${category.name}"`);
+    }
+    
+    this.approvalChain = [{
+      level: 1,
+      name: 'Aprobación Directa',
+      approverId: directApprover._id,
+      approverName: directApprover.name,
+      approverPosition: (directApprover.role as any)?.name || 'Sin cargo',
+      status: ApprovalStatus.PENDING
+    }];
+    this.currentLevel = 1;
+    
+    return await this.save();
+  }
+  
+  // Flujo estándar: usar el flujo de aprobación de la división
   const flow = await ApprovalFlow.findOne({
     divisionId: this.requesterDivision,
     active: true,

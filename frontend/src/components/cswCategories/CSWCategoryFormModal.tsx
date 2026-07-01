@@ -174,8 +174,8 @@ const CSWCategoryFormModal = observer(({ isOpen, onClose, onSuccess, categoryId 
       onClose={onClose}
       className="max-w-2xl p-6 sm:p-8"
     >
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+      <div className="mb-6" data-test-context="csw-category-form-modal">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white" data-test-key="modal-title">
           {isEditMode ? "Editar Categoría" : "Crear Categoría"}
         </h2>
       </div>
@@ -202,6 +202,7 @@ const CSWCategoryFormModal = observer(({ isOpen, onClose, onSuccess, categoryId 
             name="name"
             value={formData.name}
             onChange={handleChange}
+            data-test-key="category-name-input"
             className={`w-full px-4 py-2 rounded-lg border ${
               errors.name
                 ? "border-red-500 focus:ring-red-500"
@@ -223,6 +224,7 @@ const CSWCategoryFormModal = observer(({ isOpen, onClose, onSuccess, categoryId 
             value={formData.description}
             onChange={handleChange}
             rows={3}
+            data-test-key="category-description-input"
             className={`w-full px-4 py-2 rounded-lg border ${
               errors.description
                 ? "border-red-500 focus:ring-red-500"
@@ -260,6 +262,7 @@ const CSWCategoryFormModal = observer(({ isOpen, onClose, onSuccess, categoryId 
                 useDefaultFlow: e.target.checked,
                 directApproverId: e.target.checked ? "" : prev.directApproverId 
               }))}
+              data-test-key="use-default-flow-checkbox"
               className="h-4 w-4 text-brand-600 focus:ring-brand-500 border-gray-300 rounded"
             />
             <label htmlFor="useDefaultFlow" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
@@ -291,6 +294,7 @@ const CSWCategoryFormModal = observer(({ isOpen, onClose, onSuccess, categoryId 
                   placeholder="Buscar aprobador..."
                   error={errors.directApproverId}
                   disabled={isSubmitting}
+                  data-test-key="direct-approver-select"
                 />
               )}
             </div>
@@ -299,10 +303,10 @@ const CSWCategoryFormModal = observer(({ isOpen, onClose, onSuccess, categoryId 
 
         {/* Form Actions */}
         <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-          <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
+          <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting} data-test-key="modal-cancel-button">
             Cancelar
           </Button>
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" disabled={isSubmitting} data-test-key="modal-submit-button" data-test-state={isSubmitting ? "loading" : "ready"}>
             {isSubmitting ? "Guardando..." : isEditMode ? "Actualizar" : "Crear"}
           </Button>
         </div>

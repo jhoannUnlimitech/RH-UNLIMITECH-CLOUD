@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router";
 import Home from "./pages/Dashboard/Home";
 import SignIn from "./pages/AuthPages/SignIn";
+import ChangePassword from "./pages/AuthPages/ChangePassword";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import ErrorBoundary from "./components/common/ErrorBoundary";
@@ -22,6 +23,7 @@ import CSWView from "./pages/CSW/CSWView";
 import NotFound from "./pages/Errors/NotFound";
 import CalendarPage from "./pages/Calendar/CalendarPage";
 import EventsList from "./pages/Calendar/EventsList";
+import UserProfile from "./pages/Profile/UserProfile";
 
 export default function App() {
   // Verificar autenticación al cargar la aplicación
@@ -46,6 +48,8 @@ export default function App() {
           }
         >
           <Route index path="/" element={<Home />} />
+          <Route path="/change-password" element={<ChangePassword />} />
+          <Route path="/profile" element={<UserProfile />} />
           <Route path="/employees" element={<PermissionRoute resource="employees"><EmployeesList /></PermissionRoute>} />
           <Route path="/divisions" element={<PermissionRoute resource="divisions"><DivisionsList /></PermissionRoute>} />
           <Route path="/projects" element={<PermissionRoute resource="projects"><ProjectsList /></PermissionRoute>} />

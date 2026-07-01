@@ -114,6 +114,22 @@ export class AuthStoreLive implements IAuthStore {
     this.error = null;
   }
 
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    try {
+      await authService.changePassword(currentPassword, newPassword);
+      // Update local user state to reflect forcePasswordChange = false
+      runInAction(() => {
+        if (this.user) {
+          this.user.forcePasswordChange = false;
+        }
+      });
+      notify.success('Contraseña actualizada exitosamente');
+    } catch (err: any) {
+      notify.error(err.response?.data?.message || 'Error al cambiar la contraseña');
+      throw err;
+    }
+  }
+
   get userRole(): string | null {
     return this.user?.role?.name || null;
   }

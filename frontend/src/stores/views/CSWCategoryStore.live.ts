@@ -1,6 +1,7 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import { cswCategoryService } from '../../api/services/cswCategory';
 import { ICSWCategoryStore } from './CSWCategoryStore.contract';
+import { notify } from '../../utils/toast';
 
 /**
  * CSWCategoryStore Live Implementation
@@ -70,10 +71,12 @@ export class CSWCategoryStoreLive implements ICSWCategoryStore {
       runInAction(() => {
         this.categories.push(newCategory);
       });
+      notify.success('Categoría creada exitosamente');
     } catch (error: any) {
       runInAction(() => {
         this.error = error.response?.data?.message || 'Error al crear la categoría';
       });
+      notify.error(error.response?.data?.message || 'Error al crear la categoría');
       throw error;
     }
   }
@@ -87,10 +90,12 @@ export class CSWCategoryStoreLive implements ICSWCategoryStore {
           this.categories[index] = updated;
         }
       });
+      notify.success('Categoría actualizada exitosamente');
     } catch (error: any) {
       runInAction(() => {
         this.error = error.response?.data?.message || 'Error al actualizar la categoría';
       });
+      notify.error(error.response?.data?.message || 'Error al actualizar la categoría');
       throw error;
     }
   }
@@ -103,11 +108,13 @@ export class CSWCategoryStoreLive implements ICSWCategoryStore {
         this.categories = this.categories.filter(cat => cat._id !== id);
         this.isDeleting = false;
       });
+      notify.success('Categoría eliminada exitosamente');
     } catch (error: any) {
       runInAction(() => {
         this.error = error.response?.data?.message || 'Error al eliminar la categoría';
         this.isDeleting = false;
       });
+      notify.error(error.response?.data?.message || 'Error al eliminar la categoría');
       throw error;
     }
   }

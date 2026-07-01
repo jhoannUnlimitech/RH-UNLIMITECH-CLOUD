@@ -120,7 +120,7 @@ const CSWCategoriesList = observer(() => {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
+    <div className="p-4 sm:p-6 lg:p-8" data-test-context="csw-categories-list">
       {/* Breadcrumb */}
       <PageBreadcrumb pageTitle="Categorías CSW" />
 
@@ -135,7 +135,7 @@ const CSWCategoriesList = observer(() => {
           </p>
         </div>
         {canCreate && (
-        <Button onClick={createModal.openModal} className="w-full sm:w-auto">
+        <Button onClick={createModal.openModal} className="w-full sm:w-auto" data-test-key="create-category-button">
           Crear Categoría
         </Button>
         )}
@@ -164,6 +164,7 @@ const CSWCategoriesList = observer(() => {
                 placeholder="Buscar categorías..."
                 value={searchTerm}
                 onChange={handleSearchChange}
+                data-test-key="search-input"
                 className="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-dark-3 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
@@ -281,6 +282,7 @@ const CSWCategoriesList = observer(() => {
                             onClick={() => handleEdit(category._id)}
                             className="inline-flex items-center justify-center rounded-lg p-2 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-white/[0.05]"
                             title="Editar"
+                            data-test-key="edit-button"
                           >
                             <PencilIcon className="h-[18px] w-[18px]" />
                           </button>
@@ -290,6 +292,7 @@ const CSWCategoriesList = observer(() => {
                             onClick={() => handleDelete(category._id, category.name)}
                             className="inline-flex items-center justify-center rounded-lg p-2 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-white/[0.05]"
                             title="Eliminar"
+                            data-test-key="delete-button"
                           >
                             <TrashBinIcon className="h-[18px] w-[18px]" />
                           </button>

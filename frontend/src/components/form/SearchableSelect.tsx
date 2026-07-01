@@ -12,6 +12,8 @@ interface SearchableSelectProps {
   disabled?: boolean;
   required?: boolean;
   debounceMs?: number;
+  "data-test-key"?: string;
+  "data-test-state"?: string;
 }
 
 const SearchableSelect: React.FC<SearchableSelectProps> = ({
@@ -25,6 +27,8 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
   disabled = false,
   required = false,
   debounceMs = 500,
+  "data-test-key": dataTestKey,
+  "data-test-state": dataTestState,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -96,7 +100,7 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
   };
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="relative" data-test-key={dataTestKey} data-test-state={dataTestState}>
       {label && (
         <Label htmlFor={id}>
           {label}

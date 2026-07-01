@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { Navigate } from "react-router";
+import { Navigate, useLocation } from "react-router";
 import { authStore } from "../../stores/views";
 
 interface ProtectedRouteProps {
@@ -7,11 +7,14 @@ interface ProtectedRouteProps {
 }
 
 /**
- * Componente que protege rutas requiriendo autenticación
- * Si el usuario no está autenticado, redirige a /signin
- * Espera a que checkAuth termine antes de decidir
+ * Componente que protege rutas requiriendo autenticación.
+ * Si el usuario no está autenticado, redirige a /signin.
+ * Si el usuario tiene forcePasswordChange=true, redirige a /change-password.
+ * Espera a que checkAuth termine antes de decidir.
  */
 const ProtectedRoute = observer(({ children }: ProtectedRouteProps) => {
+  const location = useLocation();
+
   // Mientras verifica autenticación, no redirigir
   if (authStore.isLoading) {
     return (
@@ -23,6 +26,11 @@ const ProtectedRoute = observer(({ children }: ProtectedRouteProps) => {
 
   if (!authStore.isAuthenticated) {
     return <Navigate to="/signin" replace />;
+  }
+
+  // Si debe cambiar contraseña y no está en la página de cambio
+  if (authStore.user?.forcePasswordChange && location.pathname !== '/change-password') {
+    return <Navigate to="/change-password" replace />;
   }
 
   return <>{children}</>;
