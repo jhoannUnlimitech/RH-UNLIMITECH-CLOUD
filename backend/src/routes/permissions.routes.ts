@@ -10,6 +10,8 @@ import {
 } from '../controllers/permissions.controller';
 import { authMiddleware } from '../middleware/auth';
 import { requirePermission } from '../middleware/permission';
+import { validate } from '../middleware/validate';
+import { createPermissionSchema, updatePermissionSchema } from '../validators/permission.validator';
 
 const router = Router();
 
@@ -144,7 +146,7 @@ router.get('/:id', requirePermission('roles', 'read'), getPermissionById);
  *       400:
  *         description: Permiso ya existe o datos inválidos
  */
-router.post('/', requirePermission('roles', 'create'), createPermission);
+router.post('/', requirePermission('roles', 'create'), validate(createPermissionSchema), createPermission);
 
 /**
  * @swagger
@@ -179,7 +181,7 @@ router.post('/', requirePermission('roles', 'create'), createPermission);
  *       404:
  *         description: Permiso no encontrado
  */
-router.put('/:id', requirePermission('roles', 'update'), updatePermission);
+router.put('/:id', requirePermission('roles', 'update'), validate(updatePermissionSchema), updatePermission);
 
 /**
  * @swagger

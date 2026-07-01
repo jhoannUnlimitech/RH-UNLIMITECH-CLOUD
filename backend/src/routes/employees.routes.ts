@@ -12,6 +12,8 @@ import {
 } from '../controllers/employees.controller';
 import { authMiddleware } from '../middleware/auth';
 import { requirePermission } from '../middleware/permission';
+import { validate } from '../middleware/validate';
+import { createEmployeeSchema, updateEmployeeSchema } from '../validators/employee.validator';
 
 const router = Router();
 
@@ -259,7 +261,7 @@ router.get('/:id', requirePermission('employees', 'read'), getEmployeeById);
  *       400:
  *         description: Error de validación
  */
-router.post('/', requirePermission('employees', 'create'), createEmployee);
+router.post('/', requirePermission('employees', 'create'), validate(createEmployeeSchema), createEmployee);
 
 /**
  * @swagger
@@ -310,7 +312,7 @@ router.post('/', requirePermission('employees', 'create'), createEmployee);
  *       404:
  *         description: Empleado no encontrado
  */
-router.put('/:id', requirePermission('employees', 'update'), updateEmployee);
+router.put('/:id', requirePermission('employees', 'update'), validate(updateEmployeeSchema), updateEmployee);
 
 /**
  * @swagger
