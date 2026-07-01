@@ -143,23 +143,30 @@ RH-UNLIMITECH-CLOUD/
 
 ## 🔒 Seguridad
 
-- **Helmet** — Security headers (X-Frame-Options, etc.)
+- **Helmet** — Security headers (X-Frame-Options, CSP, etc.)
 - **Rate Limiting** — 10 intentos login/15min, 500 req/min global
 - **JWT httpOnly Cookie** — Token no accesible via JavaScript
-- **Zod Validation** — Validación de inputs en routes
+- **HS256 Algorithm Enforcement** — jwt.verify con algorithm explícito
+- **Zod Validation** — 12/12 endpoints validados con schemas strict
+- **CORS Dinámico** — Solo localhost en dev, solo frontend URL en prod
 - **RBAC** — Permisos granulares por recurso + acción
 - **Soft Delete** — Datos nunca se eliminan físicamente
 - **bcrypt** — Password hashing (10 salt rounds)
+- **ErrorBoundary** — Catch global de errores en frontend
+- **0 npm vulnerabilities** — Backend y frontend auditados
 
-Ver auditoría completa: [`docs/SECURITY_ARCHITECTURE_AUDIT.md`](docs/SECURITY_ARCHITECTURE_AUDIT.md)
+Ver auditoría completa: [`docs/SECURITY_ARCHITECTURE_AUDIT.md`](docs/SECURITY_ARCHITECTURE_AUDIT.md)  
+Ver plan de validación: [`docs/SINGLE_SOURCE_OF_TRUTH_AUDIT.md`](docs/SINGLE_SOURCE_OF_TRUTH_AUDIT.md)
 
 ---
 
 ## 📊 Scripts Útiles
 
 ```bash
-# Levantar servicios
-sudo ./start.sh
+# Levantar servicios (3 opciones)
+sudo ./start.sh                    # Script local
+docker compose up                  # Docker (todo containerizado)
+docker compose up -d               # Docker detached
 
 # Capturar screenshots de la app
 node scripts/capture-screenshots.cjs
@@ -169,6 +176,16 @@ cd backend && npx ts-node --transpile-only src/database/migrations/006-add-orden
 
 # Seed completo (⚠️ borra datos existentes)
 cd backend && npx ts-node --transpile-only src/database/seeds/seed-real.ts
+
+# Build frontend (producción)
+cd frontend && npm run build
+
+# Type check (sin bloquear build)
+cd frontend && npm run typecheck
+
+# Auditoría de seguridad
+cd backend && npm audit
+cd frontend && npm audit
 ```
 
 ---
@@ -180,6 +197,28 @@ cd backend && npx ts-node --transpile-only src/database/seeds/seed-real.ts
 | [CSW Module Complete](docs/CSW_MODULE_COMPLETE.md) | Flujo completo del módulo CSW |
 | [CSW Flow Bugfix](docs/CSW_FLOW_BUGFIX_ANALYSIS.md) | Análisis del bugfix CSW |
 | [Security Audit](docs/SECURITY_ARCHITECTURE_AUDIT.md) | Auditoría de seguridad + plan de acción |
+| [Single Source of Truth](docs/SINGLE_SOURCE_OF_TRUTH_AUDIT.md) | Validación Zod + fuente única de verdad |
+
+---
+
+## 🐳 Docker
+
+```bash
+# Levantar todo con Docker
+docker compose up
+
+# Solo MongoDB + Mongo Express
+docker compose up mongodb mongo-express
+
+# Rebuild después de cambios en Dockerfile
+docker compose up --build
+
+# Apagar
+docker compose down
+
+# Apagar + borrar volúmenes (⚠️ borra datos MongoDB)
+docker compose down -v
+```
 
 ---
 
@@ -195,4 +234,4 @@ npx remotion render RHUnlimitechCloud --output=video.mp4  # Exportar
 ---
 
 **Rama actual:** `bugfix/security-hardening` desde `develop`  
-**Última actualización:** 25 de Junio de 2026
+**Última actualización:** 1 de Julio de 2026

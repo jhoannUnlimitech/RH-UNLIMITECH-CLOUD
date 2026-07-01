@@ -28,14 +28,36 @@ npx ts-node --transpile-only src/server.ts
 | Weekly Reports | `/api/v1/weekly-reports` | JWT Cookie |
 | Approval Flows | `/api/v1/approval-flows` | JWT Cookie |
 
-## Seguridad (Sprint 1 implementado)
+## Seguridad (Implementado)
 
-- ✅ **Helmet** — Security headers
+- ✅ **Helmet** — Security headers (11 headers automáticos)
 - ✅ **express-rate-limit** — Rate limiting (login: 10/15min, global: 500/15min)
-- ✅ **Zod validation** — Input validation en auth + CSW routes
+- ✅ **Zod validation** — 12/12 endpoints con schemas strict
 - ✅ **JWT fail-fast** — Error en producción si JWT_SECRET no configurado
+- ✅ **HS256 enforcement** — jwt.verify con algorithms explícito
+- ✅ **Cookie-only auth** — No Bearer header, solo httpOnly cookie
+- ✅ **CORS dinámico** — Solo localhost en dev, frontend URL en prod
 - ✅ **Swagger solo en dev** — Desactivado en producción
 - ✅ **Compression** — gzip responses
+- ✅ **npm audit** — 0 vulnerabilidades
+- ✅ **Sin console.log** — Cero logs de debug en código
+
+## Validators (Fuente Única de Verdad)
+
+Cada endpoint tiene un schema Zod en `src/validators/`:
+
+| Archivo | Schemas |
+|---------|---------|
+| `csw.validator.ts` | createCSW, updateCSW, reject, login, changePassword |
+| `employee.validator.ts` | createEmployee, updateEmployee |
+| `division.validator.ts` | createDivision, updateDivision |
+| `project.validator.ts` | createProject, updateProject |
+| `calendarEvent.validator.ts` | createEvent, updateEvent |
+| `permission.validator.ts` | createPermission, updatePermission |
+| `cswCategory.validator.ts` | createCategory, updateCategory |
+| `hat.validator.ts` | createHat, updateHat |
+| `approvalFlow.validator.ts` | createFlow, updateFlow |
+| `common.ts` | objectId regex (reutilizable) |
 
 ## Estructura
 
