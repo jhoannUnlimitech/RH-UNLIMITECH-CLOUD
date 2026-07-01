@@ -15,9 +15,12 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Cookie expirada o inválida — redirigir a login
-      localStorage.removeItem('auth_user');
-      window.location.href = '/signin';
+      const requestUrl = error.config?.url || '';
+      // No redirigir para /auth/me (checkAuth espera el 401) ni si ya estamos en signin
+      if (!requestUrl.includes('/auth/me') && !window.location.pathname.includes('/signin')) {
+        localStorage.removeItem('auth_user');
+        window.location.href = '/signin';
+      }
     }
     return Promise.reject(error);
   }
