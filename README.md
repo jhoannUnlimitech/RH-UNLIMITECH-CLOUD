@@ -1,238 +1,198 @@
-# Sistema de Gestión de RRHH — RH-UNLIMITECH
+# RH Unlimitech Cloud
 
-Sistema completo de gestión de recursos humanos con **React + TailAdmin Pro** en el frontend y **Node.js + Express + MongoDB** en el backend.
+Sistema de Gestión de Recursos Humanos — Plataforma web completa para administración de personal, solicitudes internas y productividad.
 
----
-
-## Servicios y Puertos
-
-| Servicio | Puerto | URL |
-|----------|--------|-----|
-| Frontend (Vite) | 5173 | http://localhost:5173 |
-| Backend API | 9050 | http://localhost:9050 |
-| Swagger Docs | 9050 | http://localhost:9050/api-docs |
-| MongoDB | 27017 | mongodb://localhost:27017 |
-| Mongo Express | 8081 | http://localhost:8081 |
-
----
-
-## Inicio Rápido
+## 🚀 Quick Start
 
 ```bash
-# 1. Levantar MongoDB (Docker)
-docker compose up -d
-
-# 2. Backend
-cd backend
-npm install          # solo la primera vez
-npm run seed         # poblar base de datos
-npm run dev          # servidor en http://localhost:9050
-
-# 3. Frontend
-cd ../frontend
-npm install          # solo la primera vez
-npm run dev          # app en http://localhost:5173
+# Levantar todos los servicios (MongoDB + Backend + Frontend)
+sudo ./start.sh
 ```
 
----
+| Servicio | URL | Puerto |
+|----------|-----|--------|
+| Frontend | http://localhost:5173 | 5173 |
+| Backend API | http://localhost:9050 | 9050 |
+| Swagger Docs | http://localhost:9050/api-docs | 9050 |
+| MongoDB | localhost | 27017 |
+| Mongo Express | http://localhost:8081 | 8081 |
 
-## Credenciales de Acceso
+### Credenciales de prueba
 
-| Email | Password | Rol |
-|-------|----------|-----|
-| admin@rh.com | Pass2014! | ARCHITECT SOLUTIONS (Admin) |
-| jeacosta37@gmail.com | Pass2014! | Admin personalizado |
-| jordan.blake@rh.com | dev123456 | AI DRIVEN DEVELOPER |
-| taylor.morgan@rh.com | arch123456 | ARCHITECT TECHNICAL |
-| sage.wilson@rh.com | hr123456 | HUMAN TALENT |
-
----
-
-## Stack Tecnológico
-
-### Frontend
-- React 19 + TypeScript 5.7
-- Vite 6.1
-- TailwindCSS 4.0
-- TailAdmin Pro 2.2.0
-- MobX 6.15 + mobx-react-lite
-- React Router 7.1.5
-- Axios
-
-### Backend
-- Node.js 20.x + TypeScript 5.9
-- Express 5.x
-- MongoDB 7.0 + Mongoose 9.x
-- JWT (cookies httpOnly, 48h)
-- Swagger/OpenAPI
-- bcrypt, multer, cors
-
-### DevOps
-- Docker Compose (MongoDB + Mongo Express)
-- WSL2 (Ubuntu 24.04)
+| Usuario | Rol | Email | Password |
+|---------|-----|-------|----------|
+| Manuel Lara | Founder | admin@unlimitech.cloud | Pass2014! |
+| Jhoann Acosta | QA Analyst | jhoann@unlimitech.cloud | Pass2014! |
+| Laura Hernandez | HR Manager | talent@unlimitech.cloud | Pass2014! |
+| Moises Gonzalez | Tech Architect | moises@unlimitech.cloud | Pass2014! |
 
 ---
 
-## Arquitectura del Proyecto
+## 📦 Módulos
+
+### Dashboard
+- Métricas de RRHH (empleados, divisiones)
+- Cards CSW (total, en trámite, aprobadas, rechazadas, por firmar)
+- Gráficas de productividad semanal (QA + Dev)
+- Resumen de la semana actual
+- Proyectos activos del usuario
+
+### Empleados
+- CRUD completo con foto, datos personales, nacionalidad
+- Búsqueda y filtros por división/hat/estado
+- Switch approve_csw por empleado
+
+### Divisiones
+- Estructura organizacional (7 divisiones)
+- Manager asignado por división
+- Flujo de aprobación configurable por división
+
+### Hats (Roles)
+- Gestión de roles con permisos granulares
+- Sistema RBAC (Resource-Based Access Control)
+- Permisos: read, create, update, delete, approve, cancel
+
+### Proyectos
+- CRUD con equipo, líder, división, enlaces asociados
+- Estados: active, on_hold, completed, cancelled
+- Detalle con miembros del equipo
+
+### Calendario
+- Festivos automáticos (Colombia + Estados Unidos) via `date-holidays`
+- CRUD de eventos (solo HR/CEO/Founder)
+- Banderas por país (flagcdn.com)
+- Vista mes/semana/día con FullCalendar
+
+### CSW — Canal de Solicitudes de Trabajo
+- **Estado draft** con autoguardado cada 5 minutos
+- **Submit** para enviar a aprobación (draft → pending)
+- **Flujo multinivel** configurable por división (users fijos)
+- **Categorías** con flujo directo o por división
+- **Historial inmutable** con acciones traducidas + iconos
+- **Banner de rechazo** visible al editar
+- **Cancelar/Editar** según reglas de estado
+- **Formato título**: `CSW-CATEGORIA_SNAKE-YYYYMMDD-5chars`
+
+---
+
+## 🏗️ Arquitectura
+
+```
+Frontend (React 18 + MobX + Vite + TailwindCSS)
+     ↕ API REST (Cookie httpOnly)
+Backend (Express + TypeScript + Mongoose)
+     ↕
+MongoDB (sin autenticación en dev)
+```
+
+### Stack Técnico
+
+| Capa | Tecnología |
+|------|-----------|
+| Frontend | React 18, MobX, Vite, TailwindCSS, FullCalendar, ApexCharts |
+| Backend | Node.js, Express, TypeScript, Mongoose |
+| Base de datos | MongoDB 7+ |
+| Autenticación | JWT + httpOnly Cookie + bcrypt |
+| Seguridad | Helmet, express-rate-limit, Zod validation |
+| Documentación | Swagger/OpenAPI 3.0 |
+
+### Patrones de Diseño
+
+- **Store Pattern** (Contract → Mock/Live) con MobX
+- **Middleware Chain** (CORS → Helmet → RateLimit → Parse → Auth → Routes → Error)
+- **Soft Delete** universal via BaseModel plugin
+- **Permission-based access** (resource + action)
+- **Factory pattern** para stores
+- **Observer pattern** (MobX + React)
+
+---
+
+## 📁 Estructura del Proyecto
 
 ```
 RH-UNLIMITECH-CLOUD/
-├── frontend/                  # React + Vite + TailAdmin Pro
+├── backend/
 │   ├── src/
-│   │   ├── components/        # Componentes canónicos TailAdmin
-│   │   ├── components-custom/ # Componentes del proyecto
-│   │   ├── stores/            # MobX stores (ui/ y views/)
-│   │   ├── pages/             # Páginas/rutas
-│   │   ├── layout/            # AppLayout, Sidebar, Header
-│   │   ├── api/               # Servicios API (axios)
-│   │   └── utils/             # Utilidades y helpers
-│   ├── .env                   # VITE_API_URL=http://localhost:9050/api/v1
+│   │   ├── config/         # Env, DB, Swagger config
+│   │   ├── controllers/    # Lógica de negocio
+│   │   ├── middleware/     # Auth, CORS, Error, Validate, Permission
+│   │   ├── models/         # Mongoose schemas
+│   │   ├── routes/         # Express routes + Swagger docs
+│   │   ├── validators/     # Zod schemas
+│   │   ├── database/       # Migrations + Seeds
+│   │   └── scripts/        # Utilidades de BD
 │   └── package.json
-├── backend/                   # Node.js + Express + MongoDB
+├── frontend/
 │   ├── src/
-│   │   ├── config/            # database.ts, env.ts, swagger.ts
-│   │   ├── models/            # Mongoose schemas
-│   │   ├── routes/            # Express routes
-│   │   ├── controllers/       # Lógica de negocio
-│   │   ├── middleware/        # auth, cors, error, permission
-│   │   ├── database/          # 📦 Migrations & Seeds
-│   │   │   ├── migrations/    # Cambios incrementales a la BD
-│   │   │   └── seeds/         # Datos iniciales
-│   │   └── scripts/           # Utilidades de desarrollo
-│   ├── .env                   # Variables de entorno
+│   │   ├── api/            # Axios client + services
+│   │   ├── components/     # UI components reutilizables
+│   │   ├── context/        # Theme, Sidebar contexts
+│   │   ├── layout/         # AppLayout, Sidebar, Header
+│   │   ├── pages/          # Vistas por módulo
+│   │   ├── stores/         # MobX stores (contract/live/mock)
+│   │   └── utils/          # Helpers (toast, permissions, csw)
 │   └── package.json
-├── docs/                      # Documentación completa
-│   ├── AGENTS-BACKEND.md      # Arquitectura backend
-│   ├── AGENTS-FRONTEND.md     # Arquitectura frontend
-│   ├── CSW_ARCHITECTURE.md    # Sistema de aprobaciones
-│   ├── PERMISSIONS_SYSTEM.md  # RBAC
-│   ├── PROJECT_STATUS.md      # Estado del proyecto
-│   ├── TABLE_PATTERN.md       # Patrones de UI
-│   ├── COMO_LEVANTAR_BACKEND.md
-│   └── diagrams/              # Diagramas Mermaid por módulo
-├── docker-compose.yml         # MongoDB + Mongo Express
-└── README.md                  # Este archivo
+├── docs/                   # Documentación técnica
+├── scripts/                # Playwright screenshots
+├── video-promo/            # Video corporativo (Remotion)
+├── start.sh                # Script para levantar todo
+└── README.md
 ```
 
 ---
 
-## Scripts del Backend
+## 🔒 Seguridad
+
+- **Helmet** — Security headers (X-Frame-Options, etc.)
+- **Rate Limiting** — 10 intentos login/15min, 500 req/min global
+- **JWT httpOnly Cookie** — Token no accesible via JavaScript
+- **Zod Validation** — Validación de inputs en routes
+- **RBAC** — Permisos granulares por recurso + acción
+- **Soft Delete** — Datos nunca se eliminan físicamente
+- **bcrypt** — Password hashing (10 salt rounds)
+
+Ver auditoría completa: [`docs/SECURITY_ARCHITECTURE_AUDIT.md`](docs/SECURITY_ARCHITECTURE_AUDIT.md)
+
+---
+
+## 📊 Scripts Útiles
 
 ```bash
-npm run dev                 # Desarrollo con hot-reload
-npm run build               # Compilar TypeScript
-npm start                   # Producción (dist/)
-npm run seed                # Poblar BD desde cero (BORRA datos)
-npm run db:reset-password   # Resetear contraseñas por defecto
-npm run db:check-permissions # Listar permisos y roles del sistema
+# Levantar servicios
+sudo ./start.sh
+
+# Capturar screenshots de la app
+node scripts/capture-screenshots.cjs
+
+# Ejecutar migrations
+cd backend && npx ts-node --transpile-only src/database/migrations/006-add-orden-estudio-category.ts
+
+# Seed completo (⚠️ borra datos existentes)
+cd backend && npx ts-node --transpile-only src/database/seeds/seed-real.ts
 ```
 
-### Migraciones
+---
 
+## 📝 Documentación
+
+| Documento | Contenido |
+|-----------|-----------|
+| [CSW Module Complete](docs/CSW_MODULE_COMPLETE.md) | Flujo completo del módulo CSW |
+| [CSW Flow Bugfix](docs/CSW_FLOW_BUGFIX_ANALYSIS.md) | Análisis del bugfix CSW |
+| [Security Audit](docs/SECURITY_ARCHITECTURE_AUDIT.md) | Auditoría de seguridad + plan de acción |
+
+---
+
+## 🎬 Video Corporativo
+
+Proyecto Remotion en `video-promo/`:
 ```bash
-# Ejecutar una migración específica
-npx ts-node src/database/migrations/001-add-status-to-employees.ts
-npx ts-node src/database/migrations/002-fix-divisions-managerId.ts
-npx ts-node src/database/migrations/003-add-permissions-module.ts
+cd video-promo
+npx remotion studio          # Editor visual
+npx remotion render RHUnlimitechCloud --output=video.mp4  # Exportar
 ```
 
 ---
 
-## Módulos del Sistema
-
-### ✅ Completados (Backend + Frontend)
-- **Autenticación** — Login/Logout JWT en cookies httpOnly, checkAuth, refresh
-- **Empleados** — CRUD completo con foto, división, hat, approve_csw
-- **Divisiones** — Gestión con manager asignado
-- **Hats (Roles)** — RBAC completo (38 permisos, 13 hats), vista con tabla de empleados asignados
-- **Proyectos** — CRUD, asignación a división, equipo (miembros + líder), links asociados
-- **CSW (Solicitudes)** — CRUD, flujo de aprobación, categorías, pendientes
-- **Categorías CSW** — CRUD con flujo predeterminado o aprobador directo
-
-### 🟡 Parcial
-- **Flujos de Aprobación** — Backend completo, frontend básico
-- **Dashboard** — Dinámico por permisos del hat (CSW stats, proyectos, divisiones, empleados)
-
-### ❌ No Iniciados
-- **Capacitaciones (Training)** — Cursos, HP, exámenes
-- **Reportes de Productividad** — Métricas semanales QA/Dev
-- **Perfil de Usuario** — /profile con cambio de contraseña
-
----
-
-## Sistema de Permisos (RBAC)
-
-38 permisos organizados en 9 módulos. Cada hat agrupa N permisos.
-
-| Módulo | Acciones |
-|--------|----------|
-| employees | read, create, update, delete |
-| divisions | read, create, update, delete |
-| roles | read, create, update, delete |
-| permissions | read, create, update, delete |
-| projects | read, create, update, delete |
-| csw | read, create, update, approve, cancel, delete |
-| csw_categories | read, create, update, delete |
-| approval_flows | read, create, update, delete |
-| training | read, create, update, delete |
-
-### Control de acceso implementado
-
-| Capa | Función |
-|------|---------|
-| Sidebar dinámico | Oculta módulos sin permiso |
-| PermissionRoute | Redirige a / si accede por URL directa |
-| Botones condicionados | Crear/Editar/Eliminar ocultos sin permiso |
-| Dashboard adaptativo | Cards según permisos del hat |
-| Backend middleware | `requirePermission()` → 403 si no tiene permiso |
-
----
-
-## Docker
-
-```bash
-docker compose up -d        # Levantar MongoDB + Mongo Express
-docker compose ps           # Ver estado
-docker compose logs -f      # Ver logs
-docker compose down         # Detener
-docker compose down -v      # Detener + borrar volúmenes (CUIDADO)
-```
-
----
-
-## Documentación Detallada
-
-- [Arquitectura Backend](docs/AGENTS-BACKEND.md)
-- [Arquitectura Frontend](docs/AGENTS-FRONTEND.md)
-- [Sistema de Hats y Permisos](docs/HATS_PERMISSIONS_SYSTEM.md)
-- [Módulo de Proyectos](docs/PROJECTS_MODULE.md)
-- [Dashboard de Productividad](docs/DASHBOARD_PRODUCTIVITY_ANALYSIS.md)
-- [Sistema CSW](docs/CSW_ARCHITECTURE.md)
-- [Organigrama](docs/organigrama/organigrama-unlimitech-cloud.md)
-- [Cómo Levantar Backend](docs/COMO_LEVANTAR_BACKEND.md)
-- [Diagramas del Sistema](docs/diagrams/README.md)
-- [Base de Datos (Migrations/Seeds)](backend/src/database/README.md)
-
----
-
-## Variables de Entorno
-
-### Backend (`backend/.env`)
-```env
-NODE_ENV=development
-PORT=9050
-MONGO_URI=mongodb://localhost:27017/rh_management
-JWT_SECRET=<tu-secret-32-chars-min>
-FRONTEND_URL=http://localhost:5173
-UPLOAD_PATH=./uploads
-MAX_FILE_SIZE=5242880
-```
-
-### Frontend (`frontend/.env`)
-```env
-VITE_API_URL=http://localhost:9050/api/v1
-```
-
----
-
-**Última actualización:** Junio 24, 2026
+**Rama actual:** `bugfix/security-hardening` desde `develop`  
+**Última actualización:** 25 de Junio de 2026

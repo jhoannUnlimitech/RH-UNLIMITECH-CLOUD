@@ -7,33 +7,15 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // Importante para cookies httpOnly
+  withCredentials: true, // Cookie httpOnly — la autenticación viaja en la cookie, no en headers
 });
 
-// Interceptor para agregar token a las peticiones
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('auth_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Interceptor para manejar respuestas del backend
+// Interceptor de respuestas — manejar 401
 apiClient.interceptors.response.use(
-  (response) => {
-    // No modificar la respuesta, dejar que los servicios manejen la estructura
-    return response;
-  },
+  (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expirado o inválido
-      localStorage.removeItem('auth_token');
+      // Cookie expirada o inválida — redirigir a login
       localStorage.removeItem('auth_user');
       window.location.href = '/signin';
     }

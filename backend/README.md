@@ -1,211 +1,76 @@
-# Backend — RH-UNLIMITECH API
+# Backend — RH Unlimitech Cloud
 
-API REST para el sistema de gestión de RRHH. Express 5 + MongoDB + TypeScript.
+API REST con Express + TypeScript + MongoDB para el sistema de gestión de RRHH.
 
----
-
-## Inicio Rápido
+## Setup
 
 ```bash
-# Requisitos: Docker corriendo con MongoDB (ver docker-compose.yml en raíz)
-
-npm install              # Instalar dependencias
-cp .env.example .env     # Configurar variables (o usar defaults)
-npm run seed             # Poblar base de datos
-npm run dev              # http://localhost:9050
+cd backend
+cp .env.example .env  # Configurar variables de entorno
+npm install
+npx ts-node --transpile-only src/server.ts
 ```
 
----
+**Puerto:** 9050
 
-## Scripts Disponibles
+## Endpoints principales
 
-| Comando | Descripción |
-|---------|-------------|
-| `npm run dev` | Desarrollo con hot-reload (ts-node-dev) |
-| `npm run build` | Compilar TypeScript a dist/ |
-| `npm start` | Ejecutar versión compilada |
-| `npm run seed` | Poblar BD desde cero (⚠️ borra datos) |
-| `npm run db:reset-password` | Resetear contraseñas por defecto |
-| `npm run db:check-permissions` | Listar permisos y roles actuales |
+| Módulo | Base | Autenticación |
+|--------|------|---------------|
+| Auth | `/api/v1/auth` | Público (login/register) |
+| Employees | `/api/v1/employees` | JWT Cookie |
+| Divisions | `/api/v1/divisions` | JWT Cookie |
+| Roles | `/api/v1/roles` | JWT Cookie |
+| CSW | `/api/v1/csw` | JWT Cookie + Permisos |
+| CSW Categories | `/api/v1/csw-categories` | JWT Cookie |
+| Projects | `/api/v1/projects` | JWT Cookie |
+| Calendar Events | `/api/v1/calendar-events` | JWT Cookie |
+| Weekly Reports | `/api/v1/weekly-reports` | JWT Cookie |
+| Approval Flows | `/api/v1/approval-flows` | JWT Cookie |
 
-### Migraciones
+## Seguridad (Sprint 1 implementado)
+
+- ✅ **Helmet** — Security headers
+- ✅ **express-rate-limit** — Rate limiting (login: 10/15min, global: 500/15min)
+- ✅ **Zod validation** — Input validation en auth + CSW routes
+- ✅ **JWT fail-fast** — Error en producción si JWT_SECRET no configurado
+- ✅ **Swagger solo en dev** — Desactivado en producción
+- ✅ **Compression** — gzip responses
+
+## Estructura
+
+```
+src/
+├── config/          # env.ts, database.ts, swagger.ts
+├── controllers/     # Lógica de negocio por módulo
+├── middleware/      # auth, cors, error, permission, validate, swaggerAuth
+├── models/          # Mongoose schemas + soft delete base
+├── routes/          # Express routes + Swagger JSDoc
+├── validators/      # Zod schemas (csw.validator.ts)
+├── database/
+│   ├── migrations/  # Scripts incrementales (006, 007)
+│   └── seeds/       # seed-real.ts, seed-projects.ts, etc.
+└── server.ts        # Entry point
+```
+
+## Migrations
 
 ```bash
-npx ts-node src/database/migrations/001-add-status-to-employees.ts
-npx ts-node src/database/migrations/002-fix-divisions-managerId.ts
-npx ts-node src/database/migrations/003-add-permissions-module.ts
+npx ts-node --transpile-only src/database/migrations/006-add-orden-estudio-category.ts
+npx ts-node --transpile-only src/database/migrations/007-fix-approval-flow-div4.ts
 ```
 
----
+## Modelos
 
-## Estructura del Proyecto
-
-```
-backend/
-├── src/
-│   ├── config/
-│   │   ├── database.ts        # Conexión MongoDB (Mongoose)
-│   │   ├── env.ts             # Variables de entorno tipadas
-│   │   └── swagger.ts         # Configuración Swagger/OpenAPI
-│   ├── models/
-│   │   ├── base/BaseModel.ts  # Interface base (timestamps, soft delete)
-│   │   ├── Employee.ts        # Empleados (bcrypt, foto base64)
-│   │   ├── Division.ts        # Divisiones organizacionales
-│   │   ├── Role.ts            # Roles con permisos
-│   │   ├── Permission.ts      # Permisos (resource + action)
-│   │   ├── CSW.ts             # Solicitudes CSW
-│   │   ├── CSWCategory.ts     # Categorías de solicitud
-│   │   ├── CSWHistory.ts      # Historial de cambios CSW
-│   │   └── ApprovalFlow.ts    # Flujos de aprobación por división
-│   ├── controllers/
-│   │   ├── auth.controller.ts
-│   │   ├── employees.controller.ts
-│   │   ├── divisions.controller.ts
-│   │   ├── roles.controller.ts
-│   │   ├── permissions.controller.ts
-│   │   ├── csw.controller.ts
-│   │   ├── cswCategory.controller.ts
-│   │   └── approvalFlow.controller.ts
-│   ├── routes/                # Express Router por módulo
-│   ├── middleware/
-│   │   ├── auth.ts            # JWT cookie verification
-│   │   ├── permission.ts      # RBAC check (resource:action)
-│   │   ├── cors.ts            # CORS config
-│   │   ├── error.ts           # Error handler global
-│   │   └── swaggerAuth.ts     # Cookie pass-through para Swagger
-│   ├── database/              # 📦 Migrations & Seeds
-│   │   ├── migrations/        # Cambios incrementales
-│   │   ├── seeds/             # Datos iniciales
-│   │   └── README.md          # Documentación completa
-│   ├── scripts/               # Utilidades de desarrollo
-│   ├── app.ts                 # Express app setup
-│   └── server.ts              # Entry point
-├── .env                       # Variables de entorno
-├── .env.example               # Template
-├── package.json
-└── tsconfig.json
-```
-
----
-
-## API Endpoints
-
-**Base URL:** `http://localhost:9050/api/v1`
-
-### Autenticación
-```
-POST   /auth/login            # Login (devuelve cookie JWT)
-POST   /auth/logout           # Logout (limpia cookie)
-GET    /auth/me               # Usuario actual
-POST   /auth/refresh          # Refrescar token
-```
-
-### Empleados
-```
-GET    /employees             # Listar (paginado, filtros)
-GET    /employees/:id         # Obtener por ID
-POST   /employees             # Crear
-PUT    /employees/:id         # Actualizar
-DELETE /employees/:id         # Soft delete
-```
-
-### Divisiones
-```
-GET    /divisions             # Listar
-GET    /divisions/:id         # Obtener por ID
-POST   /divisions             # Crear
-PUT    /divisions/:id         # Actualizar
-DELETE /divisions/:id         # Soft delete
-```
-
-### Roles y Permisos
-```
-GET    /roles                 # Listar roles
-POST   /roles                 # Crear rol
-PUT    /roles/:id             # Actualizar rol
-DELETE /roles/:id             # Eliminar rol
-GET    /permissions           # Listar permisos
-GET    /permissions/by-resource # Permisos agrupados
-```
-
-### CSW (Solicitudes)
-```
-GET    /csw                   # Listar solicitudes
-GET    /csw/:id               # Detalle
-POST   /csw                   # Crear solicitud
-PUT    /csw/:id               # Editar (si rechazada)
-DELETE /csw/:id               # Cancelar
-POST   /csw/:id/approve       # Aprobar nivel
-POST   /csw/:id/reject        # Rechazar
-GET    /csw/my-requests       # Mis solicitudes
-GET    /csw/pending-approvals # Pendientes de aprobar
-```
-
-### Categorías CSW
-```
-GET    /csw-categories        # Listar
-POST   /csw-categories        # Crear
-PUT    /csw-categories/:id    # Actualizar
-DELETE /csw-categories/:id    # Eliminar
-```
-
-### Flujos de Aprobación
-```
-GET    /approval-flows                    # Listar todos
-GET    /approval-flows/:id                # Detalle
-GET    /approval-flows/by-division/:id    # Por división
-POST   /approval-flows                    # Crear
-PUT    /approval-flows/:id                # Actualizar
-DELETE /approval-flows/:id                # Eliminar
-```
-
----
-
-## Autenticación
-
-- JWT almacenado en cookie **httpOnly** (protección XSS)
-- Expiración: 48 horas
-- SameSite: `lax` (compatible con Swagger)
-- Renovación automática con `/auth/refresh`
-
----
-
-## Sistema de Permisos (RBAC)
-
-Cada permiso es una combinación `resource:action`. El middleware `requirePermission('employees', 'create')` verifica que el rol del usuario tenga ese permiso asignado.
-
-**Roles predefinidos:**
-- ARCHITECT SOLUTIONS — Admin total (32 permisos)
-- ARCHITECT TECHNICAL — Lectura + aprobación técnica
-- AI DRIVEN DEVELOPER — Lectura + creación básica
-- AI DRIVEN QA — Solo lectura
-- HUMAN TALENT — Gestión de personal completa
-
----
-
-## Variables de Entorno
-
-```env
-NODE_ENV=development
-PORT=9050
-MONGO_URI=mongodb://localhost:27017/rh_management
-JWT_SECRET=f7c58e1d2b2bfbfda756da1d442a58b0639300bd
-FRONTEND_URL=http://localhost:5173
-UPLOAD_PATH=./uploads
-MAX_FILE_SIZE=5242880
-```
-
----
-
-## Notas Técnicas
-
-- Todos los modelos usan **soft delete** (`deleted: boolean`)
-- Timestamps automáticos (`createdAt`, `updatedAt`)
-- Passwords hasheados con **bcrypt** (salt 10)
-- CORS permite origins `http://localhost:*`
-- Swagger UI disponible en `/api-docs`
-- Express 5.x con soporte nativo de async errors
-
----
-
-**Última actualización:** Junio 24, 2026
+| Modelo | Colección | Campos clave |
+|--------|-----------|--------------|
+| Employee | employees | name, email, role, division, approve_csw |
+| Role | roles | name, permissions[] |
+| Permission | permissions | resource, action |
+| Division | divisions | name, code, managerId |
+| CSW | csws | status, approvalChain[], history[] |
+| CSWCategory | cswcategories | name, useDefaultFlow, directApproverId |
+| ApprovalFlow | approvalflows | divisionId, levels[] |
+| Project | projects | name, code, division, members[], lead |
+| CalendarEvent | calendarevents | title, type, start, end, link |
+| WeeklyReport | weeklyreports | employee, week, qaMetrics, devMetrics |
