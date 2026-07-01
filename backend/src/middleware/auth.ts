@@ -62,7 +62,7 @@ export const authMiddleware = async (
     }
 
     // Verificar token
-    const decoded = jwt.verify(token, config.jwt.secret) as {
+    const decoded = jwt.verify(token, config.jwt.secret, { algorithms: ['HS256'] }) as {
       id: string;
       email: string;
       roleId: string;
@@ -123,7 +123,7 @@ export const optionalAuth = async (
     const token = req.cookies[config.jwt.cookieName];
     
     if (token) {
-      const decoded = jwt.verify(token, config.jwt.secret) as any;
+      const decoded = jwt.verify(token, config.jwt.secret, { algorithms: ['HS256'] }) as any;
       const employee = await Employee.findById(decoded.id)
         .populate('role', 'name')
         .select('-password');
