@@ -1,44 +1,73 @@
 version: '3.8'
 
 services:
+  # ─── MongoDB ────────────────────────────────────────────
   mongodb:
-    image: mongo:7.0
-    container_name: rh-management-mongodb
-    restart: unless-stopped
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin123
-      MONGO_INITDB_DATABASE: rh_management
+    image: mongo:7
+    container_name: rh-mongodb
     ports:
       - "27017:27017"
     volumes:
-      - mongodb_data:/data/db
-      - mongodb_config:/data/configdb
-    networks:
-      - rh-network
-
-  mongo-express:
-    image: mongo-express:1.0
-    container_name: rh-management-mongo-express
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
+
+  # ─── Mongo Express (UI para MongoDB) ───────────────────
+  mongo-express:
+    image: mongo-express:latest
+    container_name: rh-mongo-express
     ports:
       - "8081:8081"
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
-      ME_CONFIG_MONGODB_ADMINPASSWORD: admin123
-      ME_CONFIG_MONGODB_URL: mongodb://admin:admin123@mongodb:27017/
-      ME_CONFIG_BASICAUTH: false
+      ME_CONFIG_MONGODB_URL: mongodb://mongodb:27017/rh_management
+      ME_CONFIG_BASICAUTH: "false"
     depends_on:
-      - mongodb
-    networks:
-      - rh-network
+      mongodb:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ─── Backend (Node.js + Express + TypeScript) ──────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: rh-backend
+    ports:
+      - "9050:9050"
+    environment:
+      NODE_ENV: development
+      PORT: 9050
+      MONGO_URI: mongodb://mongodb:27017/rh_management
+      JWT_SECRET: ${JWT_SECRET:-rh-unlimitech-dev-only-jwt-secret-key-2026-not-for-production}
+      FRONTEND_URL: http://localhost:5173
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/uploads:/app/uploads
+    restart: unless-stopped
+
+  # ─── Frontend (React + Vite) ───────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: rh-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:9050/api/v1
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend/src:/app/src
+    restart: unless-stopped
 
 volumes:
-  mongodb_data:
+  mongo_data:
     driver: local
-  mongodb_config:
-    driver: local
-
-networks:
-  rh-network:
-    driver: bridge

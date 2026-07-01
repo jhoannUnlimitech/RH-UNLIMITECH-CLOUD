@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { authMiddleware } from '../middleware/auth';
 import { requirePermission } from '../middleware/permission';
+import { validate } from '../middleware/validate';
+import { createFlowSchema, updateFlowSchema } from '../validators/approvalFlow.validator';
 import {
   getApprovalFlows,
   getApprovalFlowById,
@@ -246,6 +248,7 @@ router.post(
   '/',
   authMiddleware,
   requirePermission('approval_flows:create'),
+  validate(createFlowSchema),
   createApprovalFlow
 );
 
@@ -289,6 +292,7 @@ router.put(
   '/:id',
   authMiddleware,
   requirePermission('approval_flows:update'),
+  validate(updateFlowSchema),
   updateApprovalFlow
 );
 

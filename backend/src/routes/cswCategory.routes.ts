@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { authMiddleware } from '../middleware/auth';
 import { requirePermission } from '../middleware/permission';
+import { validate } from '../middleware/validate';
+import { createCategorySchema, updateCategorySchema } from '../validators/cswCategory.validator';
 import {
   getCSWCategories,
   getAllCSWCategories,
@@ -174,6 +176,7 @@ router.post(
   '/',
   authMiddleware,
   requirePermission('csw_categories', 'create'),
+  validate(createCategorySchema),
   createCSWCategory
 );
 
@@ -217,6 +220,7 @@ router.put(
   '/:id',
   authMiddleware,
   requirePermission('csw_categories', 'update'),
+  validate(updateCategorySchema),
   updateCSWCategory
 );
 

@@ -35,6 +35,7 @@ export interface Employee {
   };
   status: 'active' | 'inactive';
   approve_csw?: boolean;
+  forcePasswordChange?: boolean;
   deleted: boolean;
   createdAt: string;
   updatedAt: string;

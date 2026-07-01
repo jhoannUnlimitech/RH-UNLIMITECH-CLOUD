@@ -1,41 +1,26 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:9050/api/v1';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // Importante para cookies httpOnly
+  withCredentials: true, // Cookie httpOnly — la autenticación viaja en la cookie, no en headers
 });
 
-// Interceptor para agregar token a las peticiones
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('auth_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Interceptor para manejar respuestas del backend
+// Interceptor de respuestas — manejar 401
 apiClient.interceptors.response.use(
-  (response) => {
-    // No modificar la respuesta, dejar que los servicios manejen la estructura
-    return response;
-  },
+  (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expirado o inválido
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('auth_user');
-      window.location.href = '/signin';
+      const requestUrl = error.config?.url || '';
+      // No redirigir para /auth/me (checkAuth espera el 401) ni si ya estamos en signin
+      if (!requestUrl.includes('/auth/me') && !window.location.pathname.includes('/signin')) {
+        localStorage.removeItem('auth_user');
+        window.location.href = '/signin';
+      }
     }
     return Promise.reject(error);
   }

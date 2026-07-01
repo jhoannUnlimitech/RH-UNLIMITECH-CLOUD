@@ -6,6 +6,8 @@ export interface ICSWCategory {
   description?: string;
   active: boolean;
   order: number;
+  useDefaultFlow?: boolean;
+  directApproverId?: string;
   deleted: boolean;
   createdAt: string;
   updatedAt: string;
@@ -16,6 +18,8 @@ export interface ICSWCategoryInput {
   description?: string;
   active?: boolean;
   order?: number;
+  useDefaultFlow?: boolean;
+  directApproverId?: string;
 }
 
 class CSWCategoryService {

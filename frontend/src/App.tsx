@@ -4,6 +4,7 @@ import Home from "./pages/Dashboard/Home";
 import SignIn from "./pages/AuthPages/SignIn";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
+import ErrorBoundary from "./components/common/ErrorBoundary";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import PermissionRoute from "./components/auth/PermissionRoute";
 import { authStore } from "./stores/views";
@@ -29,6 +30,7 @@ export default function App() {
   }, []);
 
   return (
+    <ErrorBoundary>
     <Router>
       <ScrollToTop />
       <Routes>
@@ -67,5 +69,6 @@ export default function App() {
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
+    </ErrorBoundary>
   );
 }
