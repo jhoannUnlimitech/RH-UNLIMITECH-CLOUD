@@ -127,7 +127,7 @@ const DivisionsList = observer(() => {
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6" data-test-context="divisions-list">
       {/* Breadcrumb */}
       <PageBreadcrumb pageTitle="Divisiones" />
 
@@ -142,7 +142,7 @@ const DivisionsList = observer(() => {
           </p>
         </div>
         {can('divisions', 'create') && (
-          <Button onClick={createModal.openModal} className="flex items-center gap-2">
+          <Button onClick={createModal.openModal} className="flex items-center gap-2" data-test-key="create-division-button">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M10 5V15M5 10H15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
@@ -224,6 +224,7 @@ const DivisionsList = observer(() => {
                 value={searchTerm}
                 onChange={handleSearchChange}
                 placeholder="Buscar divisiones..."
+                data-test-key="search-input"
                 className="h-11 w-full rounded-lg border border-gray-300 bg-transparent py-2.5 pl-11 pr-4 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[300px]"
               />
             </div>
@@ -393,6 +394,7 @@ const DivisionsList = observer(() => {
                           onClick={() => handleView(division._id)}
                           className="inline-flex items-center justify-center rounded-lg p-2 text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.05] transition"
                           title="Ver detalles"
+                          data-test-key="view-button"
                         >
                           <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path fillRule="evenodd" clipRule="evenodd" d="M10.0002 13.8619C7.23361 13.8619 4.86803 12.1372 3.92328 9.70241C4.86804 7.26761 7.23361 5.54297 10.0002 5.54297C12.7667 5.54297 15.1323 7.26762 16.0771 9.70243C15.1323 12.1372 12.7667 13.8619 10.0002 13.8619ZM10.0002 4.04297C6.48191 4.04297 3.49489 6.30917 2.4155 9.4593C2.3615 9.61687 2.3615 9.78794 2.41549 9.94552C3.49488 13.0957 6.48191 15.3619 10.0002 15.3619C13.5184 15.3619 16.5055 13.0957 17.5849 9.94555C17.6389 9.78797 17.6389 9.6169 17.5849 9.45932C16.5055 6.30919 13.5184 4.04297 10.0002 4.04297ZM9.99151 7.84413C8.96527 7.84413 8.13333 8.67606 8.13333 9.70231C8.13333 10.7286 8.96527 11.5605 9.99151 11.5605H10.0064C11.0326 11.5605 11.8646 10.7286 11.8646 9.70231C11.8646 8.67606 11.0326 7.84413 10.0064 7.84413H9.99151Z" fill="currentColor"/>
@@ -403,6 +405,7 @@ const DivisionsList = observer(() => {
                           onClick={() => handleEdit(division._id)}
                           className="inline-flex items-center justify-center rounded-lg p-2 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-white/[0.05]"
                           title="Editar"
+                          data-test-key="edit-button"
                         >
                           <PencilIcon className="h-[18px] w-[18px]" />
                         </button>
@@ -412,6 +415,7 @@ const DivisionsList = observer(() => {
                           disabled={deletingId === division._id}
                           className="inline-flex items-center justify-center rounded-lg p-2 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-white/[0.05] disabled:opacity-50 disabled:cursor-not-allowed"
                           title="Eliminar"
+                          data-test-key="delete-button"
                         >
                           {deletingId === division._id ? (
                             <div className="animate-spin rounded-full h-[18px] w-[18px] border-b-2 border-red-600"></div>

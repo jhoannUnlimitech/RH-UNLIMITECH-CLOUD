@@ -211,8 +211,8 @@ const DivisionFormModal = observer(
         onClose={onClose}
         className="relative w-full max-w-[640px] m-5 sm:m-0 rounded-3xl bg-white p-6 lg:p-10 dark:bg-gray-900"
       >
-        <div className="max-h-[70vh] overflow-y-auto">
-          <h4 className="text-title-sm mb-1 font-semibold text-gray-800 dark:text-white/90">
+        <div className="max-h-[70vh] overflow-y-auto" data-test-context="division-form-modal">
+          <h4 className="text-title-sm mb-1 font-semibold text-gray-800 dark:text-white/90" data-test-key="modal-title">
             {isEdit ? "Editar División" : "Nueva División"}
           </h4>
           <p className="mb-6 text-sm leading-6 text-gray-500 dark:text-gray-400">
