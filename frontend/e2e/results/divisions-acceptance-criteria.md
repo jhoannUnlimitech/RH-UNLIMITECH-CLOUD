@@ -26,7 +26,7 @@
 | AC | Descripción | Status |
 |----|-------------|--------|
 | AC-DIV-12 | Al crear, se asigna un manager (requerido por backend) | ✅ Pass (via API) |
-| AC-DIV-13 | Manager asignado es visible en la tabla/vista | ⏳ Pending (UI) |
+| AC-DIV-13 | Manager asignado es visible en la tabla/vista | ✅ Pass |
 
 ## D. Empleados por División
 
@@ -55,7 +55,7 @@
 | C. Manager | 2 | 1 | 1 |
 | D. Empleados por div | 1 | 0 | 1 |
 | E. Anotaciones | 5 | 5 | 0 |
-| **Total** | **19** | **18** | **1** |
+| **Total** | **19** | **19** | **0** |
 
 ## Tests
 

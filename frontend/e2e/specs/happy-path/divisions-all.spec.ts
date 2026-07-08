@@ -152,3 +152,34 @@ filterFlow.e2e.describe.serial('Divisions — Filter Employees by Division', () 
     expect(firstRowText).toContain('Infraestructura');
   });
 });
+
+
+// ─── Flow 3: Verify manager visible in table ────────────────────────────────
+
+const managerFlow = createSerialFlow();
+
+managerFlow.e2e.describe.serial('Divisions — Manager Visible in Table', () => {
+  managerFlow.e2e('1. Login and navigate', async () => {
+    const page = managerFlow.getPage();
+    const baseUrl = process.env.BASE_URL || 'http://localhost:5173';
+    await page.context().clearCookies();
+    await page.goto(`${baseUrl}/signin`);
+    await page.waitForSelector('[data-test-context="login-form"][data-test-state="ready"]', { timeout: 15_000 });
+    await page.locator('[data-test-key="email-input"]').fill(LOGIN_MOISES.email);
+    await page.locator('[data-test-key="password-input"]').fill(LOGIN_MOISES.password);
+    await page.locator('[data-test-key="submit-button"]').click();
+    await page.locator('[data-test-context="signin-page"]').waitFor({ state: 'hidden', timeout: 15_000 });
+    await page.goto(`${baseUrl}/divisions`);
+    await page.waitForSelector('[data-test-context="divisions-list"]', { timeout: 15_000 });
+  });
+
+  managerFlow.e2e('2. Verify a division shows manager name in table', async () => {
+    const page = managerFlow.getPage();
+    // At least one division should have a manager (Manuel Lara is manager of all)
+    const managerCell = page.locator('tbody tr').first().locator('td').nth(3); // Manager column
+    const text = await managerCell.textContent();
+    expect(text?.trim().length).toBeGreaterThan(0);
+    // It should contain a name (not empty or "—")
+    expect(text).not.toBe('—');
+  });
+});

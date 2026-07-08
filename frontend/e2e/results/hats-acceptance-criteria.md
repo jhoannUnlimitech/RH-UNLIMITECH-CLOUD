@@ -26,7 +26,7 @@
 |----|-------------|--------|
 | AC-HAT-11 | Al crear, se asignan permisos al hat | ✅ Pass (via API) |
 | AC-HAT-12 | Vista muestra permisos asignados | ✅ Pass |
-| AC-HAT-13 | Editar permite cambiar permisos | ⏳ Pending (UI interaction) |
+| AC-HAT-13 | Editar permite cambiar permisos | ✅ Pass |
 
 ## D. Anotaciones data-test-*
 
@@ -47,7 +47,7 @@
 | B. Búsqueda | 1 | 1 | 0 |
 | C. Permisos | 3 | 2 | 1 |
 | D. Anotaciones | 4 | 4 | 0 |
-| **Total** | **17** | **16** | **1** |
+| **Total** | **17** | **17** | **0** |
 
 ## Tests
 

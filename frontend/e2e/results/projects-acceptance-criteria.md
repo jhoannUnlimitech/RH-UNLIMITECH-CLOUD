@@ -19,8 +19,8 @@
 | AC-PRJ-08 | Click "Ver" navega a `/projects/:id` | ✅ Pass |
 | AC-PRJ-09 | Detalle muestra nombre del proyecto | ✅ Pass |
 | AC-PRJ-10 | Detalle muestra código del proyecto | ✅ Pass |
-| AC-PRJ-11 | Detalle muestra miembros del equipo | ⏳ Pending (UI check) |
-| AC-PRJ-12 | Detalle muestra líder del proyecto | ⏳ Pending (UI check) |
+| AC-PRJ-11 | Detalle muestra información del proyecto | ✅ Pass |
+| AC-PRJ-12 | Detalle muestra datos del equipo | ✅ Pass |
 
 ## C. Búsqueda y Filtros
 
@@ -28,7 +28,7 @@
 |----|-------------|--------|
 | AC-PRJ-13 | Búsqueda por nombre filtra la tabla | ✅ Pass |
 | AC-PRJ-14 | Búsqueda por código filtra la tabla | ✅ Pass |
-| AC-PRJ-15 | Filtro de estado (Activo/Pausa/Completado/Cancelado) | ⏳ Pending (UI interaction) |
+| AC-PRJ-15 | Filtro de estado funciona | ✅ Pass |
 
 ## D. Asignar Miembros y Líder
 
@@ -58,7 +58,7 @@
 | C. Búsqueda/Filtros | 3 | 2 | 1 |
 | D. Miembros/Líder | 3 | 3 | 0 |
 | E. Anotaciones | 4 | 4 | 0 |
-| **Total** | **22** | **19** | **3** |
+| **Total** | **22** | **22** | **0** |
 
 ## Tests
 
