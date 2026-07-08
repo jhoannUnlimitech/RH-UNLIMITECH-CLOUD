@@ -1,78 +1,84 @@
 /**
- * Employees Edit + Suspend + Delete Spec.
+ * Employees Suspend + Activate + Delete Spec — Self-contained.
  *
- * Flow:
- * 1. Login as Moises
- * 2. Search existing test employee
- * 3. Suspend → verify "Inactivo"
- * 4. Activate → verify "Activo"
- * 5. Delete → confirm → verify gone
+ * Creates its own employee, then suspends, activates, and deletes it.
  */
 
 import { createSerialFlow } from '../../fixtures/base';
 import { expect } from '@playwright/test';
 import {
   loginAndNavigateToEmployees,
+  openCreateEmployeeModal,
+  fillEmployeeForm,
+  submitEmployeeForm,
   searchEmployee,
   suspendFirstEmployee,
   activateFirstEmployee,
   deleteFirstEmployee,
 } from '../../factories/employees.factory';
-import { LOGIN_MOISES, EMPLOYEE_CREATE } from '../../fixtures/test-data';
+import { LOGIN_MOISES } from '../../fixtures/test-data';
+import type { EmployeeFormData } from '../../fixtures/test-data';
 
 const { e2e, getPage } = createSerialFlow();
 
+// Unique employee for this spec
+const ts = Date.now().toString().slice(-6);
+const TEST_EMP: EmployeeFormData = {
+  name: `Suspend Test ${ts}`,
+  email: `suspend-${ts}@emxeecta.mailosaur.net`,
+  password: 'TestPass2024!',
+  phone: '+573007770000',
+  nationalId: `SUS${ts}`,
+  nationality: 'Colombia',
+  birthDate: '1990-03-10',
+  hat: 'DEVELOPER',
+  division: 'Infraestructura',
+  forcePasswordChange: false,
+};
+
 e2e.describe.serial('Employees — Suspend + Activate + Delete', () => {
-  e2e('1. Login as Moises and navigate to /employees',
-    loginAndNavigateToEmployees(getPage, LOGIN_MOISES));
+  // Setup: create the employee
+  e2e('1. Login and navigate', loginAndNavigateToEmployees(getPage, LOGIN_MOISES));
+  e2e('2. Create employee', openCreateEmployeeModal(getPage));
+  e2e('3. Fill form', fillEmployeeForm(getPage, TEST_EMP));
+  e2e('4. Submit', submitEmployeeForm(getPage));
+  e2e('5. Search created employee', searchEmployee(getPage, TEST_EMP.name));
 
-  e2e('2. Search for test employee',
-    searchEmployee(getPage, EMPLOYEE_CREATE.name));
-
-  e2e('3. Verify employee is visible', async () => {
+  e2e('6. Verify employee visible', async () => {
     const page = getPage();
-    const row = page.locator('tbody tr').filter({ hasText: EMPLOYEE_CREATE.name });
+    const row = page.locator('tbody tr').filter({ hasText: TEST_EMP.name });
     await expect(row.first()).toBeVisible({ timeout: 10_000 });
   });
 
-  e2e('4. Suspend employee',
-    suspendFirstEmployee(getPage));
+  // Suspend
+  e2e('7. Suspend employee', suspendFirstEmployee(getPage));
 
-  e2e('5. Verify status changed to Inactivo', async () => {
+  e2e('8. Verify Inactivo', async () => {
     const page = getPage();
     await page.reload({ waitUntil: 'networkidle' });
-    const searchInput = page.locator('[data-test-key="search-input"]');
-    await searchInput.fill(EMPLOYEE_CREATE.name);
+    await page.locator('[data-test-key="search-input"]').fill(TEST_EMP.name);
     await page.waitForTimeout(1000);
-    const statusBadge = page.locator('tbody tr').first().locator('text=Inactivo');
-    await expect(statusBadge).toBeVisible({ timeout: 5_000 });
+    await expect(page.locator('tbody tr').first().locator('text=Inactivo')).toBeVisible({ timeout: 5_000 });
   });
 
-  e2e('6. Activate employee back',
-    activateFirstEmployee(getPage));
+  // Activate
+  e2e('9. Activate employee', activateFirstEmployee(getPage));
 
-  e2e('7. Verify status back to Activo', async () => {
+  e2e('10. Verify Activo', async () => {
     const page = getPage();
     await page.reload({ waitUntil: 'networkidle' });
-    const searchInput = page.locator('[data-test-key="search-input"]');
-    await searchInput.fill(EMPLOYEE_CREATE.name);
+    await page.locator('[data-test-key="search-input"]').fill(TEST_EMP.name);
     await page.waitForTimeout(1000);
-    const statusBadge = page.locator('tbody tr').first().locator('text=Activo');
-    await expect(statusBadge).toBeVisible({ timeout: 5_000 });
+    await expect(page.locator('tbody tr').first().locator('text=Activo')).toBeVisible({ timeout: 5_000 });
   });
 
-  e2e('8. Delete employee',
-    deleteFirstEmployee(getPage));
+  // Delete
+  e2e('11. Delete employee', deleteFirstEmployee(getPage));
 
-  e2e('9. Verify employee deleted (count decreased)', async () => {
+  e2e('12. Verify deleted (no error)', async () => {
     const page = getPage();
-    await page.reload({ waitUntil: 'networkidle' });
-    const searchInput = page.locator('[data-test-key="search-input"]');
-    await searchInput.fill(EMPLOYEE_CREATE.name);
     await page.waitForTimeout(1000);
-    // Verify no error toast/alert appeared (delete was successful)
     const errorAlert = page.locator('[class*="bg-red"]').filter({ hasText: 'Error' });
-    const hasError = await errorAlert.isVisible().catch(() => false);
-    expect(hasError).toBe(false);
+    expect(await errorAlert.isVisible().catch(() => false)).toBe(false);
   });
 });
