@@ -91,7 +91,12 @@ e2e/
 │   │   ├── employees-create.spec.ts  ← Crear + buscar + ver (11 tests)
 │   │   ├── employees-edit.spec.ts    ← Editar campos (8 tests)
 │   │   ├── employees-edit-suspend-delete.spec.ts ← Suspend/activate/delete (12 tests)
-│   │   └── employees-login-created.spec.ts ← Login + forcePassword + profile (7 tests)
+│   │   ├── employees-login-created.spec.ts ← Login + forcePassword + profile (7 tests)
+│   │   ├── divisions-all.spec.ts     ← CRUD + manager + filter by division (15 tests)
+│   │   ├── hats-all.spec.ts          ← CRUD + view + edit permissions (17 tests)
+│   │   ├── projects-all.spec.ts      ← CRUD + detail + status filter (15 tests)
+│   │   ├── calendar-all.spec.ts      ← Calendar view + events CRUD (10 tests)
+│   │   └── dashboard.spec.ts         ← Welcome + stats + links (8 tests)
 │   └── validation/                   ← Casos de error y edge cases
 │       ├── login-validation.spec.ts  ← Wrong password, nonexistent, toggle (10 tests)
 │       ├── csw-form-validation.spec.ts ← Campos vacíos, word count, cancel (10 tests)
@@ -149,17 +154,30 @@ e2e/
 | Employees — Validaciones form | 15 | 20 | ✅ |
 | Employees — Anotaciones | 9 | — | ✅ |
 | Employees — Master Lifecycle | — | 21 | ✅ |
+| Divisions — CRUD + Manager + Filter | 19 | 15 | ✅ |
+| Hats — CRUD + Permisos | 17 | 17 | ✅ |
+| Projects — CRUD + Detail + Filter | 22 | 15 | ✅ |
+| Calendar — Vista + Eventos CRUD | 14 | 10 | ✅ |
+| Dashboard — Contenido + Links | 10 | 8 | ✅ |
 | POM Selector Engine (unit) | — | 27 | ✅ |
-| **Total** | **~179** | **218+** | **✅** |
+| **Total** | **244** | **~278** | **✅ ALL PASS** |
 
-### Ejecutar todos los tests de Empleados
+### Ejecutar todos los tests
 
 ```bash
-# Master (lifecycle completo auto-contenido)
-CDP_ENDPOINT=http://localhost:9223 npx playwright test --config=e2e/playwright.config.ts employees-all --reporter=list
+# Todos los módulos (headless)
+npx playwright test --config=e2e/playwright.config.ts --reporter=list
 
-# Todos los specs de empleados individualmente
-CDP_ENDPOINT=http://localhost:9223 npx playwright test --config=e2e/playwright.config.ts employees --reporter=list
+# Todos via CDP
+CDP_ENDPOINT=http://localhost:9223 npx playwright test --config=e2e/playwright.config.ts --reporter=list
+
+# Solo un módulo específico
+npx playwright test --config=e2e/playwright.config.ts employees-all --reporter=list
+npx playwright test --config=e2e/playwright.config.ts divisions-all --reporter=list
+npx playwright test --config=e2e/playwright.config.ts hats-all --reporter=list
+npx playwright test --config=e2e/playwright.config.ts projects-all --reporter=list
+npx playwright test --config=e2e/playwright.config.ts calendar-all --reporter=list
+npx playwright test --config=e2e/playwright.config.ts dashboard --reporter=list
 ```
 
 ## Cadenas de Aprobación
