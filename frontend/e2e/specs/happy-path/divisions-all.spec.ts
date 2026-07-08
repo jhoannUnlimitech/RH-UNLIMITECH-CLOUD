@@ -104,3 +104,51 @@ e2e.describe.serial('Divisions — Full CRUD Lifecycle', () => {
     expect(await error.isVisible().catch(() => false)).toBe(false);
   });
 });
+
+
+// ─── Flow 2: Verify employees filter by division ────────────────────────────
+
+const filterFlow = createSerialFlow();
+
+filterFlow.e2e.describe.serial('Divisions — Filter Employees by Division', () => {
+  filterFlow.e2e('1. Login and navigate to /employees', async () => {
+    const page = filterFlow.getPage();
+    const baseUrl = process.env.BASE_URL || 'http://localhost:5173';
+    await page.context().clearCookies();
+    await page.goto(`${baseUrl}/signin`);
+    await page.waitForSelector('[data-test-context="login-form"][data-test-state="ready"]', { timeout: 15_000 });
+    await page.locator('[data-test-key="email-input"]').fill(LOGIN_MOISES.email);
+    await page.locator('[data-test-key="password-input"]').fill(LOGIN_MOISES.password);
+    await page.locator('[data-test-key="submit-button"]').click();
+    await page.locator('[data-test-context="signin-page"]').waitFor({ state: 'hidden', timeout: 15_000 });
+    await page.goto(`${baseUrl}/employees`);
+    await page.waitForSelector('[data-test-context="employees-list"]', { timeout: 15_000 });
+  });
+
+  filterFlow.e2e('2. Filter by "Infraestructura" division', async () => {
+    const page = filterFlow.getPage();
+    // Click division filter (SearchableSelect)
+    const divFilter = page.locator('[data-test-key="division-filter"]');
+    await divFilter.click();
+    await page.waitForTimeout(400);
+    // Search for Infraestructura
+    const dropdown = page.locator('.absolute.z-50 input[type="text"]');
+    if (await dropdown.last().isVisible()) {
+      await dropdown.last().fill('Infraestructura');
+      await page.waitForTimeout(600);
+    }
+    await page.locator('.absolute.z-50 button').filter({ hasText: 'Infraestructura' }).first().click();
+    await page.waitForTimeout(1500);
+  });
+
+  filterFlow.e2e('3. Verify table shows employees from Infraestructura', async () => {
+    const page = filterFlow.getPage();
+    // Table should have rows (Infraestructura has employees)
+    const rows = page.locator('tbody tr');
+    const count = await rows.count();
+    expect(count).toBeGreaterThan(0);
+    // Verify at least one row contains "Infraestructura"
+    const firstRowText = await rows.first().textContent();
+    expect(firstRowText).toContain('Infraestructura');
+  });
+});
