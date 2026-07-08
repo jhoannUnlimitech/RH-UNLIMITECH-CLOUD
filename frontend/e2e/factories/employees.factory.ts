@@ -220,3 +220,41 @@ export function deleteFirstEmployee(getPage: () => Page) {
     await page.waitForTimeout(1500);
   };
 }
+
+
+// ─── Edit Employee ──────────────────────────────────────────────────────────
+
+export function editFirstEmployee(getPage: () => Page, updates: { phone?: string; name?: string }) {
+  return async () => {
+    const page = getPage();
+    // Click edit on first row
+    const editBtn = page.locator('[data-test-key="edit-button"]').first();
+    await expect(editBtn).toBeVisible({ timeout: 10_000 });
+    await editBtn.click();
+    // Wait for modal with pre-filled data
+    await page.locator('text=Editar Empleado').waitFor({ timeout: 5_000 });
+    await page.waitForTimeout(1000);
+
+    const modal = page.locator('.fixed [class*="max-w"]').last();
+
+    // Update phone if provided
+    if (updates.phone) {
+      const phoneInput = modal.locator('#phone');
+      await phoneInput.clear();
+      await phoneInput.fill(updates.phone);
+    }
+
+    // Update name if provided
+    if (updates.name) {
+      const nameInput = modal.locator('#name');
+      await nameInput.clear();
+      await nameInput.fill(updates.name);
+    }
+
+    // Submit
+    await modal.locator('button[type="submit"]').first().click();
+    await page.waitForTimeout(2000);
+    // Verify back on list
+    await page.waitForSelector('[data-test-context="employees-list"]', { timeout: 10_000 });
+  };
+}

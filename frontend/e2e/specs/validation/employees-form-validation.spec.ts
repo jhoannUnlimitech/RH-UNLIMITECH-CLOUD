@@ -111,3 +111,117 @@ invalidEmail.e2e.describe.serial('Employees Validation — Invalid Email', () =>
     await expect(error.first()).toBeVisible({ timeout: 3_000 });
   });
 });
+
+
+// ─── Flow 4: Duplicate email (backend validation) ───────────────────────────
+
+const duplicateEmail = createSerialFlow();
+
+duplicateEmail.e2e.describe.serial('Employees Validation — Duplicate Email', () => {
+  duplicateEmail.e2e('1. Login and navigate',
+    loginAndNavigateToEmployees(duplicateEmail.getPage, LOGIN_MOISES));
+
+  duplicateEmail.e2e('2. Open create modal',
+    openCreateEmployeeModal(duplicateEmail.getPage));
+
+  duplicateEmail.e2e('3. Fill form with existing email', async () => {
+    const page = duplicateEmail.getPage();
+    const modal = page.locator('.fixed [class*="max-w"]').last();
+    await page.waitForTimeout(1000);
+    await modal.locator('#name').fill('Duplicate Test');
+    // Use an email that already exists in the system
+    await modal.locator('#email').fill('moises@unlimitech.cloud');
+    await modal.locator('#password').fill('ValidPass123!');
+    await modal.locator('#phone').fill('+573001234567');
+    await modal.locator('#nationalId').fill('DUPTEST001');
+
+    // Set birth date via JS (flatpickr)
+    await page.evaluate(() => {
+      const input = document.querySelector('#birthDate') as any;
+      if (input?._flatpickr) input._flatpickr.setDate('1990-01-01', true);
+    });
+
+    // Select nationality
+    const natBtn = modal.locator('#nationality');
+    await natBtn.click();
+    await page.waitForTimeout(400);
+    const dropdown = page.locator('.absolute.z-50 input[type="text"]');
+    if (await dropdown.last().isVisible()) {
+      await dropdown.last().fill('Colombia');
+      await page.waitForTimeout(600);
+    }
+    await page.locator('.absolute.z-50 button').filter({ hasText: 'Colombia' }).first().click();
+    await page.waitForTimeout(300);
+
+    // Select hat
+    const hatBtn = modal.locator('#role');
+    await hatBtn.click();
+    await page.waitForTimeout(400);
+    if (await dropdown.last().isVisible()) {
+      await dropdown.last().fill('DEVELOPER');
+      await page.waitForTimeout(600);
+    }
+    await page.locator('.absolute.z-50 button').filter({ hasText: 'DEVELOPER' }).first().click();
+    await page.waitForTimeout(300);
+
+    // Select division
+    const divBtn = modal.locator('#division');
+    await divBtn.click();
+    await page.waitForTimeout(400);
+    if (await dropdown.last().isVisible()) {
+      await dropdown.last().fill('Infraestructura');
+      await page.waitForTimeout(600);
+    }
+    await page.locator('.absolute.z-50 button').filter({ hasText: 'Infraestructura' }).first().click();
+    await page.waitForTimeout(300);
+  });
+
+  duplicateEmail.e2e('4. Submit and verify duplicate email error', async () => {
+    const page = duplicateEmail.getPage();
+    const modal = page.locator('.fixed [class*="max-w"]').last();
+    await modal.locator('button[type="submit"]').first().click();
+    await page.waitForTimeout(2000);
+    // Backend should return error — check for alert or error message
+    const errorAlert = page.locator('text=ya está registrado').or(page.locator('text=duplicate').or(page.locator('text=ya existe')));
+    await expect(errorAlert.first()).toBeVisible({ timeout: 5_000 });
+  });
+});
+
+// ─── Flow 5: Under 18 years old ─────────────────────────────────────────────
+
+const underAge = createSerialFlow();
+
+underAge.e2e.describe.serial('Employees Validation — Under 18', () => {
+  underAge.e2e('1. Login and navigate',
+    loginAndNavigateToEmployees(underAge.getPage, LOGIN_MOISES));
+
+  underAge.e2e('2. Open create modal',
+    openCreateEmployeeModal(underAge.getPage));
+
+  underAge.e2e('3. Fill form with birth date under 18', async () => {
+    const page = underAge.getPage();
+    const modal = page.locator('.fixed [class*="max-w"]').last();
+    await page.waitForTimeout(1000);
+    await modal.locator('#name').fill('Young Person');
+    await modal.locator('#email').fill('young@test.com');
+    await modal.locator('#password').fill('ValidPass123!');
+    await modal.locator('#phone').fill('+573001111111');
+    await modal.locator('#nationalId').fill('YOUNG001');
+
+    // Set birth date to 2015 (under 18 in 2026)
+    await page.evaluate(() => {
+      const input = document.querySelector('#birthDate') as any;
+      if (input?._flatpickr) input._flatpickr.setDate('2015-01-01', true);
+    });
+  });
+
+  underAge.e2e('4. Submit and verify age error', async () => {
+    const page = underAge.getPage();
+    const modal = page.locator('.fixed [class*="max-w"]').last();
+    await modal.locator('button[type="submit"]').first().click();
+    await page.waitForTimeout(500);
+    // Should show age validation error
+    const error = page.locator('text=mayor de 18').or(page.locator('text=18 años'));
+    await expect(error.first()).toBeVisible({ timeout: 3_000 });
+  });
+});

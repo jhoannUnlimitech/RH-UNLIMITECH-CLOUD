@@ -124,14 +124,14 @@
 |---------|-----|-------|--------|
 | A. Crear Empleado | 11 | `employees-create.spec.ts` (11 tests) | ✅ Pass |
 | B. Ver Empleado | 6 | `employees-create.spec.ts` (view steps) | ✅ Pass |
-| C. Editar Empleado | 8 | ⏳ | ⏳ Pending |
+| C. Editar Empleado | 8 | `employees-edit.spec.ts` (5 tests) | ✅ Pass |
 | D. Suspender | 7 | `employees-edit-suspend-delete.spec.ts` (9 tests) | ✅ Pass |
 | E. Eliminar | 5 | `employees-edit-suspend-delete.spec.ts` | ✅ Pass |
 | F. Búsqueda/Filtros | 6 | `employees-create.spec.ts` (search step) | ✅ Pass |
 | G. Login del creado | 4 | `employees-login-created.spec.ts` (7 tests) | ✅ Pass |
-| H. Validaciones | 15 | ⏳ | ⏳ Pending |
+| H. Validaciones | 15 | `employees-form-validation.spec.ts` (20 tests) | ✅ Pass |
 | I. Anotaciones | 9 | Verified in all specs | ✅ Pass |
-| **Total** | **71** | **27 pass** | **Parcial (56 ACs pass)** |
+| **Total** | **71** | **52 tests** | **✅ All Pass** |
 
 ---
 
