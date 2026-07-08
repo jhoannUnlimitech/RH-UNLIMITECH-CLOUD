@@ -189,7 +189,7 @@ const CalendarPage: React.FC = () => {
       <PageBreadcrumb pageTitle="Calendario" />
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4" data-test-context="calendar-page">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
             Calendario

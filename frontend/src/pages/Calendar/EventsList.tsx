@@ -150,7 +150,7 @@ const EventsList = observer(() => {
   const formatDate = (d: string) => new Date(d).toLocaleDateString("es", { day: "numeric", month: "short", year: "numeric" });
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6" data-test-context="events-list">
       <PageBreadcrumb pageTitle="Lista de Eventos" />
 
       {/* Header */}
