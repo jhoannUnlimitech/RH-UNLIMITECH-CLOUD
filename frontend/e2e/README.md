@@ -86,10 +86,16 @@ e2e/
 │   │   ├── csw-approval-flow.spec.ts ← Flujo 3 niveles + rechazo (30 tests)
 │   │   ├── csw-orden-estudio.spec.ts ← Aprobación directa Oscar (11 tests)
 │   │   ├── csw-create-category.spec.ts ← CRUD categorías (26 tests)
-│   │   └── profile.spec.ts           ← Validación datos perfil (16 tests)
+│   │   ├── profile.spec.ts           ← Validación datos perfil (16 tests)
+│   │   ├── employees-all.spec.ts     ← MASTER: lifecycle completo (21 tests)
+│   │   ├── employees-create.spec.ts  ← Crear + buscar + ver (11 tests)
+│   │   ├── employees-edit.spec.ts    ← Editar campos (8 tests)
+│   │   ├── employees-edit-suspend-delete.spec.ts ← Suspend/activate/delete (12 tests)
+│   │   └── employees-login-created.spec.ts ← Login + forcePassword + profile (7 tests)
 │   └── validation/                   ← Casos de error y edge cases
 │       ├── login-validation.spec.ts  ← Wrong password, nonexistent, toggle (10 tests)
-│       └── csw-form-validation.spec.ts ← Campos vacíos, word count, cancel (10 tests)
+│       ├── csw-form-validation.spec.ts ← Campos vacíos, word count, cancel (10 tests)
+│       └── employees-form-validation.spec.ts ← Empty, short pwd, invalid email, duplicate, under 18 (20 tests)
 │
 ├── playbooks/                        ← Secuencias curadas paso a paso
 │   ├── login-flow.md
@@ -134,8 +140,27 @@ e2e/
 | Profile — Editar info | 7 | 3 | ✅ |
 | Profile — Cambio contraseña | 9 | 2 | ✅ |
 | Profile — Anotaciones | 5 | — | ✅ |
+| Employees — Crear | 11 | 11 | ✅ |
+| Employees — Ver | 6 | 3 | ✅ |
+| Employees — Editar | 8 | 8 | ✅ |
+| Employees — Suspender/Activar | 7 | 12 | ✅ |
+| Employees — Eliminar | 5 | 3 | ✅ |
+| Employees — Login creado | 4 | 7 | ✅ |
+| Employees — Validaciones form | 15 | 20 | ✅ |
+| Employees — Anotaciones | 9 | — | ✅ |
+| Employees — Master Lifecycle | — | 21 | ✅ |
 | POM Selector Engine (unit) | — | 27 | ✅ |
-| **Total** | **87** | **140** | **✅** |
+| **Total** | **~179** | **218+** | **✅** |
+
+### Ejecutar todos los tests de Empleados
+
+```bash
+# Master (lifecycle completo auto-contenido)
+CDP_ENDPOINT=http://localhost:9223 npx playwright test --config=e2e/playwright.config.ts employees-all --reporter=list
+
+# Todos los specs de empleados individualmente
+CDP_ENDPOINT=http://localhost:9223 npx playwright test --config=e2e/playwright.config.ts employees --reporter=list
+```
 
 ## Cadenas de Aprobación
 
