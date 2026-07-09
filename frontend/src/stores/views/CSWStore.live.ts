@@ -86,6 +86,36 @@ export class CSWStoreLive implements ICSWStore {
     }
   }
 
+  async createAndSubmitCSW(data: ICSWStore.CSWInput): Promise<void> {
+    runInAction(() => {
+      this.isLoading = true;
+      this.error = null;
+    });
+
+    try {
+      // 1. Crear el CSW como borrador
+      const newCSW = await cswService.create(data);
+
+      // 2. Enviar inmediatamente para aprobación (inicializa la cadena)
+      const submittedCSW = await cswService.submit(newCSW._id);
+
+      runInAction(() => {
+        this.csws.unshift(submittedCSW);
+      });
+      notify.success('Solicitud CSW creada y enviada para aprobación');
+    } catch (err: any) {
+      runInAction(() => {
+        this.error = err.response?.data?.message || 'Error al crear y enviar solicitud CSW';
+      });
+      notify.error(err.response?.data?.message || 'Error al crear y enviar solicitud CSW');
+      throw err;
+    } finally {
+      runInAction(() => {
+        this.isLoading = false;
+      });
+    }
+  }
+
   async updateCSW(id: string, data: ICSWStore.CSWInput): Promise<void> {
     runInAction(() => {
       this.isLoading = true;

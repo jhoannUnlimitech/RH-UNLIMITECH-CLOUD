@@ -12,6 +12,7 @@ export interface ICSWStore {
   fetchCSWs(): Promise<void>;
   fetchCSWById(id: string): Promise<void>;
   createCSW(data: ICSWStore.CSWInput): Promise<void>;
+  createAndSubmitCSW(data: ICSWStore.CSWInput): Promise<void>;
   updateCSW(id: string, data: ICSWStore.CSWInput): Promise<void>;
   submitCSW(id: string): Promise<void>;
   deleteCSW(id: string): Promise<void>;

@@ -164,7 +164,8 @@ const CSWForm = observer(() => {
       if (isEditing && id) {
         await cswStore.updateCSW(id, submitData);
       } else {
-        await cswStore.createCSW(submitData);
+        // Crear y enviar en un solo paso (inicializa la cadena de aprobación)
+        await cswStore.createAndSubmitCSW(submitData);
       }
 
       // Solo navegar si no hubo error

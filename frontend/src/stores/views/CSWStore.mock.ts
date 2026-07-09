@@ -264,6 +264,11 @@ export class CSWStoreMock implements ICSWStore {
     });
   }
 
+  async createAndSubmitCSW(data: ICSWStore.CSWInput): Promise<void> {
+    // En mock, reutilizamos createCSW (ya crea como pending)
+    await this.createCSW(data);
+  }
+
   async updateCSW(id: string, data: ICSWStore.CSWInput): Promise<void> {
     runInAction(() => {
       this.isLoading = true;
