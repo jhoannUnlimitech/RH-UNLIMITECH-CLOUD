@@ -9,6 +9,8 @@ import {
 } from '../controllers/divisions.controller';
 import { authMiddleware } from '../middleware/auth';
 import { requirePermission } from '../middleware/permission';
+import { validate } from '../middleware/validate';
+import { createDivisionSchema, updateDivisionSchema } from '../validators/division.validator';
 
 const router = Router();
 
@@ -109,7 +111,7 @@ router.get('/:id', requirePermission('divisions', 'read'), getDivisionById);
  *       201:
  *         description: División creada
  */
-router.post('/', requirePermission('divisions', 'create'), createDivision);
+router.post('/', requirePermission('divisions', 'create'), validate(createDivisionSchema), createDivision);
 
 /**
  * @swagger
@@ -144,7 +146,7 @@ router.post('/', requirePermission('divisions', 'create'), createDivision);
  *       200:
  *         description: División actualizada
  */
-router.put('/:id', requirePermission('divisions', 'update'), updateDivision);
+router.put('/:id', requirePermission('divisions', 'update'), validate(updateDivisionSchema), updateDivision);
 
 /**
  * @swagger

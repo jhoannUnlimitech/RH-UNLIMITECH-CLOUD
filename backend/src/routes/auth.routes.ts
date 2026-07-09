@@ -8,6 +8,8 @@ import {
   debugToken
 } from '../controllers/auth.controller';
 import { authMiddleware } from '../middleware/auth';
+import { validate } from '../middleware/validate';
+import { loginSchema } from '../validators/csw.validator';
 
 const router = Router();
 
@@ -154,7 +156,7 @@ router.post('/register', register);
  *       401:
  *         description: Credenciales inválidas
  */
-router.post('/login', login);
+router.post('/login', validate(loginSchema), login);
 
 /**
  * @swagger

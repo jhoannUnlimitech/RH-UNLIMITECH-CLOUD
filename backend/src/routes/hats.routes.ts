@@ -9,6 +9,8 @@ import {
 } from '../controllers/hats.controller';
 import { authMiddleware } from '../middleware/auth';
 import { requirePermission } from '../middleware/permission';
+import { validate } from '../middleware/validate';
+import { createHatSchema, updateHatSchema } from '../validators/hat.validator';
 
 const router = Router();
 
@@ -105,7 +107,7 @@ router.get('/:id', requirePermission('roles', 'read'), getRoleById);
  *       201:
  *         description: Hat creado
  */
-router.post('/', requirePermission('roles', 'create'), createRole);
+router.post('/', requirePermission('roles', 'create'), validate(createHatSchema), createRole);
 
 /**
  * @swagger
@@ -140,7 +142,7 @@ router.post('/', requirePermission('roles', 'create'), createRole);
  *       200:
  *         description: Hat actualizado
  */
-router.put('/:id', requirePermission('roles', 'update'), updateRole);
+router.put('/:id', requirePermission('roles', 'update'), validate(updateHatSchema), updateRole);
 
 /**
  * @swagger

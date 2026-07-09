@@ -35,8 +35,7 @@ export class AuthStoreLive implements IAuthStore {
       
       notify.success(`Bienvenido, ${response.user.name}`);
       
-      // Guardar en localStorage
-      localStorage.setItem('auth_token', response.token);
+      // Cache user data para fallback (NO el token — solo la cookie lo maneja)
       localStorage.setItem('auth_user', JSON.stringify(response.user));
     } catch (err: any) {
       runInAction(() => {
@@ -55,7 +54,6 @@ export class AuthStoreLive implements IAuthStore {
     try {
       await authService.logout();
     } catch (err) {
-      // Ignorar errores al cerrar sesión
       console.error('Error al cerrar sesión:', err);
     } finally {
       runInAction(() => {
@@ -64,8 +62,6 @@ export class AuthStoreLive implements IAuthStore {
         this.isAuthenticated = false;
       });
       
-      // Limpiar localStorage
-      localStorage.removeItem('auth_token');
       localStorage.removeItem('auth_user');
     }
   }
@@ -76,31 +72,24 @@ export class AuthStoreLive implements IAuthStore {
     });
     
     try {
-      const token = localStorage.getItem('auth_token');
+      // Cookie-first: el backend lee la cookie httpOnly directamente
+      const user = await authService.checkAuth();
       
-      if (token) {
-        // Verificar token con backend
-        const user = await authService.checkAuth();
-        
-        runInAction(() => {
-          this.token = token;
-          this.user = user;
-          this.isAuthenticated = true;
-        });
-        
-        // Actualizar localStorage
-        localStorage.setItem('auth_user', JSON.stringify(user));
-      }
+      runInAction(() => {
+        this.user = user;
+        this.isAuthenticated = true;
+      });
+      
+      // Actualizar cache local
+      localStorage.setItem('auth_user', JSON.stringify(user));
     } catch (err) {
-      // Si falla la verificación pero tenemos datos en localStorage, usarlos como fallback
-      const token = localStorage.getItem('auth_token');
+      // Si falla la verificación, intentar cache como fallback
       const cachedUser = localStorage.getItem('auth_user');
       
-      if (token && cachedUser) {
+      if (cachedUser) {
         try {
           const user = JSON.parse(cachedUser);
           runInAction(() => {
-            this.token = token;
             this.user = user;
             this.isAuthenticated = true;
           });
@@ -108,7 +97,11 @@ export class AuthStoreLive implements IAuthStore {
           await this.logout();
         }
       } else {
-        await this.logout();
+        runInAction(() => {
+          this.user = null;
+          this.token = null;
+          this.isAuthenticated = false;
+        });
       }
     } finally {
       runInAction(() => {

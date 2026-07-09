@@ -57,8 +57,8 @@ export namespace IEmployeesStore {
       photo?: string;
     };
     status: 'active' | 'inactive';
-    forcePasswordChange: boolean;
-    approve_csw: boolean;
+    forcePasswordChange?: boolean;
+    approve_csw?: boolean;
     deleted: boolean;
     createdAt: string;
     updatedAt: string;
@@ -97,7 +97,6 @@ export namespace IEmployeesStore {
     status?: 'active' | 'inactive';
     forcePasswordChange?: boolean;
     approve_csw?: boolean;
-    techLeadId?: string;
   }
 
   export interface FetchParams {

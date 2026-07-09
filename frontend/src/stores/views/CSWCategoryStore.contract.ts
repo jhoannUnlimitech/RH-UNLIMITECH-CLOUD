@@ -50,6 +50,7 @@ export namespace ICSWCategoryStore {
     name: string;
     description?: string;
     active?: boolean;
+    order?: number;
     useDefaultFlow?: boolean;
     directApproverId?: string;
   }

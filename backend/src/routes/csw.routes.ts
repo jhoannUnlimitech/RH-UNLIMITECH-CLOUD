@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { authMiddleware } from '../middleware/auth';
 import { requirePermission } from '../middleware/permission';
+import { validate } from '../middleware/validate';
+import { createCSWSchema, updateCSWSchema, rejectSchema } from '../validators/csw.validator';
 import {
   getCSWs,
   getMyPendingApprovals,
@@ -415,6 +417,7 @@ router.post(
   '/',
   authMiddleware,
   requirePermission('csw', 'create'),
+  validate(createCSWSchema),
   createCSW
 );
 
@@ -468,6 +471,7 @@ router.put(
   '/:id',
   authMiddleware,
   requirePermission('csw', 'update'),
+  validate(updateCSWSchema),
   updateCSW
 );
 
@@ -567,6 +571,7 @@ router.post(
   '/:id/reject',
   authMiddleware,
   requirePermission('csw', 'approve'),
+  validate(rejectSchema),
   rejectCSW
 );
 
