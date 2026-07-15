@@ -26,6 +26,7 @@ import EventsList from "./pages/Calendar/EventsList";
 import UserProfile from "./pages/Profile/UserProfile";
 import Library from "./pages/Training/Library";
 import LibraryManage from "./pages/Training/LibraryManage";
+import LibraryCategories from "./pages/Training/LibraryCategories";
 import DocumentView from "./pages/Training/DocumentView";
 import DocumentForm from "./pages/Training/DocumentForm";
 import TrainingManage from "./pages/Training/TrainingManage";
@@ -76,6 +77,7 @@ export default function App() {
           {/* Training Module */}
           <Route path="/library" element={<PermissionRoute resource="training"><Library /></PermissionRoute>} />
           <Route path="/library/manage" element={<PermissionRoute resource="training"><LibraryManage /></PermissionRoute>} />
+          <Route path="/library/categories" element={<PermissionRoute resource="training"><LibraryCategories /></PermissionRoute>} />
           <Route path="/library/documents/new" element={<PermissionRoute resource="training"><DocumentForm /></PermissionRoute>} />
           <Route path="/library/documents/edit/:id" element={<PermissionRoute resource="training"><DocumentForm /></PermissionRoute>} />
           <Route path="/library/documents/:slug" element={<PermissionRoute resource="training"><DocumentView /></PermissionRoute>} />

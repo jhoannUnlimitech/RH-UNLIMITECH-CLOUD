@@ -1,5 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import Switch from "../form/switch/Switch";
+import "react-quill-new/dist/quill.snow.css";
+import "./editor-styles.css";
 
 /**
  * DocumentEditor — Editor dual para contenido de la Biblioteca.
@@ -53,9 +55,9 @@ const DocumentEditor: React.FC<DocumentEditorProps> = ({
     });
   }, []);
 
-  // Inicializar htmlContent desde markdown cuando se carga
+  // Inicializar htmlContent desde markdown cuando se carga o value cambia externamente
   useEffect(() => {
-    if (markedParse && value && !htmlContent) {
+    if (markedParse && value) {
       setHtmlContent(markedParse(value) as string);
     }
   }, [markedParse, value]);

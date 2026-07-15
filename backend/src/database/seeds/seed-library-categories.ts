@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { config } from '../../config/env';
 import { LibraryCategory } from '../../models/training/LibraryCategory';
+import { Employee } from '../../models/Employee';
 
 /**
  * Seed: Categorías base de la Biblioteca
@@ -36,8 +37,7 @@ async function seedLibraryCategories() {
     await mongoose.connect(config.mongodb.uri);
     console.log('   ✅ Conectado a MongoDB\n');
 
-    // Necesitamos un admin como createdBy — buscar el primer empleado admin
-    const Employee = mongoose.model('Employee');
+    // Necesitamos un admin como createdBy
     const admin = await Employee.findOne().sort({ createdAt: 1 });
 
     if (!admin) {
@@ -57,7 +57,7 @@ async function seedLibraryCategories() {
         continue;
       }
 
-      await LibraryCategory.create({
+      const category = new LibraryCategory({
         ...cat,
         isSystem: true,
         active: true,
@@ -66,6 +66,7 @@ async function seedLibraryCategories() {
         documentsCount: 0,
         createdBy: admin._id,
       });
+      await category.save();
 
       console.log(`   ✅ Creada: "${cat.name}" (${cat.icon})`);
       created++;

@@ -69,7 +69,12 @@ class LibraryDocumentService {
   async getAll(filters: DocumentFilters): Promise<{ documents: ILibraryDocument[]; total: number; pages: number }> {
     const query: any = {};
 
-    if (filters.category) query.category = filters.category;
+    // Si se filtra por categoría, incluir también documentos de sub-categorías
+    if (filters.category) {
+      const childCategories = await LibraryCategory.find({ parent: filters.category }).select('_id');
+      const categoryIds = [filters.category, ...childCategories.map(c => c._id.toString())];
+      query.category = { $in: categoryIds };
+    }
     if (filters.type) query.type = filters.type;
     if (filters.published !== undefined) query.published = filters.published;
     if (filters.featured !== undefined) query.featured = filters.featured;

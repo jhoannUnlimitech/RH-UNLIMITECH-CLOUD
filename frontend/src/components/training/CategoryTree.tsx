@@ -1,6 +1,20 @@
 import { useState } from "react";
 import { observer } from "mobx-react-lite";
+import LucideIconByName from "./LucideIcon";
 import type { LibraryCategory } from "../../api/services/library";
+
+/** Calcula total de docs de una categoría + sus hijos recursivamente */
+function getTotalDocs(category: LibraryCategory, allCategories: LibraryCategory[]): number {
+  let total = category.documentsCount || 0;
+  const children = allCategories.filter(c => {
+    const pId = typeof c.parent === 'string' ? c.parent : c.parent?._id;
+    return pId === category._id;
+  });
+  for (const child of children) {
+    total += getTotalDocs(child, allCategories);
+  }
+  return total;
+}
 
 /**
  * CategoryTree — Árbol de categorías navegable con expand/collapse.
@@ -76,16 +90,16 @@ const TreeNode: React.FC<TreeNodeProps> = ({
         )}
 
         {/* Icon */}
-        <span className="text-sm">{category.icon || "📁"}</span>
+        <LucideIconByName name={category.icon} size={16} color={category.color || undefined} />
 
         {/* Name */}
-        <span className="flex-1 truncate text-sm font-medium">
+        <span className="flex-1 text-sm font-medium line-clamp-2 break-words">
           {category.name}
         </span>
 
-        {/* Documents count */}
+        {/* Documents count (includes children) */}
         <span className="text-xs text-gray-400 dark:text-gray-500">
-          {category.documentsCount}
+          {getTotalDocs(category, allCategories)}
         </span>
 
         {/* Admin actions */}
@@ -98,7 +112,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({
                 data-test-key="edit-btn"
                 title="Editar"
               >
-                ✏️
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
               </button>
             )}
             {onDelete && (
@@ -108,7 +122,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({
                 data-test-key="delete-btn"
                 title="Eliminar"
               >
-                🗑️
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
               </button>
             )}
           </div>
@@ -151,8 +165,9 @@ const CategoryTree: React.FC<CategoryTreeProps> = observer(({
   adminMode = false,
   ...props
 }) => {
-  // Obtener categorías raíz (sin parent)
-  const roots = categories
+  // Obtener categorías raíz (sin parent) — solo activas
+  const activeCategories = categories.filter(c => c.active !== false);
+  const roots = activeCategories
     .filter(c => !c.parent)
     .sort((a, b) => a.order - b.order);
 
@@ -170,10 +185,10 @@ const CategoryTree: React.FC<CategoryTreeProps> = observer(({
         <TreeNode
           key={root._id}
           category={root}
-          children={categories.filter(c =>
+          children={activeCategories.filter(c =>
             (typeof c.parent === 'string' ? c.parent : c.parent?._id) === root._id
           )}
-          allCategories={categories}
+          allCategories={activeCategories}
           selectedId={selectedId}
           onSelect={onSelect}
           onEdit={onEdit}

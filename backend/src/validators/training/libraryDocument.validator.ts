@@ -59,7 +59,10 @@ export const updateLibraryDocumentSchema = z.object({
 
   // Contenido
   content: z.string().optional(),
-  externalLink: z.string().url().optional().nullable(),
+  externalLink: z.preprocess(
+    (val) => (val === '' ? undefined : val),
+    z.string().url().optional().nullable()
+  ),
   fileUrl: z.string().optional().nullable(),
   fileName: z.string().max(255).optional().nullable(),
   fileMimeType: z.string().optional().nullable(),

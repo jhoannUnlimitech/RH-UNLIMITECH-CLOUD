@@ -1,4 +1,5 @@
 import type { LibraryDocument } from "../../api/services/library";
+import { FileText, ExternalLink, Paperclip, Package, Star, Eye } from "lucide-react";
 
 /**
  * DocumentCard — Card visual de un documento de la Biblioteca.
@@ -17,11 +18,23 @@ interface DocumentCardProps {
 }
 
 const TYPE_ICONS: Record<string, { icon: string; label: string }> = {
-  article: { icon: "📝", label: "Artículo" },
-  link: { icon: "🔗", label: "Link" },
-  file: { icon: "📎", label: "Archivo" },
-  mixed: { icon: "📦", label: "Mixto" },
+  article: { icon: "file-text", label: "Artículo" },
+  link: { icon: "external-link", label: "Link" },
+  file: { icon: "paperclip", label: "Archivo" },
+  mixed: { icon: "package", label: "Mixto" },
 };
+
+const TYPE_ICON_COMPONENTS: Record<string, React.FC<{ size?: number; className?: string }>> = {
+  article: FileText,
+  link: ExternalLink,
+  file: Paperclip,
+  mixed: Package,
+};
+
+function TypeIcon({ type }: { type: string }) {
+  const Icon = TYPE_ICON_COMPONENTS[type] || FileText;
+  return <Icon size={18} className="text-gray-400" />;
+}
 
 const DocumentCard: React.FC<DocumentCardProps> = ({
   document,
@@ -36,19 +49,19 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
 
   return (
     <div
-      className="group cursor-pointer rounded-xl border border-gray-100 bg-white p-4 transition-all hover:border-brand-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-brand-500/30"
+      className="group cursor-pointer rounded-xl border border-gray-100 bg-white p-3 transition-all hover:border-brand-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-brand-500/30"
       onClick={() => onClick(document)}
       data-test-key={props["data-test-key"] || `doc-${document.slug}`}
     >
       {/* Header: tipo + estado */}
-      <div className="mb-3 flex items-center justify-between">
+      <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-lg">{typeInfo.icon}</span>
+          <TypeIcon type={document.type} />
           <span className="text-xs text-gray-400 dark:text-gray-500">{typeInfo.label}</span>
         </div>
         <div className="flex items-center gap-2">
           {document.featured && (
-            <span className="text-xs text-yellow-500" title="Destacado">⭐</span>
+            <Star size={14} className="fill-yellow-400 text-yellow-400" />
           )}
           <span
             className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
@@ -65,7 +78,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
 
       {/* Título */}
       <h4
-        className="mb-1 text-sm font-semibold text-gray-800 line-clamp-2 group-hover:text-brand-500 dark:text-white dark:group-hover:text-brand-400"
+        className="mb-1 text-sm font-semibold text-gray-800 line-clamp-1 group-hover:text-brand-500 dark:text-white dark:group-hover:text-brand-400"
         data-test-key="doc-title"
       >
         {document.title}
@@ -73,14 +86,14 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
 
       {/* Descripción */}
       {document.description && (
-        <p className="mb-3 text-xs text-gray-500 line-clamp-2 dark:text-gray-400">
+        <p className="mb-2 text-xs text-gray-500 line-clamp-1 dark:text-gray-400">
           {document.description}
         </p>
       )}
 
       {/* Tags */}
       {document.tags.length > 0 && (
-        <div className="mb-3 flex flex-wrap gap-1">
+        <div className="mb-2 flex flex-wrap gap-1">
           {document.tags.slice(0, 3).map((tag) => (
             <span
               key={tag}
@@ -96,11 +109,11 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
       )}
 
       {/* Footer: categoría + vistas + fecha */}
-      <div className="flex items-center justify-between text-[11px] text-gray-400 dark:text-gray-500">
+      <div className="flex items-center justify-between border-t border-gray-50 pt-2 text-[11px] text-gray-400 dark:border-gray-700 dark:text-gray-500">
         <span>{categoryName}</span>
         <div className="flex items-center gap-3">
-          <span>👁 {document.viewCount}</span>
-          <span>{new Date(document.createdAt).toLocaleDateString("es-ES", { day: "numeric", month: "short" })}</span>
+          <span className="flex items-center gap-0.5"><Eye size={11} /> {document.viewCount}</span>
+          <span>{new Date(document.createdAt).toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" })}</span>
         </div>
       </div>
 

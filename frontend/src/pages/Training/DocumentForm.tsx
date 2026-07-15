@@ -29,7 +29,9 @@ const DocumentForm = observer(() => {
     tags: [] as string[],
     visibility: "all" as "all" | "specific_roles" | "specific_divisions",
     published: false,
+    featured: false,
   });
+  const [documentId, setDocumentId] = useState<string>("");
   const [tagInput, setTagInput] = useState("");
   const [changeNote, setChangeNote] = useState("");
 
@@ -39,28 +41,28 @@ const DocumentForm = observer(() => {
 
   useEffect(() => {
     if (isEditing && id) {
-      // Cargar documento para edición
-      libraryStore.fetchDocuments({ _id: id } as any);
-    }
-  }, [id, isEditing]);
-
-  // Cargar datos del documento al editar
-  useEffect(() => {
-    const doc = libraryStore.selectedDocument;
-    if (isEditing && doc) {
-      setFormData({
-        title: doc.title,
-        description: doc.description || "",
-        category: typeof doc.category === 'object' ? doc.category._id : doc.category,
-        type: doc.type,
-        content: doc.content || "",
-        externalLink: doc.externalLink || "",
-        tags: doc.tags || [],
-        visibility: doc.visibility,
-        published: doc.published,
+      // Cargar documento por slug para edición
+      import("../../api/services/library").then(({ libraryService }) => {
+        libraryService.getDocumentBySlug(id).then(doc => {
+          setDocumentId(doc._id);
+          setFormData({
+            title: doc.title,
+            description: doc.description || "",
+            category: typeof doc.category === 'object' ? doc.category._id : doc.category,
+            type: doc.type,
+            content: doc.content || "",
+            externalLink: doc.externalLink || "",
+            tags: doc.tags || [],
+            visibility: doc.visibility,
+            published: doc.published,
+            featured: doc.featured,
+          });
+        }).catch((err) => {
+          console.error("Error cargando documento:", err);
+        });
       });
     }
-  }, [libraryStore.selectedDocument, isEditing]);
+  }, [id, isEditing]);
 
   const handleSubmit = async (publish: boolean) => {
     try {
@@ -70,8 +72,8 @@ const DocumentForm = observer(() => {
         ...(isEditing && changeNote ? { changeNote } : {}),
       };
 
-      if (isEditing && id) {
-        await libraryStore.updateDocument(id, data);
+      if (isEditing && documentId) {
+        await libraryStore.updateDocument(documentId, data);
       } else {
         await libraryStore.createDocument(data);
       }
@@ -142,7 +144,7 @@ const DocumentForm = observer(() => {
                   <option value="">Seleccionar categoría</option>
                   {libraryStore.categories.map(cat => (
                     <option key={cat._id} value={cat._id}>
-                      {cat.icon} {cat.name}
+                      {cat.name}
                     </option>
                   ))}
                 </select>
@@ -156,10 +158,10 @@ const DocumentForm = observer(() => {
                   className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                   data-test-key="type-select"
                 >
-                  <option value="article">📝 Artículo</option>
-                  <option value="link">🔗 Link externo</option>
-                  <option value="file">📎 Archivo</option>
-                  <option value="mixed">📦 Mixto</option>
+                  <option value="article">Artículo</option>
+                  <option value="link">Link externo</option>
+                  <option value="file">Archivo</option>
+                  <option value="mixed">Mixto</option>
                 </select>
               </div>
             </div>
@@ -187,6 +189,22 @@ const DocumentForm = observer(() => {
                 />
                 <Button type="button" size="sm" onClick={addTag} data-test-key="add-tag-btn">+</Button>
               </div>
+            </div>
+
+            {/* Featured toggle */}
+            <div className="flex items-center gap-3" data-test-context="featured-field">
+              <label className="relative inline-flex cursor-pointer items-center">
+                <input
+                  type="checkbox"
+                  checked={formData.featured}
+                  onChange={(e) => setFormData(prev => ({ ...prev, featured: e.target.checked }))}
+                  className="peer sr-only"
+                  data-test-key="featured-toggle"
+                />
+                <div className="peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all peer-checked:bg-brand-500 peer-checked:after:translate-x-full dark:bg-gray-700"></div>
+              </label>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Destacar documento</span>
+              <span className="text-xs text-gray-400">(aparece en la sección de destacados)</span>
             </div>
 
             {/* Link externo (si tipo es link o mixed) */}

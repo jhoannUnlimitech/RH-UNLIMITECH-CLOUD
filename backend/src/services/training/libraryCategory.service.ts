@@ -10,6 +10,16 @@ import { AppError } from '../../middleware/error';
  * llaman a estos métodos sin conocer la lógica interna.
  */
 
+/** Genera un slug URL-friendly a partir de un nombre */
+function generateSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 interface CreateCategoryInput {
   name: string;
   description?: string;
@@ -114,8 +124,24 @@ class LibraryCategoryService {
       data.order = lastSibling ? lastSibling.order + 1 : 0;
     }
 
+    // Generar slug único
+    let slug = generateSlug(data.name);
+    const existingSlug = await LibraryCategory.findOne({ slug }).setOptions({ includeDeleted: true });
+    if (existingSlug) {
+      slug = `${slug}-${Date.now().toString(36).slice(-4)}`;
+    }
+
+    // Calcular depth
+    let depth = 0;
+    if (data.parent) {
+      const parentDoc = await LibraryCategory.findById(data.parent);
+      depth = parentDoc ? parentDoc.depth + 1 : 0;
+    }
+
     const category = new LibraryCategory({
       ...data,
+      slug,
+      depth,
       parent: data.parent || null,
       createdBy,
     });
@@ -169,6 +195,14 @@ class LibraryCategoryService {
     }
 
     await category.save();
+
+    // Si se desactiva una categoría padre, desactivar también sus hijas
+    if (data.active === false) {
+      await LibraryCategory.updateMany(
+        { parent: category._id },
+        { $set: { active: false } }
+      );
+    }
 
     return category.populate('createdBy', 'name');
   }
