@@ -1,7 +1,7 @@
 # Checklist — Phase 1: Biblioteca + Estructura Formativa
 
 **Branch:** `solution/training-phase-1`
-**Estado:** 📋 Pendiente
+**Estado:** ✅ Completada (8 slices de implementación + fixes de UI)
 
 ---
 

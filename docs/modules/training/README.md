@@ -115,7 +115,7 @@ training:report     → Reportar horas de estudio (todos los empleados activos)
 
 | Fase | Contenido | Estado |
 |------|-----------|--------|
-| **1** | Biblioteca + CRUD cursos/niveles/insignias + editor dual | 📋 Pendiente |
+| **1** | Biblioteca + CRUD cursos/niveles/insignias + editor dual | ✅ Completada |
 | **2** | Progreso del empleado + marcar cursos + exámenes (cache+evaluación) | 📋 Pendiente |
 | **3** | Reportes de estudio + tabla de honor + bonificaciones trimestrales | 📋 Pendiente |
 | **4** | Certificados PDF + planes individuales + dashboard encargado | 📋 Pendiente |
