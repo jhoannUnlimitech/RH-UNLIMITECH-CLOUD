@@ -8,7 +8,7 @@
 
 import { expect } from '@playwright/test';
 import { createSerialFlow } from '../../fixtures/base';
-import { navigateToSignIn, fillLogin, submitLogin, verifyDashboard } from '../../factories/login.factory';
+import { navigateToSignIn, fillLoginForm, submitLoginForm, verifyDashboardRedirect } from '../../factories/login.factory';
 import {
   navigateToLibraryManage,
   navigateToLibraryCategories,
@@ -42,9 +42,9 @@ e2e.describe.serial('Library Module — Categories & Documents', () => {
   // ─── Login ──────────────────────────────────────────────────────────────────
   e2e('login as admin (Manuel)', async () => {
     await navigateToSignIn(getPage)();
-    await fillLogin(getPage, LOGIN_MANUEL)();
-    await submitLogin(getPage)();
-    await verifyDashboard(getPage)();
+    await fillLoginForm(getPage, LOGIN_MANUEL)();
+    await submitLoginForm(getPage)();
+    await verifyDashboardRedirect(getPage)();
   });
 
   // ─── Categories Page ────────────────────────────────────────────────────────
