@@ -84,19 +84,19 @@
 ## Slice 05 — Course Model CRUD
 **Rama:** `slice/05-course-model-crud`
 
-- [ ] Modelo `Course` (schema + interface + índices)
-- [ ] Validator Zod: `course.validator.ts`
-- [ ] Service: `courses.service.ts` — create, update, delete, getByLevel, reorder
-- [ ] Validar que el `level` referenciado existe
-- [ ] Validar que `libraryDocument` referenciado existe (si se proporciona)
-- [ ] Actualizar `Level.courses[]` al crear/eliminar curso
-- [ ] Controller + Routes
-- [ ] Endpoint: `GET /api/v1/training/courses`
-- [ ] Endpoint: `GET /api/v1/training/courses/:id`
-- [ ] Endpoint: `POST /api/v1/training/courses`
-- [ ] Endpoint: `PUT /api/v1/training/courses/:id`
-- [ ] Endpoint: `PUT /api/v1/training/courses/reorder`
-- [ ] Endpoint: `DELETE /api/v1/training/courses/:id`
+- [x] Modelo `Course` (schema + interface + índices)
+- [x] Validator Zod: `course.validator.ts`
+- [x] Service: `courses.service.ts` — create, update, delete, getByLevel, reorder
+- [x] Validar que el `level` referenciado existe
+- [x] Validar que `libraryDocument` referenciado existe (si se proporciona)
+- [x] Actualizar `Level.courses[]` al crear/eliminar curso
+- [x] Controller + Routes
+- [x] Endpoint: `GET /api/v1/training/courses`
+- [x] Endpoint: `GET /api/v1/training/courses/:id`
+- [x] Endpoint: `POST /api/v1/training/courses`
+- [x] Endpoint: `PUT /api/v1/training/courses/:id`
+- [x] Endpoint: `PUT /api/v1/training/courses/reorder`
+- [x] Endpoint: `DELETE /api/v1/training/courses/:id`
 
 ---
 

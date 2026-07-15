@@ -11,6 +11,7 @@ import projectsRoutes from './projects.routes';
 import weeklyReportRoutes from './weeklyReport.routes';
 import calendarEventRoutes from './calendarEvent.routes';
 import { libraryRouter } from './training/index';
+import trainingRoutes from './training/index';
 
 const router = Router();
 
@@ -50,7 +51,7 @@ router.use('/calendar/events', calendarEventRoutes);
 // Rutas de la Biblioteca documental (módulo Training)
 router.use('/library', libraryRouter);
 
-// Rutas de capacitaciones (se agregarán después)
-// router.use('/training', trainingRoutes);
+// Rutas del módulo Training (cursos, niveles, insignias)
+router.use('/training', trainingRoutes);
 
 export default router;
