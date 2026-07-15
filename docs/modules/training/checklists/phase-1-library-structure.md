@@ -103,20 +103,20 @@
 ## Slice 06 — Level Model CRUD
 **Rama:** `slice/06-level-model-crud`
 
-- [ ] Modelo `Level` (schema + interface + índices)
-- [ ] Validator Zod: `level.validator.ts`
-- [ ] Service: `levels.service.ts` — create, update, delete, getByBadge, reorder
-- [ ] Validar que `badge` referenciado existe
-- [ ] Validar orden secuencial (D1: no se puede saltar)
-- [ ] Actualizar `Badge.levels[]` al crear/eliminar nivel
-- [ ] Calcular `requiredCoursesCount` (default: todos)
-- [ ] Controller + Routes
-- [ ] Endpoint: `GET /api/v1/training/levels`
-- [ ] Endpoint: `GET /api/v1/training/levels/:id`
-- [ ] Endpoint: `POST /api/v1/training/levels`
-- [ ] Endpoint: `PUT /api/v1/training/levels/:id`
-- [ ] Endpoint: `PUT /api/v1/training/levels/reorder`
-- [ ] Endpoint: `DELETE /api/v1/training/levels/:id`
+- [x] Modelo `Level` (schema + interface + índices)
+- [x] Validator Zod: `level.validator.ts`
+- [x] Service: `levels.service.ts` — create, update, delete, getByBadge, reorder
+- [x] Validar que `badge` referenciado existe
+- [x] Validar orden secuencial (D1: no se puede saltar)
+- [x] Actualizar `Badge.levels[]` al crear/eliminar nivel
+- [x] Calcular `requiredCoursesCount` (default: todos)
+- [x] Controller + Routes
+- [x] Endpoint: `GET /api/v1/training/levels`
+- [x] Endpoint: `GET /api/v1/training/levels/:id`
+- [x] Endpoint: `POST /api/v1/training/levels`
+- [x] Endpoint: `PUT /api/v1/training/levels/:id`
+- [x] Endpoint: `PUT /api/v1/training/levels/reorder`
+- [x] Endpoint: `DELETE /api/v1/training/levels/:id`
 
 ---
 

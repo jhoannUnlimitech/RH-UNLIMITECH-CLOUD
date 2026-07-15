@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import libraryRoutes from './library.routes';
 import coursesRoutes from './courses.routes';
+import levelsRoutes from './levels.routes';
 
 /**
  * Training Module Routes — Barrel
@@ -14,6 +15,7 @@ const router = Router();
 
 // Rutas de Training
 router.use('/courses', coursesRoutes);
+router.use('/levels', levelsRoutes);
 
 // Rutas de la Biblioteca (categorías + documentos)
 // Se montan en /api/v1/library desde el index principal
