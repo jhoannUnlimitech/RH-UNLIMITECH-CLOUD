@@ -8,14 +8,14 @@
 ## Slice 01 — Library Models
 **Rama:** `slice/01-library-models`
 
-- [ ] Modelo `LibraryCategory` (schema + interface + índices)
-- [ ] Modelo `LibraryDocument` (schema + interface + índices)
-- [ ] Modelo `LibraryDocumentVersion` (schema + interface + TTL index)
-- [ ] Validator Zod: `libraryCategory.validator.ts`
-- [ ] Validator Zod: `libraryDocument.validator.ts`
-- [ ] Script seed: crear categorías base (Cursos, Políticas) con `isSystem: true`
-- [ ] BaseModel/softDelete aplicado a los 3 modelos
-- [ ] Sin errores TypeScript
+- [x] Modelo `LibraryCategory` (schema + interface + índices)
+- [x] Modelo `LibraryDocument` (schema + interface + índices)
+- [x] Modelo `LibraryDocumentVersion` (schema + interface + TTL index)
+- [x] Validator Zod: `libraryCategory.validator.ts`
+- [x] Validator Zod: `libraryDocument.validator.ts`
+- [x] Script seed: crear categorías base (Cursos, Políticas) con `isSystem: true`
+- [x] BaseModel/softDelete aplicado a los 3 modelos
+- [x] Sin errores TypeScript
 
 ---
 
