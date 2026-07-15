@@ -164,3 +164,96 @@
 - [x] Migración 006: permisos training + asignación a hats
 - [x] Permission model: agregar 'manage' y 'report' al enum de actions
 - [x] PermissionResource/Action types actualizados en frontend
+
+
+---
+
+## Slice 09 — Testing E2E (Phase 1)
+**Rama:** `slice/09-testing-phase-1`
+
+### Criterios de Aceptación — Biblioteca (Categorías)
+
+- [ ] AC-01: Admin puede ver lista de categorías del sistema (Cursos, Políticas)
+- [ ] AC-02: Admin puede crear nueva categoría con nombre, descripción, ícono, color
+- [ ] AC-03: Admin puede crear sub-categoría dentro de una categoría existente
+- [ ] AC-04: Admin puede editar nombre/descripción/color de una categoría
+- [ ] AC-05: Admin NO puede eliminar categoría del sistema (isSystem)
+- [ ] AC-06: Admin NO puede eliminar categoría con documentos activos
+- [ ] AC-07: Admin puede eliminar categoría vacía (sin docs ni sub-categorías)
+- [ ] AC-08: Admin puede reordenar categorías (drag o flechas)
+- [ ] AC-09: Empleado puede ver categorías y navegar el árbol
+
+### Criterios de Aceptación — Biblioteca (Documentos)
+
+- [ ] AC-10: Admin puede crear documento tipo artículo con contenido Markdown
+- [ ] AC-11: Admin puede crear documento tipo link (URL externa requerida)
+- [ ] AC-12: Admin puede crear documento tipo mixto (contenido + link)
+- [ ] AC-13: Admin puede editar documento (crea nueva versión automáticamente)
+- [ ] AC-14: Admin puede ver historial de versiones de un documento
+- [ ] AC-15: Admin puede restaurar versión anterior de un documento
+- [ ] AC-16: Admin puede publicar/despublicar un documento
+- [ ] AC-17: Admin puede destacar un documento (featured)
+- [ ] AC-18: Admin puede eliminar documento (soft delete)
+- [ ] AC-19: Admin puede agregar tags a un documento
+- [ ] AC-20: Empleado puede buscar documentos por título o tags
+- [ ] AC-21: Empleado puede ver documento publicado con contenido Markdown renderizado
+- [ ] AC-22: Empleado NO puede ver documentos en borrador
+- [ ] AC-23: Vista de documento incrementa contador de vistas
+
+### Criterios de Aceptación — Editor Dual
+
+- [ ] AC-24: El editor visual muestra toolbar (H1-H4, bold, italic, listas, links, código)
+- [ ] AC-25: El switch toggle cambia entre modo visual y modo markdown
+- [ ] AC-26: Al cambiar a markdown se convierte el HTML a MD correctamente
+- [ ] AC-27: Al cambiar a visual se carga el MD en el editor correctamente
+- [ ] AC-28: El modo markdown muestra textarea + preview lado a lado
+- [ ] AC-29: El contenido siempre se guarda como Markdown (verificar en API response)
+
+### Criterios de Aceptación — Cursos
+
+- [ ] AC-30: Admin puede crear curso con nombre, descripción, link, nivel, horas estimadas
+- [ ] AC-31: Admin puede asociar un documento de la biblioteca a un curso
+- [ ] AC-32: Admin puede editar un curso
+- [ ] AC-33: Admin puede eliminar un curso
+- [ ] AC-34: Admin puede reordenar cursos dentro de un nivel
+- [ ] AC-35: Los cursos se listan ordenados por `order` dentro de su nivel
+
+### Criterios de Aceptación — Niveles
+
+- [ ] AC-36: Admin puede crear nivel asociado a una insignia
+- [ ] AC-37: Admin puede editar un nivel
+- [ ] AC-38: Admin puede eliminar un nivel
+- [ ] AC-39: Admin puede reordenar niveles dentro de una insignia
+- [ ] AC-40: Los niveles mantienen orden secuencial estricto
+
+### Criterios de Aceptación — Insignias
+
+- [ ] AC-41: Admin puede crear insignia con nombre, descripción, ícono Lucide, forma, color
+- [ ] AC-42: BadgeIconPicker muestra grid de íconos con búsqueda
+- [ ] AC-43: BadgeShapePicker muestra las 9 formas disponibles
+- [ ] AC-44: Admin puede editar una insignia
+- [ ] AC-45: Admin NO puede eliminar insignia con niveles activos
+- [ ] AC-46: BadgeIcon renderiza correctamente: forma + color (earned) o gris (not earned)
+- [ ] AC-47: BadgeIcon muestra progress ring cuando progress > 0 y < 100
+
+### Criterios de Aceptación — Permisos y Navegación
+
+- [ ] AC-48: La sección "Training" aparece en el sidebar para todos los usuarios
+- [ ] AC-49: Items admin (Gestión, Dashboard) solo visibles con `training:create` o `training:manage`
+- [ ] AC-50: Empleado sin permiso `training:create` NO puede acceder a `/library/manage`
+- [ ] AC-51: La migración 006 crea los 6 permisos correctamente
+- [ ] AC-52: Oscar y Laura tienen todos los permisos de training
+- [ ] AC-53: Empleados regulares solo tienen `training:read` y `training:report`
+
+### Implementación de Tests
+
+- [ ] POM: `e2e/pom/library.pom.ts` (categorías, documentos, editor)
+- [ ] POM: `e2e/pom/training-manage.pom.ts` (cursos, niveles, insignias)
+- [ ] Factory: `e2e/factories/library.factory.ts`
+- [ ] Factory: `e2e/factories/training-manage.factory.ts`
+- [ ] Spec: `e2e/specs/happy-path/library-categories.spec.ts`
+- [ ] Spec: `e2e/specs/happy-path/library-documents.spec.ts`
+- [ ] Spec: `e2e/specs/happy-path/training-courses-levels-badges.spec.ts`
+- [ ] Spec: `e2e/specs/validation/library-permissions.spec.ts`
+- [ ] Results: `e2e/results/library-acceptance-criteria.md`
+- [ ] Results: `e2e/results/training-manage-acceptance-criteria.md`
