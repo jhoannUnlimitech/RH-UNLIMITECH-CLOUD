@@ -1,0 +1,89 @@
+/**
+ * Estilos para el DocumentEditor (react-quill-new)
+ * Importar en el componente o en el CSS global
+ */
+
+/* Quill editor container */
+.ql-container {
+  font-family: inherit;
+  font-size: 0.875rem;
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+}
+
+/* Quill toolbar */
+.ql-toolbar {
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+  background: #f9fafb;
+}
+
+/* Dark mode */
+.dark .ql-toolbar {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.dark .ql-container {
+  border-color: #374151;
+  color: #e5e7eb;
+  background: #111827;
+}
+
+.dark .ql-editor.ql-blank::before {
+  color: #6b7280;
+}
+
+.dark .ql-stroke {
+  stroke: #9ca3af;
+}
+
+.dark .ql-fill {
+  fill: #9ca3af;
+}
+
+.dark .ql-picker-label {
+  color: #9ca3af;
+}
+
+.dark .ql-picker-options {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+/* Editor content area */
+.ql-editor {
+  min-height: 300px;
+  line-height: 1.6;
+}
+
+.ql-editor h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+.ql-editor h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
+.ql-editor h3 { font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem; }
+.ql-editor h4 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+
+.ql-editor blockquote {
+  border-left: 3px solid #3b82f6;
+  padding-left: 1rem;
+  color: #6b7280;
+  margin: 0.5rem 0;
+}
+
+.ql-editor pre {
+  background: #1f2937;
+  color: #e5e7eb;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+}
+
+.ql-editor code {
+  background: #f3f4f6;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.85em;
+}
+
+.dark .ql-editor code {
+  background: #374151;
+}

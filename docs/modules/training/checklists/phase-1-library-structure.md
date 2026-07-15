@@ -69,15 +69,15 @@
 ## Slice 04 — Library Editor Dual
 **Rama:** `slice/04-library-editor-dual`
 
-- [ ] Instalar: `react-quill-new`, `turndown`, `react-markdown`, `remark-gfm`, `marked`
-- [ ] Componente: `DocumentEditor` con props `value` (MD) + `onChange`
-- [ ] Switch toggle: Editor Visual ↔ Markdown
-- [ ] Modo visual: toolbar (headers, bold, italic, listas, links, código, tablas)
-- [ ] Modo markdown: textarea + preview en vivo con react-markdown
-- [ ] Conversión al cambiar modo: visual→MD (turndown), MD→visual (marked)
-- [ ] Al guardar: siempre output Markdown independiente del modo
-- [ ] Componente: `MarkdownRenderer` (para vista de lectura de docs)
-- [ ] Estilos TailwindCSS para el contenido renderizado (prose)
+- [x] Instalar: `react-quill-new`, `turndown`, `react-markdown`, `remark-gfm`, `marked`
+- [x] Componente: `DocumentEditor` con props `value` (MD) + `onChange`
+- [x] Switch toggle: Editor Visual ↔ Markdown
+- [x] Modo visual: toolbar (headers, bold, italic, listas, links, código, tablas)
+- [x] Modo markdown: textarea + preview en vivo con react-markdown
+- [x] Conversión al cambiar modo: visual→MD (turndown), MD→visual (marked)
+- [x] Al guardar: siempre output Markdown independiente del modo
+- [x] Componente: `MarkdownRenderer` (para vista de lectura de docs)
+- [x] Estilos TailwindCSS para el contenido renderizado (prose)
 
 ---
 
