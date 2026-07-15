@@ -146,18 +146,21 @@
 ## Slice 08 — Frontend Library UI
 **Rama:** `slice/08-frontend-library-ui`
 
-- [ ] Store MobX: `LibraryStore.contract.ts` + `LibraryStore.live.ts`
-- [ ] Store MobX: `TrainingStore.contract.ts` + `TrainingStore.live.ts`
-- [ ] API Service: `library.ts` (categorías + documentos)
-- [ ] API Service: `training.ts` (cursos + niveles + insignias)
-- [ ] Página: `/library` — Vista empleado (categorías + docs + buscar)
-- [ ] Página: `/library/manage` — Vista admin (árbol + CRUD docs)
-- [ ] Página: `/library/documents/:slug` — Vista lectura de documento
-- [ ] Página: `/library/documents/new` — Crear documento (editor dual)
-- [ ] Página: `/library/documents/edit/:id` — Editar documento
-- [ ] Página: `/training/courses` — Gestión cursos/niveles/insignias (admin)
-- [ ] Componente: `CategoryTree` (árbol navegable con FolderCard)
-- [ ] Componente: `DocumentCard` (card de documento con tipo/estado)
-- [ ] Sidebar: agregar sección "Training" con sub-items
-- [ ] Permisos: mostrar/ocultar según `training:read`, `training:create`
-- [ ] `data-test-*` annotations en todos los componentes
+- [x] Store MobX: `LibraryStore.contract.ts` + `LibraryStore.live.ts`
+- [x] Store MobX: `TrainingStore.contract.ts` + `TrainingStore.live.ts`
+- [x] API Service: `library.ts` (categorías + documentos)
+- [x] API Service: `training.ts` (cursos + niveles + insignias)
+- [x] Página: `/library` — Vista empleado (categorías + docs + buscar)
+- [x] Página: `/library/manage` — Vista admin (árbol + CRUD docs)
+- [x] Página: `/library/documents/:slug` — Vista lectura de documento
+- [x] Página: `/library/documents/new` — Crear documento (editor dual)
+- [x] Página: `/library/documents/edit/:id` — Editar documento
+- [x] Página: `/training/courses` — Gestión cursos/niveles/insignias (admin)
+- [x] Componente: `CategoryTree` (árbol navegable con FolderCard)
+- [x] Componente: `DocumentCard` (card de documento con tipo/estado)
+- [x] Sidebar: agregar sección "Training" con sub-items
+- [x] Permisos: mostrar/ocultar según `training:read`, `training:create`
+- [x] `data-test-*` annotations en todos los componentes
+- [x] Migración 006: permisos training + asignación a hats
+- [x] Permission model: agregar 'manage' y 'report' al enum de actions
+- [x] PermissionResource/Action types actualizados en frontend

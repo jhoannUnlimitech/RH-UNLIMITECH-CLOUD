@@ -24,6 +24,11 @@ import NotFound from "./pages/Errors/NotFound";
 import CalendarPage from "./pages/Calendar/CalendarPage";
 import EventsList from "./pages/Calendar/EventsList";
 import UserProfile from "./pages/Profile/UserProfile";
+import Library from "./pages/Training/Library";
+import LibraryManage from "./pages/Training/LibraryManage";
+import DocumentView from "./pages/Training/DocumentView";
+import DocumentForm from "./pages/Training/DocumentForm";
+import TrainingManage from "./pages/Training/TrainingManage";
 
 export default function App() {
   // Verificar autenticación al cargar la aplicación
@@ -67,6 +72,19 @@ export default function App() {
           <Route path="/csw/all" element={<PermissionRoute resource="csw"><CSWList /></PermissionRoute>} />
           <Route path="/calendar" element={<CalendarPage />} />
           <Route path="/calendar/events" element={<EventsList />} />
+
+          {/* Training Module */}
+          <Route path="/library" element={<PermissionRoute resource="training"><Library /></PermissionRoute>} />
+          <Route path="/library/manage" element={<PermissionRoute resource="training"><LibraryManage /></PermissionRoute>} />
+          <Route path="/library/documents/new" element={<PermissionRoute resource="training"><DocumentForm /></PermissionRoute>} />
+          <Route path="/library/documents/edit/:id" element={<PermissionRoute resource="training"><DocumentForm /></PermissionRoute>} />
+          <Route path="/library/documents/:slug" element={<PermissionRoute resource="training"><DocumentView /></PermissionRoute>} />
+          <Route path="/training/manage" element={<PermissionRoute resource="training"><TrainingManage /></PermissionRoute>} />
+          <Route path="/training/my-progress" element={<PermissionRoute resource="training"><Library /></PermissionRoute>} />
+          <Route path="/training/report" element={<PermissionRoute resource="training"><Library /></PermissionRoute>} />
+          <Route path="/training/honor-table" element={<PermissionRoute resource="training"><Library /></PermissionRoute>} />
+          <Route path="/training/certificates" element={<PermissionRoute resource="training"><Library /></PermissionRoute>} />
+          <Route path="/training/admin/dashboard" element={<PermissionRoute resource="training"><TrainingManage /></PermissionRoute>} />
         </Route>
 
         {/* 404 */}

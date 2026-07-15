@@ -4,7 +4,7 @@
 
 import { IAuthStore } from '../stores/views/AuthStore.contract';
 
-export type PermissionAction = 'read' | 'create' | 'update' | 'delete' | 'approve' | 'cancel';
+export type PermissionAction = 'read' | 'create' | 'update' | 'delete' | 'approve' | 'cancel' | 'manage' | 'report';
 export type PermissionResource = 
   | 'employees' 
   | 'divisions' 

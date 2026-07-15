@@ -76,6 +76,20 @@ const navItems: NavItem[] = [
     path: "/calendar",
     // Sin resource → visible para todos
   },
+  {
+    name: "Training",
+    icon: <DocsIcon />,
+    subItems: [
+      { name: "Biblioteca", path: "/library", resource: "training" },
+      { name: "Mi Progreso", path: "/training/my-progress", resource: "training" },
+      { name: "Reportar Estudio", path: "/training/report", resource: "training" },
+      { name: "Tabla de Honor", path: "/training/honor-table", resource: "training" },
+      { name: "Mis Certificados", path: "/training/certificates", resource: "training" },
+      { name: "Gestión Contenido", path: "/training/manage", resource: "training", action: "create" },
+      { name: "Gestión Biblioteca", path: "/library/manage", resource: "training", action: "create" },
+      { name: "Dashboard", path: "/training/admin/dashboard", resource: "training", action: "manage" },
+    ],
+  },
 ];
 
 const AppSidebar: React.FC = observer(() => {
