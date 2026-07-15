@@ -123,23 +123,23 @@
 ## Slice 07 — Badge Model CRUD
 **Rama:** `slice/07-badge-model-crud`
 
-- [ ] Modelo `Badge` (schema + interface + `BadgeShape` enum + índices)
-- [ ] Validator Zod: `badge.validator.ts`
-- [ ] Service: `badges.service.ts` — create, update, delete, getAll
-- [ ] Calcular `totalCourses` automáticamente (sum de cursos en niveles)
-- [ ] Instalar: `lucide-react`
-- [ ] Componente: `BadgeIcon` — renderiza shape SVG + ícono Lucide centrado
-- [ ] Props: shape, icon, color, earned, progress, size
-- [ ] 9 shapes SVG: circle, shield, hexagon, star, diamond, pentagon, octagon, badge, medal
-- [ ] Estado: color (earned), gris (not started), parcial con % (in progress)
-- [ ] Componente: `BadgeIconPicker` — selector de ícono Lucide (search + grid)
-- [ ] Componente: `BadgeShapePicker` — selector visual de forma
-- [ ] Controller + Routes
-- [ ] Endpoint: `GET /api/v1/training/badges`
-- [ ] Endpoint: `GET /api/v1/training/badges/:id`
-- [ ] Endpoint: `POST /api/v1/training/badges`
-- [ ] Endpoint: `PUT /api/v1/training/badges/:id`
-- [ ] Endpoint: `DELETE /api/v1/training/badges/:id`
+- [x] Modelo `Badge` (schema + interface + `BadgeShape` enum + índices)
+- [x] Validator Zod: `badge.validator.ts`
+- [x] Service: `badges.service.ts` — create, update, delete, getAll
+- [x] Calcular `totalCourses` automáticamente (sum de cursos en niveles)
+- [x] Instalar: `lucide-react`
+- [x] Componente: `BadgeIcon` — renderiza shape SVG + ícono Lucide centrado
+- [x] Props: shape, icon, color, earned, progress, size
+- [x] 9 shapes SVG: circle, shield, hexagon, star, diamond, pentagon, octagon, badge, medal
+- [x] Estado: color (earned), gris (not started), parcial con % (in progress)
+- [x] Componente: `BadgeIconPicker` — selector de ícono Lucide (search + grid)
+- [x] Componente: `BadgeShapePicker` — selector visual de forma
+- [x] Controller + Routes
+- [x] Endpoint: `GET /api/v1/training/badges`
+- [x] Endpoint: `GET /api/v1/training/badges/:id`
+- [x] Endpoint: `POST /api/v1/training/badges`
+- [x] Endpoint: `PUT /api/v1/training/badges/:id`
+- [x] Endpoint: `DELETE /api/v1/training/badges/:id`
 
 ---
 
