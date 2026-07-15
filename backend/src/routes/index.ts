@@ -10,6 +10,7 @@ import cswRoutes from './csw.routes';
 import projectsRoutes from './projects.routes';
 import weeklyReportRoutes from './weeklyReport.routes';
 import calendarEventRoutes from './calendarEvent.routes';
+import { libraryRouter } from './training/index';
 
 const router = Router();
 
@@ -45,6 +46,9 @@ router.use('/reports/weekly', weeklyReportRoutes);
 
 // Rutas de calendario/eventos
 router.use('/calendar/events', calendarEventRoutes);
+
+// Rutas de la Biblioteca documental (módulo Training)
+router.use('/library', libraryRouter);
 
 // Rutas de capacitaciones (se agregarán después)
 // router.use('/training', trainingRoutes);

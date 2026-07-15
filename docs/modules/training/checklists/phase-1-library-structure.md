@@ -22,20 +22,20 @@
 ## Slice 02 — Library Categories CRUD
 **Rama:** `slice/02-library-categories-crud`
 
-- [ ] Service: `library.service.ts` — createCategory, updateCategory, deleteCategory
-- [ ] Service: getCategories (árbol jerárquico), getCategoryById
-- [ ] Service: reorderCategories (actualizar `order`)
-- [ ] Service: validar que no se elimine categoría con docs activos
-- [ ] Controller: `library.controller.ts` — solo HTTP
-- [ ] Routes: `library.routes.ts` — CRUD categorías
-- [ ] Middleware: `authMiddleware` + `requirePermission('training', 'create')`
-- [ ] Endpoint: `GET /api/v1/library/categories` (árbol o por parent)
-- [ ] Endpoint: `POST /api/v1/library/categories`
-- [ ] Endpoint: `PUT /api/v1/library/categories/:id`
-- [ ] Endpoint: `PUT /api/v1/library/categories/reorder`
-- [ ] Endpoint: `DELETE /api/v1/library/categories/:id`
-- [ ] Calcular `depth` automáticamente al crear sub-categoría
-- [ ] Calcular `documentsCount` al agregar/eliminar docs
+- [x] Service: `library.service.ts` — createCategory, updateCategory, deleteCategory
+- [x] Service: getCategories (árbol jerárquico), getCategoryById
+- [x] Service: reorderCategories (actualizar `order`)
+- [x] Service: validar que no se elimine categoría con docs activos
+- [x] Controller: `library.controller.ts` — solo HTTP
+- [x] Routes: `library.routes.ts` — CRUD categorías
+- [x] Middleware: `authMiddleware` + `requirePermission('training', 'create')`
+- [x] Endpoint: `GET /api/v1/library/categories` (árbol o por parent)
+- [x] Endpoint: `POST /api/v1/library/categories`
+- [x] Endpoint: `PUT /api/v1/library/categories/:id`
+- [x] Endpoint: `PUT /api/v1/library/categories/reorder`
+- [x] Endpoint: `DELETE /api/v1/library/categories/:id`
+- [x] Calcular `depth` automáticamente al crear sub-categoría
+- [x] Calcular `documentsCount` al agregar/eliminar docs
 
 ---
 
