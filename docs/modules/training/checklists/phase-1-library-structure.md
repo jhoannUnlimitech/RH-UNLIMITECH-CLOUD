@@ -42,27 +42,27 @@
 ## Slice 03 — Library Documents CRUD
 **Rama:** `slice/03-library-documents-crud`
 
-- [ ] Service: createDocument (validar categoría existe, generar slug)
-- [ ] Service: updateDocument (crear versión nueva en `LibraryDocumentVersion`)
-- [ ] Service: deleteDocument (soft delete)
-- [ ] Service: getDocuments (filtros: categoría, tipo, tags, publicado)
-- [ ] Service: getDocumentBySlug
-- [ ] Service: getVersionHistory (listar versiones de un doc)
-- [ ] Service: restoreVersion (restaurar versión anterior)
-- [ ] Service: publishDocument / unpublishDocument
-- [ ] Service: incrementViewCount
-- [ ] Controller: endpoints HTTP
-- [ ] Endpoint: `GET /api/v1/library/documents`
-- [ ] Endpoint: `GET /api/v1/library/documents/:slug`
-- [ ] Endpoint: `POST /api/v1/library/documents`
-- [ ] Endpoint: `PUT /api/v1/library/documents/:id`
-- [ ] Endpoint: `PUT /api/v1/library/documents/:id/publish`
-- [ ] Endpoint: `GET /api/v1/library/documents/:id/versions`
-- [ ] Endpoint: `POST /api/v1/library/documents/:id/restore-version/:version`
-- [ ] Endpoint: `DELETE /api/v1/library/documents/:id`
-- [ ] Endpoint: `GET /api/v1/library/search?q=&category=&type=`
-- [ ] Búsqueda por título + tags (D16)
-- [ ] Visibilidad: filtrar por rol/división del usuario actual
+- [x] Service: createDocument (validar categoría existe, generar slug)
+- [x] Service: updateDocument (crear versión nueva en `LibraryDocumentVersion`)
+- [x] Service: deleteDocument (soft delete)
+- [x] Service: getDocuments (filtros: categoría, tipo, tags, publicado)
+- [x] Service: getDocumentBySlug
+- [x] Service: getVersionHistory (listar versiones de un doc)
+- [x] Service: restoreVersion (restaurar versión anterior)
+- [x] Service: publishDocument / unpublishDocument
+- [x] Service: incrementViewCount
+- [x] Controller: endpoints HTTP
+- [x] Endpoint: `GET /api/v1/library/documents`
+- [x] Endpoint: `GET /api/v1/library/documents/:slug`
+- [x] Endpoint: `POST /api/v1/library/documents`
+- [x] Endpoint: `PUT /api/v1/library/documents/:id`
+- [x] Endpoint: `PUT /api/v1/library/documents/:id/publish`
+- [x] Endpoint: `GET /api/v1/library/documents/:id/versions`
+- [x] Endpoint: `POST /api/v1/library/documents/:id/restore-version/:version`
+- [x] Endpoint: `DELETE /api/v1/library/documents/:id`
+- [x] Endpoint: `GET /api/v1/library/search?q=&category=&type=`
+- [x] Búsqueda por título + tags (D16)
+- [x] Visibilidad: filtrar por rol/división del usuario actual
 
 ---
 
