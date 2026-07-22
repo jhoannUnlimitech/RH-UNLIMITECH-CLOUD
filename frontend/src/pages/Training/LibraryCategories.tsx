@@ -64,12 +64,22 @@ const LibraryCategories = observer(() => {
       setDeletingCategory(null);
     } catch (err: any) {
       if (err.conflictData) {
-        // Has documents — ask user if they want to force (deactivate docs)
-        const docs = err.conflictData.documents as { title: string }[];
-        const docList = docs.map((d: any) => `  • ${d.title}`).join('\n');
-        const forceConfirm = confirm(
-          `Esta categoría tiene ${docs.length} documento(s) asociado(s):\n\n${docList}\n\n¿Desea eliminar la categoría de todas formas?\nLos documentos serán despublicados (no eliminados).`
-        );
+        // Tiene sub-categorías y/o documentos — mostrar detalle y pedir force
+        const { subcategories, documents } = err.conflictData;
+        let msg = `Esta categoría tiene dependencias:\n\n`;
+        if (subcategories?.length > 0) {
+          msg += `📁 Sub-categorías (${subcategories.length}):\n`;
+          msg += subcategories.map((c: any) => `  • ${c.name}`).join('\n');
+          msg += '\n\n';
+        }
+        if (documents?.length > 0) {
+          msg += `📄 Documentos (${documents.length}):\n`;
+          msg += documents.map((d: any) => `  • ${d.title}`).join('\n');
+          msg += '\n\n';
+        }
+        msg += `¿Desea eliminar de todas formas?\nLas sub-categorías serán eliminadas y los documentos serán despublicados.`;
+
+        const forceConfirm = confirm(msg);
         if (forceConfirm) {
           try {
             await libraryStore.deleteCategory(deletingCategory._id, true);

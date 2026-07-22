@@ -13,7 +13,10 @@ interface DocumentCardProps {
   onClick: (doc: LibraryDocument) => void;
   onPublish?: (doc: LibraryDocument) => void;
   onDelete?: (doc: LibraryDocument) => void;
+  onRestore?: (doc: LibraryDocument) => void;
+  onHardDelete?: (doc: LibraryDocument) => void;
   adminMode?: boolean;
+  isDeletedView?: boolean;
   "data-test-key"?: string;
 }
 
@@ -41,7 +44,10 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
   onClick,
   onPublish,
   onDelete,
+  onRestore,
+  onHardDelete,
   adminMode = false,
+  isDeletedView = false,
   ...props
 }) => {
   const typeInfo = TYPE_ICONS[document.type] || TYPE_ICONS.article;
@@ -123,23 +129,48 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
           className="mt-3 flex gap-2 border-t border-gray-100 pt-3 opacity-0 transition-opacity group-hover:opacity-100 dark:border-gray-700"
           onClick={(e) => e.stopPropagation()}
         >
-          {onPublish && (
-            <button
-              onClick={() => onPublish(document)}
-              className="text-xs text-brand-500 hover:text-brand-600"
-              data-test-key="publish-btn"
-            >
-              {document.published ? "Despublicar" : "Publicar"}
-            </button>
-          )}
-          {onDelete && (
-            <button
-              onClick={() => onDelete(document)}
-              className="text-xs text-red-500 hover:text-red-600"
-              data-test-key="delete-btn"
-            >
-              Eliminar
-            </button>
+          {isDeletedView ? (
+            <>
+              {onRestore && (
+                <button
+                  onClick={() => onRestore(document)}
+                  className="text-xs text-green-600 hover:text-green-700"
+                  data-test-key="restore-btn"
+                >
+                  Restaurar
+                </button>
+              )}
+              {onHardDelete && (
+                <button
+                  onClick={() => onHardDelete(document)}
+                  className="text-xs text-red-500 hover:text-red-600"
+                  data-test-key="hard-delete-btn"
+                >
+                  Eliminar permanentemente
+                </button>
+              )}
+            </>
+          ) : (
+            <>
+              {onPublish && (
+                <button
+                  onClick={() => onPublish(document)}
+                  className="text-xs text-brand-500 hover:text-brand-600"
+                  data-test-key="publish-btn"
+                >
+                  {document.published ? "Despublicar" : "Publicar"}
+                </button>
+              )}
+              {onDelete && (
+                <button
+                  onClick={() => onDelete(document)}
+                  className="text-xs text-red-500 hover:text-red-600"
+                  data-test-key="delete-btn"
+                >
+                  Eliminar
+                </button>
+              )}
+            </>
           )}
         </div>
       )}

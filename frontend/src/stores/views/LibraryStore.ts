@@ -202,6 +202,28 @@ class LibraryStore {
     }
   }
 
+  async restoreDocument(id: string) {
+    try {
+      await libraryService.restoreDocument(id);
+      runInAction(() => { this.documents = this.documents.filter(d => d._id !== id); });
+      notify.success('Documento restaurado');
+    } catch (err: any) {
+      notify.error(err.response?.data?.message || 'Error al restaurar documento');
+      throw err;
+    }
+  }
+
+  async hardDeleteDocument(id: string) {
+    try {
+      await libraryService.hardDeleteDocument(id);
+      runInAction(() => { this.documents = this.documents.filter(d => d._id !== id); });
+      notify.success('Documento eliminado permanentemente');
+    } catch (err: any) {
+      notify.error(err.response?.data?.message || 'Error al eliminar documento');
+      throw err;
+    }
+  }
+
   async publishDocument(id: string, published: boolean) {
     try {
       const updated = await libraryService.publishDocument(id, published);

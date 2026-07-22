@@ -1,13 +1,14 @@
 # E2E Tests — RH Unlimitech Cloud
 
-Suite de tests end-to-end para la plataforma de gestión de Recursos Humanos. Valida Login, CSW (Solicitudes con flujo de aprobación multi-nivel), Categorías CRUD, y Perfil de usuario.
+Suite de tests end-to-end para la plataforma de gestión de Recursos Humanos. Valida Login, CSW (Solicitudes con flujo de aprobación multi-nivel), Categorías CRUD, Perfil de usuario, Empleados, Divisiones, Hats, Proyectos, Calendario, Dashboard y **Biblioteca (Training Phase 1)**.
 
 ## Requisitos
 
 - Node.js 20+
-- Backend corriendo en puerto 9050 (`npm run dev` en `/backend`)
+- Backend corriendo en puerto 9050 (`npx tsx src/server.ts` en `/backend`)
 - Frontend corriendo en puerto 5173 (`npm run dev` en `/frontend`)
 - Chrome con `--remote-debugging-port=9223` (modo CDP)
+- MongoDB corriendo en puerto 27017
 - Usuario e2e creado (`npm run e2e:seed`)
 
 ## Setup Inicial
@@ -66,8 +67,9 @@ e2e/
 │   ├── states.ts                     ← Vocabulario de estados conocidos
 │   ├── signin.pom.ts                 ← POM: Login page
 │   ├── csw.pom.ts                    ← POM: CSW (list, form, view)
-│   ├── csw-categories.pom.ts        ← POM: CSW Categories (list, modal)
-│   └── profile.pom.ts               ← POM: Profile (header, info, security, modals)
+│   ├── csw-categories.pom.ts         ← POM: CSW Categories (list, modal)
+│   ├── profile.pom.ts                ← POM: Profile (header, info, security, modals)
+│   └── library.pom.ts                ← POM: Library (manage, categories, docs, editor, view)
 │
 ├── fixtures/                         ← Datos y sesión
 │   ├── base.ts                       ← createSerialFlow() — sesión aislada CDP/headless
@@ -77,7 +79,8 @@ e2e/
 │
 ├── factories/                        ← Lógica de interacción reutilizable
 │   ├── login.factory.ts              ← Login: navigate, fill, submit, verify
-│   └── csw.factory.ts                ← CSW: create, approve, reject, verify
+│   ├── csw.factory.ts                ← CSW: create, approve, reject, verify
+│   └── library.factory.ts            ← Library: categories CRUD, docs CRUD, editor, search
 │
 ├── specs/
 │   ├── happy-path/                   ← Flujos completos exitosos
@@ -85,7 +88,7 @@ e2e/
 │   │   ├── csw-create.spec.ts        ← Crear solicitud "Permiso" (5 tests)
 │   │   ├── csw-approval-flow.spec.ts ← Flujo 3 niveles + rechazo (30 tests)
 │   │   ├── csw-orden-estudio.spec.ts ← Aprobación directa Oscar (11 tests)
-│   │   ├── csw-create-category.spec.ts ← CRUD categorías (26 tests)
+│   │   ├── csw-create-category.spec.ts ← CRUD categorías CSW (26 tests)
 │   │   ├── profile.spec.ts           ← Validación datos perfil (16 tests)
 │   │   ├── employees-all.spec.ts     ← MASTER: lifecycle completo (21 tests)
 │   │   ├── employees-create.spec.ts  ← Crear + buscar + ver (11 tests)
@@ -96,11 +99,17 @@ e2e/
 │   │   ├── hats-all.spec.ts          ← CRUD + view + edit permissions (17 tests)
 │   │   ├── projects-all.spec.ts      ← CRUD + detail + status filter (15 tests)
 │   │   ├── calendar-all.spec.ts      ← Calendar view + events CRUD (10 tests)
-│   │   └── dashboard.spec.ts         ← Welcome + stats + links (8 tests)
+│   │   ├── dashboard.spec.ts         ← Welcome + stats + links (8 tests)
+│   │   ├── library-categories.spec.ts ← Categorías CRUD lifecycle (30 tests)
+│   │   ├── library-documents.spec.ts  ← Documentos CRUD lifecycle (21 tests)
+│   │   ├── library-editor.spec.ts     ← Editor dual visual/markdown (11 tests)
+│   │   ├── library-all.spec.ts        ← Vista empleado + doc view + manage + permisos (31 tests)
+│   │   └── library-api-crud.spec.ts   ← API Training courses/levels/badges (14 tests)
 │   └── validation/                   ← Casos de error y edge cases
 │       ├── login-validation.spec.ts  ← Wrong password, nonexistent, toggle (10 tests)
 │       ├── csw-form-validation.spec.ts ← Campos vacíos, word count, cancel (10 tests)
-│       └── employees-form-validation.spec.ts ← Empty, short pwd, invalid email, duplicate, under 18 (20 tests)
+│       ├── employees-form-validation.spec.ts ← Empty, short pwd, invalid email (20 tests)
+│       └── library-permissions.spec.ts ← Permisos admin vs read-only (14 tests)
 │
 ├── playbooks/                        ← Secuencias curadas paso a paso
 │   ├── login-flow.md
@@ -109,7 +118,8 @@ e2e/
 ├── results/                          ← Criterios de aceptación y reportes
 │   ├── acceptance-criteria-checklist.md   ← Login ACs (6 ACs ✅)
 │   ├── csw-acceptance-criteria.md         ← CSW ACs (42 ACs ✅)
-│   └── profile-acceptance-criteria.md     ← Profile ACs (38 ACs ✅)
+│   ├── profile-acceptance-criteria.md     ← Profile ACs (38 ACs ✅)
+│   └── library-acceptance-criteria.md     ← Library ACs (102 ACs ✅)
 │
 ├── playwright.config.ts              ← Configuración Playwright
 └── README.md                         ← Este archivo
@@ -159,8 +169,14 @@ e2e/
 | Projects — CRUD + Detail + Filter | 22 | 15 | ✅ |
 | Calendar — Vista + Eventos CRUD | 14 | 10 | ✅ |
 | Dashboard — Contenido + Links | 10 | 8 | ✅ |
+| **Library — Categorías CRUD + Lifecycle** | **32** | **30** | **✅** |
+| **Library — Documentos CRUD** | **18** | **21** | **✅** |
+| **Library — Editor Dual** | **6** | **11** | **✅** |
+| **Library — Vista Empleado + Doc View + Manage** | **22** | **31** | **✅** |
+| **Library — Permisos y Navegación** | **5** | **14** | **✅** |
+| **Library — API CRUD (Courses/Levels/Badges)** | **12** | **14** | **✅** |
 | POM Selector Engine (unit) | — | 27 | ✅ |
-| **Total** | **244** | **~278** | **✅ ALL PASS** |
+| **Total** | **~346** | **~399** | **✅ ALL PASS** |
 
 ### Ejecutar todos los tests
 
@@ -178,6 +194,17 @@ npx playwright test --config=e2e/playwright.config.ts hats-all --reporter=list
 npx playwright test --config=e2e/playwright.config.ts projects-all --reporter=list
 npx playwright test --config=e2e/playwright.config.ts calendar-all --reporter=list
 npx playwright test --config=e2e/playwright.config.ts dashboard --reporter=list
+
+# Library module (por spec individual)
+CDP_ENDPOINT=http://localhost:9223 npx playwright test --config=e2e/playwright.config.ts library-categories --reporter=list
+CDP_ENDPOINT=http://localhost:9223 npx playwright test --config=e2e/playwright.config.ts library-documents --reporter=list
+CDP_ENDPOINT=http://localhost:9223 npx playwright test --config=e2e/playwright.config.ts library-editor --reporter=list
+CDP_ENDPOINT=http://localhost:9223 npx playwright test --config=e2e/playwright.config.ts library-all --reporter=list
+CDP_ENDPOINT=http://localhost:9223 npx playwright test --config=e2e/playwright.config.ts library-api-crud --reporter=list
+CDP_ENDPOINT=http://localhost:9223 npx playwright test --config=e2e/playwright.config.ts library-permissions --reporter=list
+
+# Library module completo (todos los specs)
+CDP_ENDPOINT=http://localhost:9223 npx playwright test --config=e2e/playwright.config.ts library- --reporter=list
 ```
 
 ## Cadenas de Aprobación
@@ -196,6 +223,16 @@ npx playwright test --config=e2e/playwright.config.ts dashboard --reporter=list
 | 3 | Zod validator rechazaba `directApproverId: ""` con 500 | `z.preprocess` empty → undefined |
 | 4 | Sin toasts en categorías CRUD | `notify.success/error` en store |
 | 5 | Rate limiting restrictivo para dev | 1000/5min global, 50/5min auth |
+| 6 | `externalLink: ""` rechazado por Zod url validator | `z.preprocess` empty → undefined en create schema |
+| 7 | `slug` required fallaba — Mongoose validate antes de pre-save | Mover generación a `pre('validate')` |
+| 8 | Slug unique index bloqueaba con soft-deleted | Partial unique index `{deleted: {$ne: true}}` |
+| 9 | PermissionRoute no verificaba `action` específica | Extendido con prop `action` opcional |
+| 10 | `/library/manage` accesible sin `training:create` | Ruta protegida con `action="create"` |
+| 11 | Delete categoría con hijas bloqueaba en vez de cascada | Cascade: soft-delete hijas + unpublish docs |
+| 12 | Delete documento usaba `confirm()` nativo | Migrado a `DeleteConfirmModal` React |
+| 13 | Sin endpoint hard-delete para documentos | Agregado `DELETE /documents/:id/permanent` |
+| 14 | Sin endpoint restore para documentos | Agregado `POST /documents/:id/restore` |
+| 15 | Sin filtro de estado en gestión de documentos | Agregado select Todos/Publicados/Borradores/Eliminados |
 
 ## Rate Limiting (Development)
 

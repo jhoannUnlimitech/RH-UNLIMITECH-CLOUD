@@ -75,7 +75,6 @@ const LibraryDocumentSchema = new Schema<ILibraryDocument>({
   slug: {
     type: String,
     required: true,
-    unique: true,
     lowercase: true,
     trim: true
   },
@@ -213,11 +212,13 @@ LibraryDocumentSchema.index({ author: 1 });
 LibraryDocumentSchema.index({ published: 1, featured: 1 });
 LibraryDocumentSchema.index({ linkedCourse: 1 });
 LibraryDocumentSchema.index({ deleted: 1 });
+// Slug unique solo para documentos no eliminados (partial index)
+LibraryDocumentSchema.index({ slug: 1 }, { unique: true, partialFilterExpression: { deleted: { $ne: true } } });
 // Índice de texto para búsqueda por título y tags
 LibraryDocumentSchema.index({ title: 'text', tags: 'text' });
 
-// --- Pre-save: generar slug, manejar publishedAt ---
-LibraryDocumentSchema.pre('save', async function () {
+// --- Pre-validate: generar slug antes de validación ---
+LibraryDocumentSchema.pre('validate', async function () {
   // Generar slug si es nuevo o el título cambió
   if (this.isNew || this.isModified('title')) {
     this.slug = this.title
@@ -227,16 +228,20 @@ LibraryDocumentSchema.pre('save', async function () {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
 
-    // Asegurar unicidad del slug
+    // Asegurar unicidad del slug (excluyendo soft-deleted)
     const existing = await mongoose.model('LibraryDocument').findOne({
       slug: this.slug,
-      _id: { $ne: this._id }
+      _id: { $ne: this._id },
+      deleted: { $ne: true },
     });
     if (existing) {
       this.slug = `${this.slug}-${Date.now().toString(36).slice(-4)}`;
     }
   }
+});
 
+// --- Pre-save: manejar publishedAt ---
+LibraryDocumentSchema.pre('save', function () {
   // Setear publishedAt al publicar por primera vez
   if (this.isModified('published') && this.published && !this.publishedAt) {
     this.publishedAt = new Date();

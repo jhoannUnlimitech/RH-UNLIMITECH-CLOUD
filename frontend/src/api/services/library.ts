@@ -151,6 +151,15 @@ class LibraryService {
     await apiClient.delete(`${this.baseURL}/documents/${id}`);
   }
 
+  async restoreDocument(id: string): Promise<LibraryDocument> {
+    const res = await apiClient.post<{ success: boolean; data: LibraryDocument }>(`${this.baseURL}/documents/${id}/restore`);
+    return res.data.data;
+  }
+
+  async hardDeleteDocument(id: string): Promise<void> {
+    await apiClient.delete(`${this.baseURL}/documents/${id}/permanent`);
+  }
+
   async searchDocuments(q: string, filters?: { category?: string; type?: string }): Promise<LibraryDocument[]> {
     const params = new URLSearchParams({ q });
     if (filters?.category) params.append('category', filters.category);

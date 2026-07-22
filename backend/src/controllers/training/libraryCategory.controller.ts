@@ -97,7 +97,8 @@ export const deleteCategory = async (req: AuthRequest, res: Response, next: Next
     res.json({
       success: true,
       message: 'Categoría eliminada exitosamente',
-      deactivatedDocs: result.deactivatedDocs
+      deactivatedDocs: result.deactivatedDocs,
+      deactivatedCategories: result.deactivatedCategories,
     });
   } catch (error) {
     next(error);

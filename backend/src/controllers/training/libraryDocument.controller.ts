@@ -11,7 +11,7 @@ import { libraryDocumentService } from '../../services/training/libraryDocument.
 /** GET /api/v1/library/documents */
 export const getDocuments = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { category, type, published, featured, author, page, limit } = req.query;
+    const { category, type, published, featured, author, page, limit, includeDeleted } = req.query;
 
     const result = await libraryDocumentService.getAll({
       category: category as string,
@@ -21,6 +21,7 @@ export const getDocuments = async (req: AuthRequest, res: Response, next: NextFu
       author: author as string,
       page: page ? Number(page) : undefined,
       limit: limit ? Number(limit) : undefined,
+      includeDeleted: includeDeleted === 'true',
     });
 
     res.json({
@@ -171,6 +172,37 @@ export const deleteDocument = async (req: AuthRequest, res: Response, next: Next
     res.json({
       success: true,
       message: 'Documento eliminado exitosamente'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/** DELETE /api/v1/library/documents/:id/permanent */
+export const hardDeleteDocument = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const id = req.params.id as string;
+    await libraryDocumentService.hardDelete(id);
+
+    res.json({
+      success: true,
+      message: 'Documento eliminado permanentemente'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/** POST /api/v1/library/documents/:id/restore */
+export const restoreDocument = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const id = req.params.id as string;
+    const document = await libraryDocumentService.restore(id);
+
+    res.json({
+      success: true,
+      data: document,
+      message: 'Documento restaurado exitosamente'
     });
   } catch (error) {
     next(error);

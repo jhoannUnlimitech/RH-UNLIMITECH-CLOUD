@@ -4,9 +4,12 @@ import { useNavigate } from "react-router";
 import { Folder, Plus, Search, Star } from "lucide-react";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import Button from "../../components/ui/button/Button";
+import { Modal } from "../../components/ui/modal";
 import Pagination from "../../components/ui/pagination/Pagination";
 import CategoryTree from "../../components/training/CategoryTree";
 import DocumentCard from "../../components/training/DocumentCard";
+import DeleteConfirmModal from "../../components/employees/DeleteConfirmModal";
+import HardDeleteModal from "../../components/ui/modal/HardDeleteModal";
 import LibraryCategoryFormModal from "../../components/training/LibraryCategoryFormModal";
 import { libraryStore } from "../../stores/views/LibraryStore";
 import type { LibraryCategory, LibraryDocument } from "../../api/services/library";
@@ -23,12 +26,24 @@ const LibraryManage = observer(() => {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | undefined>();
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   // Modal de categoría
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<LibraryCategory | null>(null);
+
+  // Modales de documentos
+  const [deleteDocModalOpen, setDeleteDocModalOpen] = useState(false);
+  const [deletingDoc, setDeletingDoc] = useState<LibraryDocument | null>(null);
+  const [isDeletingDoc, setIsDeletingDoc] = useState(false);
+  const [hardDeleteDocModalOpen, setHardDeleteDocModalOpen] = useState(false);
+  const [hardDeletingDoc, setHardDeletingDoc] = useState<LibraryDocument | null>(null);
+  const [isHardDeletingDoc, setIsHardDeletingDoc] = useState(false);
+  const [restoreDocModalOpen, setRestoreDocModalOpen] = useState(false);
+  const [restoringDoc, setRestoringDoc] = useState<LibraryDocument | null>(null);
+  const [isRestoringDoc, setIsRestoringDoc] = useState(false);
 
   useEffect(() => {
     libraryStore.fetchCategories();
@@ -38,8 +53,13 @@ const LibraryManage = observer(() => {
     const filters: Record<string, string> = { page: String(currentPage), limit: "12" };
     if (selectedCategoryId) filters.category = selectedCategoryId;
     if (typeFilter) filters.type = typeFilter;
+    // Filtro por estado
+    if (statusFilter === 'published') filters.published = 'true';
+    else if (statusFilter === 'draft') filters.published = 'false';
+    else if (statusFilter === 'deleted') filters.includeDeleted = 'true';
+    // 'all' = sin filtro de published ni deleted
     libraryStore.fetchDocuments(filters);
-  }, [selectedCategoryId, typeFilter, currentPage]);
+  }, [selectedCategoryId, typeFilter, statusFilter, currentPage]);
 
   // Búsqueda con debounce
   useEffect(() => {
@@ -65,9 +85,51 @@ const LibraryManage = observer(() => {
   };
 
   const handleDeleteDoc = (doc: LibraryDocument) => {
-    if (confirm(`¿Eliminar "${doc.title}"?`)) {
-      libraryStore.deleteDocument(doc._id);
-    }
+    setDeletingDoc(doc);
+    setDeleteDocModalOpen(true);
+  };
+
+  const confirmDeleteDoc = async () => {
+    if (!deletingDoc) return;
+    setIsDeletingDoc(true);
+    try {
+      await libraryStore.deleteDocument(deletingDoc._id);
+      setDeleteDocModalOpen(false);
+      setDeletingDoc(null);
+    } catch { /* toast */ }
+    finally { setIsDeletingDoc(false); }
+  };
+
+  const handleRestoreDoc = (doc: LibraryDocument) => {
+    setRestoringDoc(doc);
+    setRestoreDocModalOpen(true);
+  };
+
+  const confirmRestoreDoc = async () => {
+    if (!restoringDoc) return;
+    setIsRestoringDoc(true);
+    try {
+      await libraryStore.restoreDocument(restoringDoc._id);
+      setRestoreDocModalOpen(false);
+      setRestoringDoc(null);
+    } catch { /* toast */ }
+    finally { setIsRestoringDoc(false); }
+  };
+
+  const handleHardDeleteDoc = (doc: LibraryDocument) => {
+    setHardDeletingDoc(doc);
+    setHardDeleteDocModalOpen(true);
+  };
+
+  const confirmHardDeleteDoc = async () => {
+    if (!hardDeletingDoc) return;
+    setIsHardDeletingDoc(true);
+    try {
+      await libraryStore.hardDeleteDocument(hardDeletingDoc._id);
+      setHardDeleteDocModalOpen(false);
+      setHardDeletingDoc(null);
+    } catch { /* toast */ }
+    finally { setIsHardDeletingDoc(false); }
   };
 
   const handleEditCategory = (cat: LibraryCategory) => {
@@ -75,28 +137,34 @@ const LibraryManage = observer(() => {
     setCategoryModalOpen(true);
   };
 
-  const handleDeleteCategory = (cat: LibraryCategory) => {
-    // Verificar si tiene sub-categorías
-    const children = libraryStore.categories.filter(c => {
-      const pId = typeof c.parent === 'string' ? c.parent : c.parent?._id;
-      return pId === cat._id;
-    });
+  const handleDeleteCategory = async (cat: LibraryCategory) => {
+    if (cat.isSystem) return;
 
-    if (children.length > 0) {
-      const childNames = children.map(c => `  • ${c.name}`).join('\n');
-      alert(
-        `No se puede eliminar "${cat.name}" porque tiene ${children.length} sub-categoría(s):\n\n${childNames}\n\nElimina o reubica las sub-categorías primero.`
-      );
-      return;
-    }
+    // Intento de eliminación — el backend devuelve 409 si tiene dependencias
+    try {
+      await libraryStore.deleteCategory(cat._id);
+    } catch (err: any) {
+      if (err.conflictData) {
+        const { subcategories, documents } = err.conflictData;
+        let msg = `La categoría "${cat.name}" tiene dependencias:\n\n`;
+        if (subcategories?.length > 0) {
+          msg += `📁 Sub-categorías (${subcategories.length}):\n`;
+          msg += subcategories.map((c: any) => `  • ${c.name}`).join('\n');
+          msg += '\n\n';
+        }
+        if (documents?.length > 0) {
+          msg += `📄 Documentos (${documents.length}):\n`;
+          msg += documents.map((d: any) => `  • ${d.title}`).join('\n');
+          msg += '\n\n';
+        }
+        msg += `¿Eliminar de todas formas?\nLas sub-categorías serán eliminadas y los documentos despublicados.`;
 
-    if (cat.documentsCount > 0) {
-      alert(`No se puede eliminar "${cat.name}" porque tiene ${cat.documentsCount} documento(s). Mueve los documentos primero.`);
-      return;
-    }
-
-    if (confirm(`¿Eliminar categoría "${cat.name}"? Esta acción no se puede deshacer.`)) {
-      libraryStore.deleteCategory(cat._id);
+        if (confirm(msg)) {
+          try {
+            await libraryStore.deleteCategory(cat._id, true);
+          } catch { /* toast */ }
+        }
+      }
     }
   };
 
@@ -186,6 +254,19 @@ const LibraryManage = observer(() => {
               <option value="mixed">Mixtos</option>
             </select>
 
+            {/* Filtro por estado */}
+            <select
+              value={statusFilter}
+              onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }}
+              className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+              data-test-key="status-filter"
+            >
+              <option value="all">Todos</option>
+              <option value="published">Publicados</option>
+              <option value="draft">Borradores</option>
+              <option value="deleted">Eliminados</option>
+            </select>
+
             {/* Toggle vista grid/list */}
             <div className="flex rounded-xl border border-gray-200 dark:border-gray-700" data-test-key="view-toggle">
               <button
@@ -241,7 +322,10 @@ const LibraryManage = observer(() => {
                   onClick={handleDocumentClick}
                   onPublish={handlePublish}
                   onDelete={handleDeleteDoc}
+                  onRestore={handleRestoreDoc}
+                  onHardDelete={handleHardDeleteDoc}
                   adminMode={true}
+                  isDeletedView={statusFilter === 'deleted'}
                 />
               ))}
             </div>
@@ -318,6 +402,66 @@ const LibraryManage = observer(() => {
         category={editingCategory}
         parentId={selectedCategoryId}
       />
+
+      {/* Modal confirmar eliminación de documento */}
+      <DeleteConfirmModal
+        isOpen={deleteDocModalOpen}
+        onClose={() => { setDeleteDocModalOpen(false); setDeletingDoc(null); }}
+        onConfirm={confirmDeleteDoc}
+        itemName={deletingDoc?.title || ''}
+        itemType="documento"
+        isLoading={isDeletingDoc}
+      />
+
+      {/* Modal eliminación permanente de documento */}
+      <HardDeleteModal
+        isOpen={hardDeleteDocModalOpen}
+        onClose={() => { setHardDeleteDocModalOpen(false); setHardDeletingDoc(null); }}
+        onConfirm={confirmHardDeleteDoc}
+        itemName={hardDeletingDoc?.title || ''}
+        itemType="documento"
+        isLoading={isHardDeletingDoc}
+      />
+
+      {/* Modal restaurar documento */}
+      <Modal
+        isOpen={restoreDocModalOpen}
+        onClose={() => { setRestoreDocModalOpen(false); setRestoringDoc(null); }}
+        className="relative w-full max-w-[500px] m-5 sm:m-0 rounded-3xl bg-white p-6 lg:p-10 dark:bg-gray-900"
+      >
+        <div className="text-center">
+          <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
+            <svg className="h-7 w-7 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8M21 3v5h-5M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16M3 21v-5h5" />
+            </svg>
+          </div>
+          <h4 className="mb-3 text-xl font-semibold text-gray-800 dark:text-white/90">
+            ¿Restaurar este documento?
+          </h4>
+          <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">
+            El documento volverá a estar disponible como borrador:
+          </p>
+          <p className="mb-6 text-base font-semibold text-gray-900 dark:text-white">
+            "{restoringDoc?.title}"
+          </p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <Button variant="outline" onClick={() => { setRestoreDocModalOpen(false); setRestoringDoc(null); }} disabled={isRestoringDoc}>
+              Cancelar
+            </Button>
+            <button
+              onClick={confirmRestoreDoc}
+              disabled={isRestoringDoc}
+              className="flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-white rounded-lg bg-green-600 hover:bg-green-700 disabled:opacity-50"
+            >
+              {isRestoringDoc ? (
+                <><span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span> Restaurando...</>
+              ) : (
+                'Restaurar'
+              )}
+            </button>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 });

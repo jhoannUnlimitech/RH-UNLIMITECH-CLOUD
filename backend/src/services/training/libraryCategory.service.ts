@@ -217,7 +217,7 @@ class LibraryCategoryService {
    * Eliminar una categoría (soft delete).
    * Si force=true y tiene documentos, los desactiva (unpublish) antes de eliminar.
    */
-  async delete(id: string, force = false): Promise<{ deactivatedDocs: number }> {
+  async delete(id: string, force = false): Promise<{ deactivatedDocs: number; deactivatedCategories: number }> {
     if (!Types.ObjectId.isValid(id)) {
       throw new AppError('ID de categoría no válido', 400);
     }
@@ -231,45 +231,59 @@ class LibraryCategoryService {
       throw new AppError('No se puede eliminar una categoría del sistema', 400);
     }
 
-    // Verificar sub-categorías activas
-    const childrenCount = await LibraryCategory.countDocuments({ parent: id, deleted: { $ne: true } });
-    if (childrenCount > 0) {
-      throw new AppError(
-        `No se puede eliminar. La categoría tiene ${childrenCount} sub-categoría(s) activa(s). Elimina las sub-categorías primero.`,
-        400
-      );
-    }
-
-    // Verificar documentos activos
     const { LibraryDocument } = await import('../../models/training/LibraryDocument');
-    const docsCount = await LibraryDocument.countDocuments({ category: id, deleted: { $ne: true } });
-    
-    if (docsCount > 0 && !force) {
-      // Devolver lista de docs para que el frontend los muestre
-      const docs = await LibraryDocument.find({ category: id, deleted: { $ne: true } }).select('title slug');
+
+    // 1. Recoger sub-categorías descendientes (recursivo)
+    const allChildIds = await this.getAllDescendantIds(id);
+    const allCategoryIds = [id, ...allChildIds];
+
+    // 2. Buscar documentos activos en TODAS las categorías afectadas
+    const affectedDocs = await LibraryDocument.find(
+      { category: { $in: allCategoryIds }, deleted: { $ne: true } }
+    ).select('title slug');
+
+    // 3. Buscar sub-categorías afectadas
+    const affectedChildren = await LibraryCategory.find(
+      { _id: { $in: allChildIds }, deleted: { $ne: true } }
+    ).select('name slug');
+
+    // Si hay dependientes y no es force → devolver preview de afectados (409)
+    if (!force && (affectedChildren.length > 0 || affectedDocs.length > 0)) {
       throw new AppError(
-        JSON.stringify({ 
-          message: `La categoría tiene ${docsCount} documento(s) activo(s)`,
-          documents: docs.map(d => ({ title: d.title, slug: d.slug })),
-          canForce: true
+        JSON.stringify({
+          message: `La categoría "${category.name}" tiene dependencias`,
+          subcategories: affectedChildren.map(c => ({ name: c.name, slug: c.slug })),
+          documents: affectedDocs.map(d => ({ title: d.title, slug: d.slug })),
+          canForce: true,
         }),
-        409 // Conflict — resolvable with force
+        409
       );
     }
 
-    // Si force, desactivar (unpublish) los documentos
+    // 4. Ejecutar cascada: desactivar (unpublish) documentos
     let deactivatedDocs = 0;
-    if (docsCount > 0 && force) {
-      const result = await LibraryDocument.updateMany(
-        { category: id, deleted: { $ne: true } },
+    if (affectedDocs.length > 0) {
+      const docsResult = await LibraryDocument.updateMany(
+        { category: { $in: allCategoryIds }, deleted: { $ne: true }, published: true },
         { $set: { published: false } }
       );
-      deactivatedDocs = result.modifiedCount;
+      deactivatedDocs = docsResult.modifiedCount;
     }
 
+    // 5. Soft-delete sub-categorías
+    let deactivatedCategories = 0;
+    if (allChildIds.length > 0) {
+      const catsResult = await LibraryCategory.updateMany(
+        { _id: { $in: allChildIds } },
+        { $set: { active: false, deleted: true, deletedAt: new Date() } }
+      );
+      deactivatedCategories = catsResult.modifiedCount;
+    }
+
+    // 6. Soft-delete la categoría padre
     category.active = false;
     await category.softDelete();
-    return { deactivatedDocs };
+    return { deactivatedDocs, deactivatedCategories };
   }
 
   /**
@@ -298,6 +312,26 @@ class LibraryCategoryService {
    */
   async decrementDocumentsCount(categoryId: string): Promise<void> {
     await LibraryCategory.findByIdAndUpdate(categoryId, { $inc: { documentsCount: -1 } });
+  }
+
+  /**
+   * Obtener todos los IDs de sub-categorías descendientes (recursivo, BFS).
+   */
+  private async getAllDescendantIds(parentId: string): Promise<string[]> {
+    const result: string[] = [];
+    const queue = [parentId];
+
+    while (queue.length > 0) {
+      const currentId = queue.shift()!;
+      const children = await LibraryCategory.find({ parent: currentId, deleted: { $ne: true } }).select('_id');
+      for (const child of children) {
+        const childId = child._id.toString();
+        result.push(childId);
+        queue.push(childId);
+      }
+    }
+
+    return result;
   }
 
   /**

@@ -35,6 +35,8 @@ import {
   getVersion,
   restoreVersion,
   deleteDocument,
+  hardDeleteDocument,
+  restoreDocument,
   searchDocuments,
 } from '../../controllers/training/libraryDocument.controller';
 
@@ -296,6 +298,30 @@ router.delete(
   authMiddleware,
   requirePermission('training', 'delete'),
   deleteDocument
+);
+
+/**
+ * @route   DELETE /api/v1/library/documents/:id/permanent
+ * @desc    Eliminar documento permanentemente (hard delete, solo desde papelera)
+ * @access  Private (training:delete)
+ */
+router.delete(
+  '/documents/:id/permanent',
+  authMiddleware,
+  requirePermission('training', 'delete'),
+  hardDeleteDocument
+);
+
+/**
+ * @route   POST /api/v1/library/documents/:id/restore
+ * @desc    Restaurar documento eliminado (vuelve como borrador)
+ * @access  Private (training:update)
+ */
+router.post(
+  '/documents/:id/restore',
+  authMiddleware,
+  requirePermission('training', 'update'),
+  restoreDocument
 );
 
 export default router;

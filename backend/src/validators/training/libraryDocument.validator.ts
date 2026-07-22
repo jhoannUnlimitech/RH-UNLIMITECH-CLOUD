@@ -22,9 +22,10 @@ export const createLibraryDocumentSchema = z.object({
 
   // Contenido (según type)
   content: z.string().optional().default(''),
-  externalLink: z.string()
-    .url('El link debe ser una URL válida')
-    .optional(),
+  externalLink: z.preprocess(
+    (val) => (val === '' || val === null ? undefined : val),
+    z.string().url('El link debe ser una URL válida').optional()
+  ),
   fileUrl: z.string().optional(),
   fileName: z.string().max(255).optional(),
   fileMimeType: z.string().optional(),

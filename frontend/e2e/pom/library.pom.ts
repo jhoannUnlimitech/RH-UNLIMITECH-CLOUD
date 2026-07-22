@@ -1,12 +1,29 @@
 import { createPom, context, key } from './selector-engine';
 
 /**
- * POM — Library module (Categorías + Documentos)
+ * POM — Library module (Categorías + Documentos + Vista Empleado)
  *
- * Covers: /library/manage, /library/categories, /library/documents/*
+ * Covers:
+ *   /library           — Vista empleado (featured slider, docs, search, pagination)
+ *   /library/manage    — Admin panel (sidebar, grid/list, filters)
+ *   /library/categories — Categories CRUD (table, filters, pagination, modals)
+ *   /library/documents/new | edit/:slug — Document form (editor dual)
+ *   /library/documents/:slug — Document view (read-only)
  */
 
 export const pom = createPom({
+  // ─── Library Employee Page (/library) ──────────────────────────────
+  library_page: context({
+    search_input: key(),
+    type_filter: key(),
+    featured_section: context({
+      // featured-{slug} keys are dynamic
+    }),
+    documents_list: context({
+      // doc-{slug} keys are dynamic
+    }),
+  }),
+
   // ─── Library Manage Page (/library/manage) ─────────────────────────
   library_manage_page: context({
     categories_sidebar: context({
@@ -44,9 +61,15 @@ export const pom = createPom({
     name_input: key(),
     description_input: key(),
     color_input: key(),
+    icon_picker: context({}),
     parent_select: key(),
     cancel_btn: key(),
     submit_btn: key(),
+  }),
+
+  // ─── Hard Delete Modal ─────────────────────────────────────────────
+  hard_delete_modal: context({
+    confirm_name_input: key(),
   }),
 
   // ─── Document Form Page (/library/documents/new | edit/:slug) ──────
@@ -98,6 +121,7 @@ export const pom = createPom({
 
   // ─── Document View Page (/library/documents/:slug) ─────────────────
   document_view_page: context({
+    back_to_library: key(),
     document_header: context({
       category_badge: key(),
       status_badge: key(),

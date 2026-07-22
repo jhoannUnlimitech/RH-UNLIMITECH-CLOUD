@@ -59,6 +59,7 @@ interface DocumentFilters {
   author?: string;
   page?: number;
   limit?: number;
+  includeDeleted?: boolean;
 }
 
 class LibraryDocumentService {
@@ -86,6 +87,7 @@ class LibraryDocumentService {
 
     const [documents, total] = await Promise.all([
       LibraryDocument.find(query)
+        .setOptions(filters.includeDeleted ? { includeDeleted: true } : {})
         .populate('category', 'name slug icon color')
         .populate('author', 'name email')
         .sort({ order: 1, createdAt: -1 })
@@ -249,6 +251,63 @@ class LibraryDocumentService {
 
     await document.softDelete();
     await libraryCategoryService.decrementDocumentsCount(document.category.toString());
+  }
+
+  /**
+   * Eliminar permanentemente un documento (hard delete).
+   * Solo permite eliminar documentos que ya estén soft-deleted.
+   */
+  async hardDelete(id: string): Promise<void> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new AppError('ID de documento no válido', 400);
+    }
+
+    const document = await LibraryDocument.findById(id).setOptions({ includeDeleted: true });
+    if (!document) {
+      throw new AppError('Documento no encontrado', 404);
+    }
+
+    if (!document.deleted) {
+      throw new AppError('Solo se pueden eliminar permanentemente documentos ya eliminados (papelera)', 400);
+    }
+
+    // Eliminar versiones asociadas
+    const { LibraryDocumentVersion } = await import('../../models/training/LibraryDocumentVersion');
+    await LibraryDocumentVersion.deleteMany({ document: id });
+
+    // Eliminar permanentemente
+    await LibraryDocument.deleteOne({ _id: id });
+  }
+
+  /**
+   * Restaurar un documento soft-deleted (vuelve como borrador no publicado).
+   */
+  async restore(id: string): Promise<ILibraryDocument> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new AppError('ID de documento no válido', 400);
+    }
+
+    const document = await LibraryDocument.findById(id).setOptions({ includeDeleted: true });
+    if (!document) {
+      throw new AppError('Documento no encontrado', 404);
+    }
+
+    if (!document.deleted) {
+      throw new AppError('El documento no está eliminado', 400);
+    }
+
+    document.deleted = false;
+    document.deletedAt = undefined;
+    document.published = false; // Restaurar como borrador
+    await document.save();
+
+    // Incrementar contador de la categoría
+    await libraryCategoryService.incrementDocumentsCount(document.category.toString());
+
+    await document.populate('category', 'name slug icon color');
+    await document.populate('author', 'name email');
+
+    return document;
   }
 
   /**

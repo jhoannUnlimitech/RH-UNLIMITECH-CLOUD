@@ -191,3 +191,116 @@ export const EMPLOYEE_CREATE: EmployeeFormData = {
   division: 'Infraestructura',
   forcePasswordChange: true,
 };
+
+
+// ─── Library (Training Phase 1) ─────────────────────────────────────────────
+
+export interface LibraryCategoryData {
+  name: string;
+  description?: string;
+  icon?: string;
+  parent?: string; // parent name (for selecting in modal)
+}
+
+export interface LibraryDocumentData {
+  title: string;
+  description?: string;
+  type: 'article' | 'link' | 'file' | 'mixed';
+  content?: string;
+  externalLink?: string;
+  tags?: string[];
+  featured?: boolean;
+  category?: string; // category name (for selecting in form)
+}
+
+/** Category to create during E2E — unique prefix avoids collisions */
+export const LIB_CATEGORY: LibraryCategoryData = {
+  name: 'E2E Cat Automated',
+  description: 'Categoría creada por tests E2E automatizados',
+};
+
+/** Sub-category (child of LIB_CATEGORY) */
+export const LIB_SUBCATEGORY: LibraryCategoryData = {
+  name: 'E2E SubCat Child',
+  description: 'Sub-categoría hija para tests',
+  parent: 'E2E Cat Automated',
+};
+
+/** Article document */
+export const LIB_DOC_ARTICLE: LibraryDocumentData = {
+  title: 'E2E Artículo Prueba',
+  description: 'Documento de artículo creado por test automatizado',
+  type: 'article',
+  content: '# Documento E2E\n\nContenido de **prueba** con _formato_ markdown.\n\n## Sección 2\n\n- Item 1\n- Item 2\n- Item 3\n\n```javascript\nconsole.log("hello");\n```',
+  tags: ['e2e', 'test', 'automation'],
+  featured: true,
+};
+
+/** Link document */
+export const LIB_DOC_LINK: LibraryDocumentData = {
+  title: 'E2E Link Externo',
+  description: 'Documento tipo link para validación E2E',
+  type: 'link',
+  externalLink: 'https://playwright.dev/docs/intro',
+  tags: ['e2e', 'link'],
+};
+
+/** Mixed document (content + link) */
+export const LIB_DOC_MIXED: LibraryDocumentData = {
+  title: 'E2E Mixto Completo',
+  description: 'Documento mixto con contenido y link',
+  type: 'mixed',
+  content: '# Recurso Mixto\n\nEste documento tiene contenido y un enlace externo.',
+  externalLink: 'https://example.com/resource',
+  tags: ['e2e', 'mixed'],
+};
+
+/** Draft document (not published) */
+export const LIB_DOC_DRAFT: LibraryDocumentData = {
+  title: 'E2E Borrador Draft',
+  description: 'Este documento no se publica',
+  type: 'article',
+  content: '# Borrador\n\nEsto no debería verse en /library.',
+  tags: ['draft', 'e2e'],
+};
+
+// ─── Training API CRUD Data ─────────────────────────────────────────────────
+
+export interface TrainingCourseData {
+  name: string;
+  description: string;
+  categoryId?: string;
+}
+
+export interface TrainingLevelData {
+  name: string;
+  description: string;
+  order: number;
+}
+
+export interface TrainingBadgeData {
+  name: string;
+  description: string;
+  icon: string;
+  shape?: string;
+  color?: string;
+}
+
+export const TRAINING_COURSE: TrainingCourseData = {
+  name: 'E2E Curso TypeScript Avanzado',
+  description: 'Curso de prueba creado por test automatizado',
+};
+
+export const TRAINING_LEVEL: TrainingLevelData = {
+  name: 'E2E Nivel Básico',
+  description: 'Nivel básico de prueba',
+  order: 1,
+};
+
+export const TRAINING_BADGE: TrainingBadgeData = {
+  name: 'E2E Badge Completado',
+  description: 'Insignia de prueba E2E automatizada',
+  icon: 'trophy',
+  shape: 'hexagon',
+  color: '#F59E0B',
+};
