@@ -1,55 +1,86 @@
 # Checklist — Phase 2: Progreso + Exámenes
 
 **Branch:** `solution/training-phase-2`
-**Estado:** 📋 Pendiente
+**Estado:** � En progreso (Slices 09, 11 completados + refactor permisos)
 
 ---
 
-## Slice 09 — Exam Model CRUD
-**Rama:** `slice/09-exam-model-crud`
+## Slice 09 — Exam Model CRUD ✅
+**Rama:** `solution/training-phase-2` (commit `de6ac95` + `09f26f8`)
 
-- [ ] Modelo `Exam` (schema + interface + `IExamQuestion` + índices)
-- [ ] Campo `expectedAnswer` en preguntas open_text (guía para evaluador D7)
-- [ ] Sin campo `timeLimitMinutes` (D6: sin tiempo límite)
-- [ ] `maxAttempts` default: 1 (D5)
-- [ ] Validator Zod: `exam.validator.ts`
-- [ ] Service: `exams.service.ts` — create, update, delete, getByLevel, assignToEmployee
-- [ ] Validar que opciones de multiple_choice tengan exactamente 1 correcta
-- [ ] Controller + Routes
-- [ ] Endpoint: `GET /api/v1/training/exams`
-- [ ] Endpoint: `GET /api/v1/training/exams/:id` (sin `isCorrect` para empleados)
-- [ ] Endpoint: `POST /api/v1/training/exams`
-- [ ] Endpoint: `PUT /api/v1/training/exams/:id`
-- [ ] Endpoint: `POST /api/v1/training/exams/:id/assign/:employeeId`
-- [ ] Endpoint: `DELETE /api/v1/training/exams/:id`
+- [x] Modelo `Exam` (schema + interface + `IExamQuestion` + índices)
+- [x] Campo `expectedAnswer` en preguntas open_text (guía para evaluador D7)
+- [x] Sin campo `timeLimitMinutes` (D6: sin tiempo límite)
+- [x] `maxAttempts` default: 1 (D5)
+- [x] Campo `assignedTo: ObjectId[]` para asignación a empleados específicos
+- [x] Validator Zod: `exam.validator.ts` (create, update, reorderQuestions)
+- [x] Service: `exams.service.ts` — create, update, delete, getByLevel, assignToEmployee, getMyExams
+- [x] Validar que opciones de multiple_choice tengan exactamente 1 correcta
+- [x] Controller + Routes
+- [x] Endpoint: `GET /api/v1/training/exams` (list, filtros level/active)
+- [x] Endpoint: `GET /api/v1/training/exams/me` (mis exámenes asignados, sin respuestas)
+- [x] Endpoint: `GET /api/v1/training/exams/:id` (sin `isCorrect` para empleados sin manage)
+- [x] Endpoint: `POST /api/v1/training/exams`
+- [x] Endpoint: `PUT /api/v1/training/exams/:id`
+- [x] Endpoint: `PUT /api/v1/training/exams/:id/reorder-questions`
+- [x] Endpoint: `POST /api/v1/training/exams/:id/assign/:employeeId`
+- [x] Endpoint: `DELETE /api/v1/training/exams/:id`
+- [x] Permisos: `training:manage` para CRUD, `training:read` para ver
+
+**Nota:** No hay UI/frontend para exámenes en este slice. La UI del CRUD de exámenes se implementará como parte del TrainingManage (Slice 18) o un slice dedicado.
 
 ---
 
 ## Slice 10 — Exam Questions Reorder
 **Rama:** `slice/10-exam-questions-reorder`
 
-- [ ] Endpoint: `PUT /api/v1/training/exams/:id/reorder-questions`
-- [ ] Body: `{ questions: [{ order: number }] }` (nuevo orden)
-- [ ] Service: validar que todos los orders son consecutivos
+- [x] Endpoint: `PUT /api/v1/training/exams/:id/reorder-questions` (ya en Slice 09)
+- [x] Body: `{ questions: [{ order: number }] }` (nuevo orden)
+- [x] Service: reorderQuestions con validación de cantidad
 - [ ] Frontend: UI de preguntas con react-dnd drag & drop
 - [ ] Flechas ↑↓ como alternativa al drag
 - [ ] Feedback visual al arrastrar
 - [ ] `data-test-*` annotations en cada pregunta reordenable
 
+**Nota:** Backend completado en Slice 09. Frontend pendiente — requiere primero la UI del editor de exámenes.
+
 ---
 
-## Slice 11 — Progress Model + Auto-init
-**Rama:** `slice/11-progress-model-init`
+## Slice 11 — Progress Model + Auto-init ✅
+**Rama:** `solution/training-phase-2` (commit `134c1d9`)
 
-- [ ] Modelo `EmployeeTrainingProgress` (schema + interface + subdocuments)
-- [ ] Campo `active: boolean` (D22: false si empleado inactivo)
-- [ ] Hook: al crear Employee → crear EmployeeTrainingProgress automáticamente (D21)
+- [x] Modelo `EmployeeTrainingProgress` (schema + interface + subdocuments)
+- [x] Campo `active: boolean` (D22: false si empleado inactivo)
+- [x] Hook: al crear Employee → crear EmployeeTrainingProgress automáticamente (D21)
 - [ ] Hook: al suspender Employee → marcar progress `active: false` (D22)
 - [ ] Hook: al reactivar Employee → marcar progress `active: true`
-- [ ] Inicializar con primer badge/nivel disponible como `currentLevel`
-- [ ] Service: `progress.service.ts` — getMyProgress, getProgressByEmployee
-- [ ] Endpoint: `GET /api/v1/training/progress/me`
-- [ ] Endpoint: `GET /api/v1/training/progress/:employeeId`
+- [x] Inicializar con primer badge/nivel disponible como `currentLevel`
+- [x] Service: `progress.service.ts` — getMyProgress, getProgressByEmployee, activate, deactivate
+- [x] Endpoint: `GET /api/v1/training/progress/me`
+- [x] Endpoint: `GET /api/v1/training/progress/:employeeId`
+
+**Pendiente:** Los hooks de suspender/reactivar requieren modificar el Employee controller (employees.controller.ts) para que al cambiar el status del empleado llame a progressService.activate/deactivate.
+
+---
+
+## Refactor: Modelo de Permisos Unificado ✅
+**Commit:** `09f26f8`
+
+Permisos del módulo Training reorganizados:
+
+| Acción | Quién | Ámbito |
+|--------|-------|--------|
+| `read` | Todos | Ver biblioteca, progreso propio, exámenes asignados |
+| `report` | Todos | Reportar horas de estudio |
+| `content` | Gestores contenido | CRUD biblioteca (docs + categorías) |
+| `manage` | Admin Training | CRUD cursos/niveles/badges/exámenes + asignar + evaluar |
+| `delete` | Admin | Eliminación permanente (hard delete) |
+
+- [x] Permission model: action enum extendido con `content`
+- [x] Rutas courses/levels/badges/exams: `manage` para escritura
+- [x] Rutas library: `content` para escritura
+- [x] Frontend: PermissionRoute + Sidebar actualizados
+- [x] Migración: script `add-training-permissions.ts` ejecutado
 
 ---
 
@@ -166,5 +197,8 @@
 - [ ] Página: `/training/assignments` — Mis asignaciones extraordinarias
 - [ ] Página: `/training/admin/evaluations` — Dashboard evaluaciones pendientes
 - [ ] Página: `/training/admin/employee/:id` — Vista progreso de un empleado
+- [ ] Página: `/training/manage` — Tabs completos (Badges + Levels + Courses + Exams CRUD)
 - [ ] ProgressBar componente reutilizado del template
 - [ ] `data-test-*` annotations en todas las páginas
+
+**Nota:** La UI de gestión de exámenes (CRUD admin) se incluirá aquí como un tab dentro de TrainingManage.
