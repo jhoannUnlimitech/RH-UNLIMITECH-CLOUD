@@ -50,6 +50,16 @@ const DocumentView = observer(() => {
     <>
       <PageBreadcrumb pageTitle={doc.title} />
       <div className="mx-auto max-w-4xl" data-test-context="document-view-page">
+        {/* Botón volver */}
+        <button
+          onClick={() => navigate('/library')}
+          className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400"
+          data-test-key="back-to-library"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+          Volver a Biblioteca
+        </button>
+
         <div className="rounded-xl bg-white p-8 shadow-1 dark:bg-gray-dark dark:shadow-card">
           {/* Header */}
           <div className="mb-6 border-b border-gray-200 pb-6 dark:border-gray-700" data-test-context="document-header">

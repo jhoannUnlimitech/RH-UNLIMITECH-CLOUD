@@ -20,6 +20,8 @@ import {
   updateCategory,
   reorderCategories,
   deleteCategory,
+  restoreCategory,
+  hardDeleteCategory,
 } from '../../controllers/training/libraryCategory.controller';
 import {
   getDocuments,
@@ -120,6 +122,30 @@ router.delete(
   authMiddleware,
   requirePermission('training', 'delete'),
   deleteCategory
+);
+
+/**
+ * @route   POST /api/v1/library/categories/:id/restore
+ * @desc    Restaurar categoría eliminada (soft-deleted → active)
+ * @access  Private (training:update)
+ */
+router.post(
+  '/categories/:id/restore',
+  authMiddleware,
+  requirePermission('training', 'update'),
+  restoreCategory
+);
+
+/**
+ * @route   DELETE /api/v1/library/categories/:id/permanent
+ * @desc    Eliminar permanentemente (hard delete, solo desde papelera)
+ * @access  Private (training:delete)
+ */
+router.delete(
+  '/categories/:id/permanent',
+  authMiddleware,
+  requirePermission('training', 'delete'),
+  hardDeleteCategory
 );
 
 // ─── Documentos ────────────────────────────────────────────────────────────────

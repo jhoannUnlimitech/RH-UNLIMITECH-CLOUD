@@ -51,20 +51,26 @@ class LibraryCategoryService {
    * Obtener todas las categorías en estructura de árbol.
    * Devuelve las categorías raíz con sus hijos anidados.
    */
-  async getAll(): Promise<ILibraryCategory[]> {
-    return LibraryCategory.find()
+  async getAll(includeDeleted = false): Promise<ILibraryCategory[]> {
+    const query = LibraryCategory.find()
       .populate('parent', 'name slug')
       .populate('createdBy', 'name')
       .sort({ depth: 1, order: 1 });
+    
+    if (includeDeleted) query.setOptions({ includeDeleted: true });
+    return query;
   }
 
   /**
    * Obtener categorías raíz (depth = 0).
    */
-  async getRoots(): Promise<ILibraryCategory[]> {
-    return LibraryCategory.find({ parent: null })
+  async getRoots(includeDeleted = false): Promise<ILibraryCategory[]> {
+    const query = LibraryCategory.find({ parent: null })
       .populate('createdBy', 'name')
       .sort({ order: 1 });
+    
+    if (includeDeleted) query.setOptions({ includeDeleted: true });
+    return query;
   }
 
   /**
@@ -209,9 +215,9 @@ class LibraryCategoryService {
 
   /**
    * Eliminar una categoría (soft delete).
-   * No permite eliminar categorías del sistema ni con documentos activos.
+   * Si force=true y tiene documentos, los desactiva (unpublish) antes de eliminar.
    */
-  async delete(id: string): Promise<void> {
+  async delete(id: string, force = false): Promise<{ deactivatedDocs: number }> {
     if (!Types.ObjectId.isValid(id)) {
       throw new AppError('ID de categoría no válido', 400);
     }
@@ -225,23 +231,45 @@ class LibraryCategoryService {
       throw new AppError('No se puede eliminar una categoría del sistema', 400);
     }
 
-    if (category.documentsCount > 0) {
-      throw new AppError(
-        `No se puede eliminar. La categoría tiene ${category.documentsCount} documento(s) activo(s)`,
-        400
-      );
-    }
-
-    // Verificar que no tenga sub-categorías activas
-    const childrenCount = await LibraryCategory.countDocuments({ parent: id });
+    // Verificar sub-categorías activas
+    const childrenCount = await LibraryCategory.countDocuments({ parent: id, deleted: { $ne: true } });
     if (childrenCount > 0) {
       throw new AppError(
-        `No se puede eliminar. La categoría tiene ${childrenCount} sub-categoría(s)`,
+        `No se puede eliminar. La categoría tiene ${childrenCount} sub-categoría(s) activa(s). Elimina las sub-categorías primero.`,
         400
       );
     }
 
+    // Verificar documentos activos
+    const { LibraryDocument } = await import('../../models/training/LibraryDocument');
+    const docsCount = await LibraryDocument.countDocuments({ category: id, deleted: { $ne: true } });
+    
+    if (docsCount > 0 && !force) {
+      // Devolver lista de docs para que el frontend los muestre
+      const docs = await LibraryDocument.find({ category: id, deleted: { $ne: true } }).select('title slug');
+      throw new AppError(
+        JSON.stringify({ 
+          message: `La categoría tiene ${docsCount} documento(s) activo(s)`,
+          documents: docs.map(d => ({ title: d.title, slug: d.slug })),
+          canForce: true
+        }),
+        409 // Conflict — resolvable with force
+      );
+    }
+
+    // Si force, desactivar (unpublish) los documentos
+    let deactivatedDocs = 0;
+    if (docsCount > 0 && force) {
+      const result = await LibraryDocument.updateMany(
+        { category: id, deleted: { $ne: true } },
+        { $set: { published: false } }
+      );
+      deactivatedDocs = result.modifiedCount;
+    }
+
+    category.active = false;
     await category.softDelete();
+    return { deactivatedDocs };
   }
 
   /**
@@ -289,6 +317,65 @@ class LibraryCategoryService {
     }
 
     return false;
+  }
+
+  /**
+   * Restaurar una categoría eliminada (soft-deleted → active).
+   */
+  async restore(id: string): Promise<ILibraryCategory> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new AppError('ID de categoría no válido', 400);
+    }
+
+    const category = await LibraryCategory.findById(id).setOptions({ includeDeleted: true });
+    if (!category) {
+      throw new AppError('Categoría no encontrada', 404);
+    }
+
+    if (!category.deleted) {
+      throw new AppError('La categoría no está eliminada', 400);
+    }
+
+    category.deleted = false;
+    category.deletedAt = undefined;
+    category.active = true;
+    await category.save();
+
+    return category;
+  }
+
+  /**
+   * Eliminar permanentemente (hard delete) una categoría.
+   * Solo funciona con categorías que ya están soft-deleted.
+   */
+  async hardDelete(id: string): Promise<void> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new AppError('ID de categoría no válido', 400);
+    }
+
+    const category = await LibraryCategory.findById(id).setOptions({ includeDeleted: true });
+    if (!category) {
+      throw new AppError('Categoría no encontrada', 404);
+    }
+
+    if (!category.deleted) {
+      throw new AppError('Solo se pueden eliminar permanentemente categorías que ya están en la papelera', 400);
+    }
+
+    if (category.isSystem) {
+      throw new AppError('No se puede eliminar permanentemente una categoría del sistema', 400);
+    }
+
+    const { LibraryDocument } = await import('../../models/training/LibraryDocument');
+    const docsCount = await LibraryDocument.countDocuments({ category: id });
+    if (docsCount > 0) {
+      throw new AppError(
+        `No se puede eliminar permanentemente. Aún tiene ${docsCount} documento(s) asociado(s).`,
+        400
+      );
+    }
+
+    await LibraryCategory.deleteOne({ _id: id });
   }
 }
 

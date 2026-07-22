@@ -207,7 +207,6 @@ const LibraryDocumentSchema = new Schema<ILibraryDocument>({
 });
 
 // --- Índices ---
-LibraryDocumentSchema.index({ slug: 1 }, { unique: true });
 LibraryDocumentSchema.index({ category: 1, order: 1, published: 1 });
 LibraryDocumentSchema.index({ tags: 1 });
 LibraryDocumentSchema.index({ author: 1 });

@@ -61,9 +61,9 @@ class LibraryService {
 
   // --- Categorías ---
 
-  async getCategories(parent?: string): Promise<LibraryCategory[]> {
-    const params = parent ? `?parent=${parent}` : '';
-    const res = await apiClient.get<{ success: boolean; data: LibraryCategory[] }>(`${this.baseURL}/categories${params}`);
+  async getCategories(params?: string): Promise<LibraryCategory[]> {
+    const query = params ? `?${params}` : '';
+    const res = await apiClient.get<{ success: boolean; data: LibraryCategory[] }>(`${this.baseURL}/categories${query}`);
     return res.data.data;
   }
 
@@ -86,8 +86,18 @@ class LibraryService {
     await apiClient.put(`${this.baseURL}/categories/reorder`, { categories });
   }
 
-  async deleteCategory(id: string): Promise<void> {
-    await apiClient.delete(`${this.baseURL}/categories/${id}`);
+  async deleteCategory(id: string, force = false): Promise<void> {
+    const params = force ? '?force=true' : '';
+    await apiClient.delete(`${this.baseURL}/categories/${id}${params}`);
+  }
+
+  async restoreCategory(id: string): Promise<LibraryCategory> {
+    const res = await apiClient.post<{ success: boolean; data: LibraryCategory }>(`${this.baseURL}/categories/${id}/restore`);
+    return res.data.data;
+  }
+
+  async hardDeleteCategory(id: string): Promise<void> {
+    await apiClient.delete(`${this.baseURL}/categories/${id}/permanent`);
   }
 
   // --- Documentos ---

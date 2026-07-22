@@ -118,7 +118,6 @@ const LibraryCategorySchema = new Schema<ILibraryCategory>({
 });
 
 // --- Índices ---
-LibraryCategorySchema.index({ slug: 1 }, { unique: true });
 LibraryCategorySchema.index({ parent: 1, order: 1 });
 LibraryCategorySchema.index({ depth: 1, active: 1 });
 LibraryCategorySchema.index({ deleted: 1 });

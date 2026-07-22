@@ -4,8 +4,11 @@ import { useNavigate } from "react-router";
 import { Plus, Edit2, Trash2, Eye, EyeOff, Search } from "lucide-react";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import Button from "../../components/ui/button/Button";
+import { Modal } from "../../components/ui/modal";
 import Pagination from "../../components/ui/pagination/Pagination";
 import TableSkeleton from "../../components/ui/skeleton/TableSkeleton";
+import DeleteConfirmModal from "../../components/employees/DeleteConfirmModal";
+import HardDeleteModal from "../../components/ui/modal/HardDeleteModal";
 import LucideIconByName from "../../components/training/LucideIcon";
 import LibraryCategoryFormModal from "../../components/training/LibraryCategoryFormModal";
 import { libraryStore } from "../../stores/views/LibraryStore";
@@ -26,10 +29,20 @@ const LibraryCategories = observer(() => {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deletingCategory, setDeletingCategory] = useState<LibraryCategory | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [hardDeleteModalOpen, setHardDeleteModalOpen] = useState(false);
+  const [hardDeletingCategory, setHardDeletingCategory] = useState<LibraryCategory | null>(null);
+  const [isHardDeleting, setIsHardDeleting] = useState(false);
+  const [restoreModalOpen, setRestoreModalOpen] = useState(false);
+  const [restoringCategory, setRestoringCategory] = useState<LibraryCategory | null>(null);
+  const [isRestoring, setIsRestoring] = useState(false);
 
   useEffect(() => {
-    libraryStore.fetchCategories();
-  }, []);
+    // Fetch with includeDeleted when "deleted" filter is active
+    libraryStore.fetchCategories(undefined, statusFilter === 'deleted');
+  }, [statusFilter]);
 
   const handleEdit = (cat: LibraryCategory) => {
     setEditingCategory(cat);
@@ -38,43 +51,80 @@ const LibraryCategories = observer(() => {
 
   const handleDelete = async (cat: LibraryCategory) => {
     if (cat.isSystem) return;
+    setDeletingCategory(cat);
+    setDeleteModalOpen(true);
+  };
 
-    // Verificar si tiene sub-categorías
-    const children = libraryStore.categories.filter(c => {
-      const pId = typeof c.parent === 'string' ? c.parent : c.parent?._id;
-      return pId === cat._id;
-    });
-
-    if (children.length > 0) {
-      const childNames = children.map(c => `  • ${c.name}`).join('\n');
-      alert(
-        `No se puede eliminar "${cat.name}" porque tiene ${children.length} sub-categoría(s) asociadas:\n\n${childNames}\n\nDebes eliminar o reubicar las sub-categorías primero.`
-      );
-      return;
-    }
-
-    if (cat.documentsCount > 0) {
-      alert(
-        `No se puede eliminar "${cat.name}" porque tiene ${cat.documentsCount} documento(s) asociados.\n\nDebes eliminar o mover los documentos a otra categoría primero.`
-      );
-      return;
-    }
-
-    const confirmed = confirm(
-      `¿Estás seguro de eliminar la categoría "${cat.name}"?\n\nEsta acción no se puede deshacer.`
-    );
-    if (confirmed) {
-      await libraryStore.deleteCategory(cat._id);
+  const confirmDelete = async () => {
+    if (!deletingCategory) return;
+    setIsDeleting(true);
+    try {
+      await libraryStore.deleteCategory(deletingCategory._id);
+      setDeleteModalOpen(false);
+      setDeletingCategory(null);
+    } catch (err: any) {
+      if (err.conflictData) {
+        // Has documents — ask user if they want to force (deactivate docs)
+        const docs = err.conflictData.documents as { title: string }[];
+        const docList = docs.map((d: any) => `  • ${d.title}`).join('\n');
+        const forceConfirm = confirm(
+          `Esta categoría tiene ${docs.length} documento(s) asociado(s):\n\n${docList}\n\n¿Desea eliminar la categoría de todas formas?\nLos documentos serán despublicados (no eliminados).`
+        );
+        if (forceConfirm) {
+          try {
+            await libraryStore.deleteCategory(deletingCategory._id, true);
+            setDeleteModalOpen(false);
+            setDeletingCategory(null);
+          } catch {
+            // Error shown via toast
+          }
+        }
+      }
+    } finally {
+      setIsDeleting(false);
     }
   };
 
   const handleToggleActive = async (cat: LibraryCategory) => {
     await libraryStore.updateCategory(cat._id, { active: !cat.active } as any);
-    libraryStore.fetchCategories();
+    libraryStore.fetchCategories(undefined, statusFilter === 'deleted');
+  };
+
+  const handleRestore = async (cat: LibraryCategory) => {
+    setRestoringCategory(cat);
+    setRestoreModalOpen(true);
+  };
+
+  const confirmRestore = async () => {
+    if (!restoringCategory) return;
+    setIsRestoring(true);
+    try {
+      await libraryStore.restoreCategory(restoringCategory._id);
+      libraryStore.fetchCategories(undefined, true);
+      setRestoreModalOpen(false);
+      setRestoringCategory(null);
+    } catch { /* toast */ }
+    finally { setIsRestoring(false); }
+  };
+
+  const handleHardDelete = async (cat: LibraryCategory) => {
+    setHardDeletingCategory(cat);
+    setHardDeleteModalOpen(true);
+  };
+
+  const confirmHardDelete = async () => {
+    if (!hardDeletingCategory) return;
+    setIsHardDeleting(true);
+    try {
+      await libraryStore.hardDeleteCategory(hardDeletingCategory._id);
+      setHardDeleteModalOpen(false);
+      setHardDeletingCategory(null);
+    } catch { /* toast */ }
+    finally { setIsHardDeleting(false); }
   };
 
   const handleSuccess = () => {
-    libraryStore.fetchCategories();
+    libraryStore.fetchCategories(undefined, statusFilter === 'deleted');
     setModalOpen(false);
     setEditingCategory(null);
   };
@@ -85,7 +135,11 @@ const LibraryCategories = observer(() => {
   // Filtrar por búsqueda y estado
   const filtered = allCats.filter(c => {
     const matchesSearch = !searchQuery || c.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || (statusFilter === 'active' && c.active) || (statusFilter === 'inactive' && !c.active);
+    let matchesStatus = true;
+    if (statusFilter === 'active') matchesStatus = c.active && !c.deleted;
+    else if (statusFilter === 'inactive') matchesStatus = !c.active && !c.deleted;
+    else if (statusFilter === 'deleted') matchesStatus = !!c.deleted;
+    else matchesStatus = !c.deleted; // 'all' = no deleted
     return matchesSearch && matchesStatus;
   });
 
@@ -154,6 +208,7 @@ const LibraryCategories = observer(() => {
               <option value="all">Todos</option>
               <option value="active">Activas</option>
               <option value="inactive">Inactivas</option>
+              <option value="deleted">Eliminadas</option>
             </select>
           </div>
         </div>
@@ -188,6 +243,9 @@ const LibraryCategories = observer(() => {
                   onEdit={handleEdit}
                   onDelete={handleDelete}
                   onToggleActive={handleToggleActive}
+                  onRestore={handleRestore}
+                  onHardDelete={handleHardDelete}
+                  isDeletedView={statusFilter === 'deleted'}
                 />
               ))}
               {paginatedCats.length === 0 && (
@@ -224,17 +282,80 @@ const LibraryCategories = observer(() => {
         onSuccess={handleSuccess}
         category={editingCategory}
       />
+
+      {/* Modal confirmar eliminación */}
+      <DeleteConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={() => { setDeleteModalOpen(false); setDeletingCategory(null); }}
+        onConfirm={confirmDelete}
+        itemName={deletingCategory?.name || ''}
+        itemType="categoría"
+        isLoading={isDeleting}
+      />
+
+      {/* Modal eliminación permanente */}
+      <HardDeleteModal
+        isOpen={hardDeleteModalOpen}
+        onClose={() => { setHardDeleteModalOpen(false); setHardDeletingCategory(null); }}
+        onConfirm={confirmHardDelete}
+        itemName={hardDeletingCategory?.name || ''}
+        itemType="categoría"
+        isLoading={isHardDeleting}
+      />
+
+      {/* Modal confirmar restauración */}
+      <Modal
+        isOpen={restoreModalOpen}
+        onClose={() => { setRestoreModalOpen(false); setRestoringCategory(null); }}
+        className="relative w-full max-w-[500px] m-5 sm:m-0 rounded-3xl bg-white p-6 lg:p-10 dark:bg-gray-900"
+      >
+        <div className="text-center">
+          <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
+            <svg className="h-7 w-7 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8M21 3v5h-5M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16M3 21v-5h5" />
+            </svg>
+          </div>
+          <h4 className="mb-3 text-xl font-semibold text-gray-800 dark:text-white/90">
+            ¿Restaurar esta categoría?
+          </h4>
+          <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">
+            La categoría volverá a estar activa y visible:
+          </p>
+          <p className="mb-6 text-base font-semibold text-gray-900 dark:text-white">
+            "{restoringCategory?.name}"
+          </p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <Button variant="outline" onClick={() => { setRestoreModalOpen(false); setRestoringCategory(null); }} disabled={isRestoring}>
+              Cancelar
+            </Button>
+            <button
+              onClick={confirmRestore}
+              disabled={isRestoring}
+              className="flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-white rounded-lg bg-green-600 hover:bg-green-700 disabled:opacity-50"
+            >
+              {isRestoring ? (
+                <><span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span> Restaurando...</>
+              ) : (
+                'Restaurar'
+              )}
+            </button>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 });
 
 // Row component
-function CategoryRow({ category, depth, onEdit, onDelete, onToggleActive }: {
+function CategoryRow({ category, depth, onEdit, onDelete, onToggleActive, onRestore, onHardDelete, isDeletedView }: {
   category: LibraryCategory;
   depth: number;
   onEdit: (c: LibraryCategory) => void;
   onDelete: (c: LibraryCategory) => void;
   onToggleActive: (c: LibraryCategory) => void;
+  onRestore?: (c: LibraryCategory) => void;
+  onHardDelete?: (c: LibraryCategory) => void;
+  isDeletedView?: boolean;
 }) {
   return (
     <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/50" data-test-key={`category-row-${category.slug}`}>
@@ -269,28 +390,53 @@ function CategoryRow({ category, depth, onEdit, onDelete, onToggleActive }: {
       </td>
       <td className="px-4 py-3">
         <div className="flex items-center justify-end gap-1">
-          <button
-            onClick={() => onToggleActive(category)}
-            className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700"
-            title={category.active ? "Desactivar" : "Activar"}
-          >
-            {category.active ? <EyeOff size={16} /> : <Eye size={16} />}
-          </button>
-          <button
-            onClick={() => onEdit(category)}
-            className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-brand-500 dark:hover:bg-gray-700"
-            title="Editar"
-          >
-            <Edit2 size={16} />
-          </button>
-          {!category.isSystem && (
-            <button
-              onClick={() => onDelete(category)}
-              className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10"
-              title="Eliminar"
-            >
-              <Trash2 size={16} />
-            </button>
+          {isDeletedView ? (
+            <>
+              {onRestore && (
+                <button
+                  onClick={() => onRestore(category)}
+                  className="rounded-lg p-2 text-gray-400 hover:bg-green-50 hover:text-green-600 dark:hover:bg-green-500/10"
+                  title="Restaurar"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
+                </button>
+              )}
+              {onHardDelete && !category.isSystem && (
+                <button
+                  onClick={() => onHardDelete(category)}
+                  className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10"
+                  title="Eliminar permanentemente"
+                >
+                  <Trash2 size={16} />
+                </button>
+              )}
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => onToggleActive(category)}
+                className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700"
+                title={category.active ? "Desactivar" : "Activar"}
+              >
+                {category.active ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+              <button
+                onClick={() => onEdit(category)}
+                className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-brand-500 dark:hover:bg-gray-700"
+                title="Editar"
+              >
+                <Edit2 size={16} />
+              </button>
+              {!category.isSystem && (
+                <button
+                  onClick={() => onDelete(category)}
+                  className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10"
+                  title="Eliminar"
+                >
+                  <Trash2 size={16} />
+                </button>
+              )}
+            </>
           )}
         </div>
       </td>

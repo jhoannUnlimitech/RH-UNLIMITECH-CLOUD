@@ -301,25 +301,6 @@ export class EmployeesStoreMock implements IEmployeesStore {
     }
   }
 
-  async toggleEmployeeStatus(id: string): Promise<void> {
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      
-      const index = this.employees.findIndex((e) => e._id === id);
-      if (index !== -1) {
-        const newStatus = this.employees[index].status === 'active' ? 'inactive' : 'active';
-        this.employees[index] = {
-          ...this.employees[index],
-          status: newStatus,
-          updatedAt: new Date().toISOString(),
-        };
-      }
-    } catch (err: any) {
-      this.error = 'Error al cambiar estado del empleado';
-      throw err;
-    }
-  }
-
   clearError(): void {
     this.error = null;
   }

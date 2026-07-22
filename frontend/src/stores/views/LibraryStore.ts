@@ -24,11 +24,16 @@ class LibraryStore {
 
   // --- Categorías ---
 
-  async fetchCategories(parent?: string) {
+  async fetchCategories(parent?: string, includeDeleted = false) {
     this.isLoading = true;
     this.error = null;
     try {
-      const categories = await libraryService.getCategories(parent);
+      const params = new URLSearchParams();
+      if (parent) params.append('parent', parent);
+      if (includeDeleted) params.append('includeDeleted', 'true');
+      const queryString = params.toString() || undefined;
+      
+      const categories = await libraryService.getCategories(queryString);
       runInAction(() => { this.categories = categories; });
     } catch (err: any) {
       runInAction(() => { this.error = err.response?.data?.message || 'Error al cargar categorías'; });
@@ -76,13 +81,52 @@ class LibraryStore {
     }
   }
 
-  async deleteCategory(id: string) {
+  async deleteCategory(id: string, force = false) {
     try {
-      await libraryService.deleteCategory(id);
+      await libraryService.deleteCategory(id, force);
       runInAction(() => { this.categories = this.categories.filter(c => c._id !== id); });
       notify.success('Categoría eliminada');
     } catch (err: any) {
-      notify.error(err.response?.data?.message || 'Error al eliminar categoría');
+      const status = err.response?.status;
+      const message = err.response?.data?.message;
+      
+      // 409 = tiene docs, parse the JSON message
+      if (status === 409 && message) {
+        try {
+          const parsed = JSON.parse(message);
+          // Re-throw with structured data for the UI to handle
+          throw { conflictData: parsed, original: err };
+        } catch (parseErr: any) {
+          if (parseErr.conflictData) throw parseErr;
+        }
+      }
+      
+      notify.error(message || 'Error al eliminar categoría');
+      throw err;
+    }
+  }
+
+  async restoreCategory(id: string) {
+    try {
+      const restored = await libraryService.restoreCategory(id);
+      runInAction(() => {
+        const idx = this.categories.findIndex(c => c._id === id);
+        if (idx !== -1) this.categories[idx] = restored;
+      });
+      notify.success('Categoría restaurada exitosamente');
+    } catch (err: any) {
+      notify.error(err.response?.data?.message || 'Error al restaurar categoría');
+      throw err;
+    }
+  }
+
+  async hardDeleteCategory(id: string) {
+    try {
+      await libraryService.hardDeleteCategory(id);
+      runInAction(() => { this.categories = this.categories.filter(c => c._id !== id); });
+      notify.success('Categoría eliminada permanentemente');
+    } catch (err: any) {
+      notify.error(err.response?.data?.message || 'Error al eliminar permanentemente');
       throw err;
     }
   }

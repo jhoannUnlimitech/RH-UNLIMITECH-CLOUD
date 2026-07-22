@@ -12,14 +12,15 @@ import { libraryCategoryService } from '../../services/training/libraryCategory.
 export const getCategories = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const parent = req.query.parent as string | undefined;
+    const includeDeleted = req.query.includeDeleted === 'true';
 
     let categories;
     if (parent === 'root' || parent === 'null') {
-      categories = await libraryCategoryService.getRoots();
+      categories = await libraryCategoryService.getRoots(includeDeleted);
     } else if (parent) {
       categories = await libraryCategoryService.getChildren(parent);
     } else {
-      categories = await libraryCategoryService.getAll();
+      categories = await libraryCategoryService.getAll(includeDeleted);
     }
 
     res.json({ success: true, data: categories });
@@ -90,11 +91,44 @@ export const reorderCategories = async (req: AuthRequest, res: Response, next: N
 export const deleteCategory = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const id = req.params.id as string;
-    await libraryCategoryService.delete(id);
+    const force = req.query.force === 'true';
+    const result = await libraryCategoryService.delete(id, force);
 
     res.json({
       success: true,
-      message: 'Categoría eliminada exitosamente'
+      message: 'Categoría eliminada exitosamente',
+      deactivatedDocs: result.deactivatedDocs
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/** POST /api/v1/library/categories/:id/restore */
+export const restoreCategory = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const id = req.params.id as string;
+    const category = await libraryCategoryService.restore(id);
+
+    res.json({
+      success: true,
+      data: category,
+      message: 'Categoría restaurada exitosamente'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/** DELETE /api/v1/library/categories/:id/permanent */
+export const hardDeleteCategory = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const id = req.params.id as string;
+    await libraryCategoryService.hardDelete(id);
+
+    res.json({
+      success: true,
+      message: 'Categoría eliminada permanentemente'
     });
   } catch (error) {
     next(error);

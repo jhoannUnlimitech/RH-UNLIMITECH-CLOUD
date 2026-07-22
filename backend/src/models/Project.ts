@@ -88,7 +88,6 @@ const ProjectSchema = new Schema<IProject>({
 });
 
 // Índices
-ProjectSchema.index({ code: 1 }, { unique: true });
 ProjectSchema.index({ divisionId: 1, status: 1 });
 ProjectSchema.index({ members: 1 });
 ProjectSchema.index({ deleted: 1 });

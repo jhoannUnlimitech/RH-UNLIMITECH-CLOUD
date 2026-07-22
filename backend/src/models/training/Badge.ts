@@ -112,7 +112,6 @@ const BadgeSchema = new Schema<IBadge>({
 });
 
 // --- Índices ---
-BadgeSchema.index({ name: 1 }, { unique: true });
 BadgeSchema.index({ active: 1, deleted: 1 });
 
 // --- Plugin soft delete ---
