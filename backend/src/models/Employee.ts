@@ -148,4 +148,17 @@ EmployeeSchema.methods.comparePassword = async function(candidatePassword: strin
 // Aplicar plugin de soft delete
 EmployeeSchema.plugin(softDeletePlugin);
 
+// Hook: auto-inicializar EmployeeTrainingProgress al crear empleado (D21)
+EmployeeSchema.post('save', async function(doc) {
+  if (doc.isNew || doc.wasNew) {
+    try {
+      const { progressService } = await import('../services/training/progress.service');
+      await progressService.initializeForEmployee(doc._id.toString());
+    } catch {
+      // No bloquear la creación del empleado si falla el progress init
+      console.warn(`⚠️ No se pudo inicializar progress para empleado ${doc._id}`);
+    }
+  }
+});
+
 export const Employee = mongoose.model<IEmployee>('Employee', EmployeeSchema);

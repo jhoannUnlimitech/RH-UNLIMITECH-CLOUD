@@ -4,6 +4,7 @@ import coursesRoutes from './courses.routes';
 import levelsRoutes from './levels.routes';
 import badgesRoutes from './badges.routes';
 import examsRoutes from './exams.routes';
+import progressRoutes from './progress.routes';
 
 /**
  * Training Module Routes — Barrel
@@ -20,6 +21,7 @@ router.use('/courses', coursesRoutes);
 router.use('/levels', levelsRoutes);
 router.use('/badges', badgesRoutes);
 router.use('/exams', examsRoutes);
+router.use('/progress', progressRoutes);
 
 // Rutas de la Biblioteca (categorías + documentos)
 // Se montan en /api/v1/library desde el index principal
