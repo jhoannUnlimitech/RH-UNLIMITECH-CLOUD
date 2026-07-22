@@ -31,18 +31,24 @@
 
 ---
 
-## Slice 10 — Exam Questions Reorder
-**Rama:** `slice/10-exam-questions-reorder`
+## Slice 10 — Exam Questions Reorder + UI Gestión ✅
+**Rama:** `slice/10-exam-questions-reorder` (commits `030fefb` → `9fdc5b7`)
 
 - [x] Endpoint: `PUT /api/v1/training/exams/:id/reorder-questions` (ya en Slice 09)
 - [x] Body: `{ questions: [{ order: number }] }` (nuevo orden)
 - [x] Service: reorderQuestions con validación de cantidad
-- [ ] Frontend: UI de preguntas con react-dnd drag & drop
-- [ ] Flechas ↑↓ como alternativa al drag
-- [ ] Feedback visual al arrastrar
-- [ ] `data-test-*` annotations en cada pregunta reordenable
-
-**Nota:** Backend completado en Slice 09. Frontend pendiente — requiere primero la UI del editor de exámenes.
+- [x] UI: TrainingManage.tsx — 4 tabs funcionales (Insignias/Niveles/Cursos/Exámenes)
+- [x] UI: ExamForm.tsx — Crear/Editar examen con preguntas dinámicas
+- [x] UI: Asociación flexible (nivel, curso o documento)
+- [x] UI: Default 80% aprobación
+- [x] Flechas ↑↓ para reordenar preguntas
+- [x] Preguntas multiple_choice: opciones con radio correcta
+- [x] Preguntas open_text: campo expectedAnswer para evaluador
+- [x] `data-test-*` annotations en todos los elementos
+- [x] API Service frontend: métodos exams completos
+- [x] Rutas: /training/manage/exams/new y /training/manage/exams/edit/:id
+- [ ] React-dnd drag & drop (implementado con flechas ↑↓, drag pendiente como mejora futura)
+- [ ] Feedback visual al arrastrar (mejora futura)
 
 ---
 
