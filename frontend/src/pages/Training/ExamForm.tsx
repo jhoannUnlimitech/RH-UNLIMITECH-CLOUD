@@ -1,7 +1,9 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router";
 import { observer } from "mobx-react-lite";
 import { Plus, ChevronUp, ChevronDown, Trash2, GripVertical } from "lucide-react";
+import { DndProvider, useDrag, useDrop } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import Button from "../../components/ui/button/Button";
 import { trainingService } from "../../api/services/training";
@@ -103,6 +105,15 @@ const ExamForm = observer(() => {
       return newArr.map((q, i) => ({ ...q, order: i }));
     });
   };
+
+  const moveQuestionDnD = useCallback((dragIndex: number, hoverIndex: number) => {
+    setQuestions(prev => {
+      const newArr = [...prev];
+      const [dragged] = newArr.splice(dragIndex, 1);
+      newArr.splice(hoverIndex, 0, dragged);
+      return newArr.map((q, i) => ({ ...q, order: i }));
+    });
+  }, []);
 
   const updateQuestion = (index: number, field: string, value: any) => {
     setQuestions(prev => prev.map((q, i) => {
@@ -342,23 +353,26 @@ const ExamForm = observer(() => {
               </div>
             )}
 
-            <div className="space-y-4">
-              {questions.map((q, qIdx) => (
-                <QuestionCard
-                  key={q.tempId}
-                  question={q}
-                  index={qIdx}
-                  total={questions.length}
-                  onUpdate={(field, value) => updateQuestion(qIdx, field, value)}
-                  onMoveUp={() => moveQuestion(qIdx, 'up')}
-                  onMoveDown={() => moveQuestion(qIdx, 'down')}
-                  onRemove={() => removeQuestion(qIdx)}
-                  onAddOption={() => addOption(qIdx)}
-                  onRemoveOption={(optIdx) => removeOption(qIdx, optIdx)}
-                  onUpdateOption={(optIdx, field, value) => updateOption(qIdx, optIdx, field, value)}
-                />
-              ))}
-            </div>
+            <DndProvider backend={HTML5Backend}>
+              <div className="space-y-4">
+                {questions.map((q, qIdx) => (
+                  <QuestionCard
+                    key={q.tempId}
+                    question={q}
+                    index={qIdx}
+                    total={questions.length}
+                    onUpdate={(field, value) => updateQuestion(qIdx, field, value)}
+                    onMoveUp={() => moveQuestion(qIdx, 'up')}
+                    onMoveDown={() => moveQuestion(qIdx, 'down')}
+                    onMoveDnD={moveQuestionDnD}
+                    onRemove={() => removeQuestion(qIdx)}
+                    onAddOption={() => addOption(qIdx)}
+                    onRemoveOption={(optIdx) => removeOption(qIdx, optIdx)}
+                    onUpdateOption={(optIdx, field, value) => updateOption(qIdx, optIdx, field, value)}
+                  />
+                ))}
+              </div>
+            </DndProvider>
           </div>
 
           {/* Actions */}
@@ -385,22 +399,59 @@ interface QuestionCardProps {
   onUpdate: (field: string, value: any) => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
+  onMoveDnD: (dragIndex: number, hoverIndex: number) => void;
   onRemove: () => void;
   onAddOption: () => void;
   onRemoveOption: (optIdx: number) => void;
   onUpdateOption: (optIdx: number, field: string, value: any) => void;
 }
 
-function QuestionCard({ question, index, total, onUpdate, onMoveUp, onMoveDown, onRemove, onAddOption, onRemoveOption, onUpdateOption }: QuestionCardProps) {
+const QUESTION_DND_TYPE = 'EXAM_QUESTION';
+
+function QuestionCard({ question, index, total, onUpdate, onMoveUp, onMoveDown, onMoveDnD, onRemove, onAddOption, onRemoveOption, onUpdateOption }: QuestionCardProps) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const [{ isDragging }, drag, preview] = useDrag({
+    type: QUESTION_DND_TYPE,
+    item: { index },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+
+  const [{ isOver }, drop] = useDrop({
+    accept: QUESTION_DND_TYPE,
+    hover: (item: { index: number }) => {
+      if (item.index === index) return;
+      onMoveDnD(item.index, index);
+      item.index = index;
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+    }),
+  });
+
+  // Combine drag preview and drop ref
+  preview(drop(ref));
+
   return (
     <div
-      className="rounded-xl border border-gray-200 bg-gray-50/50 p-4 dark:border-gray-700 dark:bg-gray-800/50"
+      ref={ref}
+      className={`rounded-xl border p-4 transition-all ${
+        isDragging
+          ? 'opacity-40 border-brand-300 bg-brand-50/50 dark:bg-brand-500/5'
+          : isOver
+            ? 'border-brand-400 bg-brand-50/30 shadow-md dark:border-brand-500/50'
+            : 'border-gray-200 bg-gray-50/50 dark:border-gray-700 dark:bg-gray-800/50'
+      }`}
       data-test-key={`question-${index}`}
     >
-      {/* Header: número + acciones */}
+      {/* Header: drag handle + número + acciones */}
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <GripVertical size={16} className="text-gray-300 cursor-grab" />
+          <span ref={drag} className="cursor-grab active:cursor-grabbing rounded p-0.5 hover:bg-gray-200 dark:hover:bg-gray-700" title="Arrastrar para reordenar">
+            <GripVertical size={16} className="text-gray-400" />
+          </span>
           <span className="text-sm font-semibold text-gray-600 dark:text-gray-300">
             Pregunta {index + 1}
           </span>
