@@ -42,7 +42,9 @@ export const createExamSchema = z.object({
     .trim()
     .optional()
     .default(''),
-  level: objectId,
+  level: objectId.optional(),
+  course: objectId.optional(),
+  libraryDocument: objectId.optional(),
   questions: z.array(examQuestion)
     .min(1, 'El examen debe tener al menos 1 pregunta'),
   passingScore: z.number()
@@ -50,7 +52,7 @@ export const createExamSchema = z.object({
     .min(1, 'El puntaje mínimo es 1%')
     .max(100, 'El puntaje máximo es 100%')
     .optional()
-    .default(70),
+    .default(80),
   maxAttempts: z.number()
     .int()
     .min(1, 'Mínimo 1 intento')
@@ -63,7 +65,9 @@ export const createExamSchema = z.object({
 export const updateExamSchema = z.object({
   title: z.string().min(3).max(200).trim().optional(),
   description: z.string().max(500).trim().optional(),
-  level: objectId.optional(),
+  level: objectId.optional().nullable(),
+  course: objectId.optional().nullable(),
+  libraryDocument: objectId.optional().nullable(),
   questions: z.array(examQuestion).min(1).optional(),
   passingScore: z.number().int().min(1).max(100).optional(),
   maxAttempts: z.number().int().min(1).max(10).optional(),

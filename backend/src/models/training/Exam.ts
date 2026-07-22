@@ -94,9 +94,11 @@ const ExamQuestionSchema = new Schema<IExamQuestion>({
 export interface IExam extends Document {
   title: string;
   description?: string;
-  level: Types.ObjectId;            // ref: Level
+  level?: Types.ObjectId;            // ref: Level (examen de nivel)
+  course?: Types.ObjectId;           // ref: Course (examen de curso específico)
+  libraryDocument?: Types.ObjectId;  // ref: LibraryDocument (examen de documento)
   questions: IExamQuestion[];
-  passingScore: number;             // Puntaje mínimo para aprobar (%)
+  passingScore: number;             // Puntaje mínimo para aprobar (%) — default 80
   maxAttempts: number;              // Intentos máximos (D5: default 1)
   assignedTo?: Types.ObjectId[];    // ref: Employee[] (asignación a empleados específicos, D4)
   active: boolean;
@@ -134,7 +136,16 @@ const ExamSchema = new Schema<IExam>({
   level: {
     type: Schema.Types.ObjectId,
     ref: 'Level',
-    required: [true, 'El nivel es requerido'],
+    index: true
+  },
+  course: {
+    type: Schema.Types.ObjectId,
+    ref: 'Course',
+    index: true
+  },
+  libraryDocument: {
+    type: Schema.Types.ObjectId,
+    ref: 'LibraryDocument',
     index: true
   },
   questions: {
@@ -150,7 +161,7 @@ const ExamSchema = new Schema<IExam>({
     required: [true, 'El puntaje de aprobación es requerido'],
     min: [1, 'El puntaje mínimo es 1%'],
     max: [100, 'El puntaje máximo es 100%'],
-    default: 70
+    default: 80
   },
   maxAttempts: {
     type: Number,

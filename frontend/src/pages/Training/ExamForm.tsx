@@ -5,7 +5,7 @@ import { Plus, ChevronUp, ChevronDown, Trash2, GripVertical } from "lucide-react
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import Button from "../../components/ui/button/Button";
 import { trainingService } from "../../api/services/training";
-import type { Exam, ExamQuestion, ExamOption, Level } from "../../api/services/training";
+import type { Exam, ExamQuestion, ExamOption, Level, Course } from "../../api/services/training";
 import { notify } from "../../utils/toast";
 
 /**
@@ -27,21 +27,26 @@ const ExamForm = observer(() => {
   const isEditing = !!id;
 
   const [levels, setLevels] = useState<Level[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
     description: "",
+    associationType: "level" as "level" | "course" | "document",
     level: "",
-    passingScore: 70,
+    course: "",
+    libraryDocument: "",
+    passingScore: 80,
     maxAttempts: 1,
   });
 
   const [questions, setQuestions] = useState<QuestionFormData[]>([]);
 
-  // Cargar niveles disponibles
+  // Cargar niveles y cursos disponibles
   useEffect(() => {
     trainingService.getLevels({ active: 'true' }).then(setLevels);
+    trainingService.getCourses({ active: 'true' }).then(setCourses);
   }, []);
 
   // Cargar examen si es edición
@@ -156,7 +161,9 @@ const ExamForm = observer(() => {
   const handleSubmit = async () => {
     // Validaciones básicas
     if (!formData.title.trim()) { notify.error("El título es requerido"); return; }
-    if (!formData.level) { notify.error("Seleccione un nivel"); return; }
+    if (formData.associationType === 'level' && !formData.level) { notify.error("Seleccione un nivel"); return; }
+    if (formData.associationType === 'course' && !formData.course) { notify.error("Seleccione un curso"); return; }
+    if (formData.associationType === 'document' && !formData.libraryDocument) { notify.error("Ingrese el ID del documento"); return; }
     if (questions.length === 0) { notify.error("Agregue al menos una pregunta"); return; }
 
     for (let i = 0; i < questions.length; i++) {
@@ -172,10 +179,17 @@ const ExamForm = observer(() => {
 
     setIsSubmitting(true);
     try {
-      const payload = {
-        ...formData,
+      const payload: any = {
+        title: formData.title,
+        description: formData.description,
+        passingScore: formData.passingScore,
+        maxAttempts: formData.maxAttempts,
         questions: questions.map(({ tempId, ...q }) => q),
       };
+      // Solo enviar el campo de asociación que corresponde
+      if (formData.level) payload.level = formData.level;
+      if (formData.course) payload.course = formData.course;
+      if (formData.libraryDocument) payload.libraryDocument = formData.libraryDocument;
 
       if (isEditing && id) {
         await trainingService.updateExam(id, payload);
@@ -226,21 +240,64 @@ const ExamForm = observer(() => {
               />
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Nivel *</label>
+                <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Asociar a *</label>
                 <select
-                  value={formData.level}
-                  onChange={(e) => setFormData(prev => ({ ...prev, level: e.target.value }))}
+                  value={formData.associationType}
+                  onChange={(e) => setFormData(prev => ({ ...prev, associationType: e.target.value as any, level: '', course: '', libraryDocument: '' }))}
                   className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-                  data-test-key="level-select"
+                  data-test-key="association-type-select"
                 >
-                  <option value="">Seleccionar nivel</option>
-                  {levels.map(l => (
-                    <option key={l._id} value={l._id}>{l.name}</option>
-                  ))}
+                  <option value="level">Nivel</option>
+                  <option value="course">Curso</option>
+                  <option value="document">Documento</option>
                 </select>
               </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {formData.associationType === 'level' ? 'Nivel' : formData.associationType === 'course' ? 'Curso' : 'Documento'} *
+                </label>
+                {formData.associationType === 'level' && (
+                  <select
+                    value={formData.level}
+                    onChange={(e) => setFormData(prev => ({ ...prev, level: e.target.value }))}
+                    className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                    data-test-key="level-select"
+                  >
+                    <option value="">Seleccionar nivel</option>
+                    {levels.map(l => (
+                      <option key={l._id} value={l._id}>{l.name}</option>
+                    ))}
+                  </select>
+                )}
+                {formData.associationType === 'course' && (
+                  <select
+                    value={formData.course}
+                    onChange={(e) => setFormData(prev => ({ ...prev, course: e.target.value }))}
+                    className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                    data-test-key="course-select"
+                  >
+                    <option value="">Seleccionar curso</option>
+                    {courses.map(c => (
+                      <option key={c._id} value={c._id}>{c.name}</option>
+                    ))}
+                  </select>
+                )}
+                {formData.associationType === 'document' && (
+                  <input
+                    type="text"
+                    value={formData.libraryDocument}
+                    onChange={(e) => setFormData(prev => ({ ...prev, libraryDocument: e.target.value }))}
+                    className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                    placeholder="ID del documento"
+                    data-test-key="document-input"
+                  />
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">% Aprobación *</label>
                 <input
