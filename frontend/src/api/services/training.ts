@@ -46,6 +46,38 @@ export interface Badge {
   updatedAt: string;
 }
 
+export interface ExamOption {
+  text: string;
+  isCorrect?: boolean; // Oculto para empleados sin manage
+}
+
+export interface ExamQuestion {
+  _id?: string;
+  question: string;
+  type: 'multiple_choice' | 'open_text';
+  options?: ExamOption[];
+  expectedAnswer?: string; // Oculto para empleados sin manage
+  points: number;
+  order: number;
+}
+
+export interface Exam {
+  _id: string;
+  title: string;
+  description?: string;
+  level: string | { _id: string; name: string; order: number };
+  questions: ExamQuestion[];
+  passingScore: number;
+  maxAttempts: number;
+  assignedTo?: string[];
+  active: boolean;
+  totalPoints?: number;
+  questionCount?: number;
+  createdBy: string | { _id: string; name: string; email: string };
+  createdAt: string;
+  updatedAt: string;
+}
+
 class TrainingService {
   private readonly baseURL = '/training';
 
@@ -136,6 +168,48 @@ class TrainingService {
 
   async deleteBadge(id: string): Promise<void> {
     await apiClient.delete(`${this.baseURL}/badges/${id}`);
+  }
+
+  // --- Exámenes ---
+
+  async getExams(filters?: { level?: string; active?: string }): Promise<Exam[]> {
+    const params = filters ? '?' + new URLSearchParams(filters).toString() : '';
+    const res = await apiClient.get<{ success: boolean; data: Exam[] }>(`${this.baseURL}/exams${params}`);
+    return res.data.data;
+  }
+
+  async getMyExams(): Promise<Exam[]> {
+    const res = await apiClient.get<{ success: boolean; data: Exam[] }>(`${this.baseURL}/exams/me`);
+    return res.data.data;
+  }
+
+  async getExamById(id: string): Promise<Exam> {
+    const res = await apiClient.get<{ success: boolean; data: Exam }>(`${this.baseURL}/exams/${id}`);
+    return res.data.data;
+  }
+
+  async createExam(data: Partial<Exam>): Promise<Exam> {
+    const res = await apiClient.post<{ success: boolean; data: Exam }>(`${this.baseURL}/exams`, data);
+    return res.data.data;
+  }
+
+  async updateExam(id: string, data: Partial<Exam>): Promise<Exam> {
+    const res = await apiClient.put<{ success: boolean; data: Exam }>(`${this.baseURL}/exams/${id}`, data);
+    return res.data.data;
+  }
+
+  async reorderExamQuestions(id: string, questions: { order: number }[]): Promise<Exam> {
+    const res = await apiClient.put<{ success: boolean; data: Exam }>(`${this.baseURL}/exams/${id}/reorder-questions`, { questions });
+    return res.data.data;
+  }
+
+  async assignExam(examId: string, employeeId: string): Promise<Exam> {
+    const res = await apiClient.post<{ success: boolean; data: Exam }>(`${this.baseURL}/exams/${examId}/assign/${employeeId}`);
+    return res.data.data;
+  }
+
+  async deleteExam(id: string): Promise<void> {
+    await apiClient.delete(`${this.baseURL}/exams/${id}`);
   }
 }
 
