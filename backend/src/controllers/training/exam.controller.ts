@@ -21,6 +21,25 @@ export const getExams = async (req: AuthRequest, res: Response, next: NextFuncti
   }
 };
 
+/** GET /api/v1/training/exams/me — Exámenes asignados al empleado actual */
+export const getMyExams = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const employeeId = req.user!.id;
+    // Obtener el nivel actual del empleado desde su progreso
+    const { progressService } = await import('../../services/training/progress.service');
+    let currentLevelId: string | undefined;
+    try {
+      const progress = await progressService.getByEmployee(employeeId);
+      currentLevelId = progress.currentLevel?.toString();
+    } catch { /* progress may not exist yet */ }
+
+    const exams = await examService.getMyExams(employeeId, currentLevelId);
+    res.json({ success: true, data: exams });
+  } catch (error) {
+    next(error);
+  }
+};
+
 /** GET /api/v1/training/exams/:id */
 export const getExamById = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -93,6 +112,22 @@ export const deleteExam = async (req: AuthRequest, res: Response, next: NextFunc
     res.json({
       success: true,
       message: 'Examen eliminado exitosamente'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/** POST /api/v1/training/exams/:id/assign/:employeeId */
+export const assignExam = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { id, employeeId } = req.params;
+    const exam = await examService.assignToEmployee(id, employeeId);
+
+    res.json({
+      success: true,
+      data: exam,
+      message: 'Examen asignado al empleado exitosamente'
     });
   } catch (error) {
     next(error);

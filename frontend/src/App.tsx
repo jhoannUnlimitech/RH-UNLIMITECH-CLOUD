@@ -76,10 +76,10 @@ export default function App() {
 
           {/* Training Module */}
           <Route path="/library" element={<PermissionRoute resource="training"><Library /></PermissionRoute>} />
-          <Route path="/library/manage" element={<PermissionRoute resource="training" action="create"><LibraryManage /></PermissionRoute>} />
-          <Route path="/library/categories" element={<PermissionRoute resource="training" action="create"><LibraryCategories /></PermissionRoute>} />
-          <Route path="/library/documents/new" element={<PermissionRoute resource="training" action="create"><DocumentForm /></PermissionRoute>} />
-          <Route path="/library/documents/edit/:id" element={<PermissionRoute resource="training" action="update"><DocumentForm /></PermissionRoute>} />
+          <Route path="/library/manage" element={<PermissionRoute resource="training" action="content"><LibraryManage /></PermissionRoute>} />
+          <Route path="/library/categories" element={<PermissionRoute resource="training" action="content"><LibraryCategories /></PermissionRoute>} />
+          <Route path="/library/documents/new" element={<PermissionRoute resource="training" action="content"><DocumentForm /></PermissionRoute>} />
+          <Route path="/library/documents/edit/:id" element={<PermissionRoute resource="training" action="content"><DocumentForm /></PermissionRoute>} />
           <Route path="/library/documents/:slug" element={<PermissionRoute resource="training"><DocumentView /></PermissionRoute>} />
           <Route path="/training/manage" element={<PermissionRoute resource="training" action="manage"><TrainingManage /></PermissionRoute>} />
           <Route path="/training/my-progress" element={<PermissionRoute resource="training"><Library /></PermissionRoute>} />

@@ -8,14 +8,18 @@ import { getBadges, getBadgeById, createBadge, updateBadge, deleteBadge } from '
 /**
  * Badge Routes — Insignias del módulo Training.
  * Base: /api/v1/training/badges
+ *
+ * Permisos:
+ *   - read: ver insignias (todos los empleados)
+ *   - manage: crear, editar, eliminar (admin training)
  */
 
 const router = Router();
 
 router.get('/', authMiddleware, requirePermission('training', 'read'), getBadges);
 router.get('/:id', authMiddleware, requirePermission('training', 'read'), getBadgeById);
-router.post('/', authMiddleware, requirePermission('training', 'create'), validate(createBadgeSchema), createBadge);
-router.put('/:id', authMiddleware, requirePermission('training', 'update'), validate(updateBadgeSchema), updateBadge);
-router.delete('/:id', authMiddleware, requirePermission('training', 'delete'), deleteBadge);
+router.post('/', authMiddleware, requirePermission('training', 'manage'), validate(createBadgeSchema), createBadge);
+router.put('/:id', authMiddleware, requirePermission('training', 'manage'), validate(updateBadgeSchema), updateBadge);
+router.delete('/:id', authMiddleware, requirePermission('training', 'manage'), deleteBadge);
 
 export default router;

@@ -78,12 +78,12 @@ router.get(
 /**
  * @route   POST /api/v1/library/categories
  * @desc    Crear nueva categoría
- * @access  Private (training:create)
+ * @access  Private (training:content)
  */
 router.post(
   '/categories',
   authMiddleware,
-  requirePermission('training', 'create'),
+  requirePermission('training', 'content'),
   validate(createLibraryCategorySchema),
   createCategory
 );
@@ -91,12 +91,12 @@ router.post(
 /**
  * @route   PUT /api/v1/library/categories/reorder
  * @desc    Reordenar categorías (batch update de order)
- * @access  Private (training:update)
+ * @access  Private (training:content)
  */
 router.put(
   '/categories/reorder',
   authMiddleware,
-  requirePermission('training', 'update'),
+  requirePermission('training', 'content'),
   validate(reorderLibraryCategoriesSchema),
   reorderCategories
 );
@@ -104,12 +104,12 @@ router.put(
 /**
  * @route   PUT /api/v1/library/categories/:id
  * @desc    Actualizar categoría
- * @access  Private (training:update)
+ * @access  Private (training:content)
  */
 router.put(
   '/categories/:id',
   authMiddleware,
-  requirePermission('training', 'update'),
+  requirePermission('training', 'content'),
   validate(updateLibraryCategorySchema),
   updateCategory
 );
@@ -117,24 +117,24 @@ router.put(
 /**
  * @route   DELETE /api/v1/library/categories/:id
  * @desc    Eliminar categoría (soft delete)
- * @access  Private (training:delete)
+ * @access  Private (training:content)
  */
 router.delete(
   '/categories/:id',
   authMiddleware,
-  requirePermission('training', 'delete'),
+  requirePermission('training', 'content'),
   deleteCategory
 );
 
 /**
  * @route   POST /api/v1/library/categories/:id/restore
  * @desc    Restaurar categoría eliminada (soft-deleted → active)
- * @access  Private (training:update)
+ * @access  Private (training:content)
  */
 router.post(
   '/categories/:id/restore',
   authMiddleware,
-  requirePermission('training', 'update'),
+  requirePermission('training', 'content'),
   restoreCategory
 );
 
@@ -191,36 +191,36 @@ router.get(
 /**
  * @route   GET /api/v1/library/documents/:id/versions
  * @desc    Historial de versiones de un documento
- * @access  Private (training:manage)
+ * @access  Private (training:content)
  */
 router.get(
   '/documents/:id/versions',
   authMiddleware,
-  requirePermission('training', 'update'),
+  requirePermission('training', 'content'),
   getVersions
 );
 
 /**
  * @route   GET /api/v1/library/documents/:id/versions/:version
  * @desc    Obtener versión específica de un documento
- * @access  Private (training:manage)
+ * @access  Private (training:content)
  */
 router.get(
   '/documents/:id/versions/:version',
   authMiddleware,
-  requirePermission('training', 'update'),
+  requirePermission('training', 'content'),
   getVersion
 );
 
 /**
  * @route   POST /api/v1/library/documents
  * @desc    Crear nuevo documento
- * @access  Private (training:create)
+ * @access  Private (training:content)
  */
 router.post(
   '/documents',
   authMiddleware,
-  requirePermission('training', 'create'),
+  requirePermission('training', 'content'),
   validate(createLibraryDocumentSchema),
   createDocument
 );
@@ -228,12 +228,12 @@ router.post(
 /**
  * @route   PUT /api/v1/library/documents/:id
  * @desc    Actualizar documento (crea nueva versión si content cambió)
- * @access  Private (training:update)
+ * @access  Private (training:content)
  */
 router.put(
   '/documents/:id',
   authMiddleware,
-  requirePermission('training', 'update'),
+  requirePermission('training', 'content'),
   validate(updateLibraryDocumentSchema),
   updateDocument
 );
@@ -241,12 +241,12 @@ router.put(
 /**
  * @route   PUT /api/v1/library/documents/:id/publish
  * @desc    Publicar o despublicar documento
- * @access  Private (training:manage)
+ * @access  Private (training:content)
  */
 router.put(
   '/documents/:id/publish',
   authMiddleware,
-  requirePermission('training', 'update'),
+  requirePermission('training', 'content'),
   validate(publishDocumentSchema),
   publishDocument
 );
@@ -254,12 +254,12 @@ router.put(
 /**
  * @route   PUT /api/v1/library/documents/:id/feature
  * @desc    Destacar o quitar de destacados
- * @access  Private (training:manage)
+ * @access  Private (training:content)
  */
 router.put(
   '/documents/:id/feature',
   authMiddleware,
-  requirePermission('training', 'update'),
+  requirePermission('training', 'content'),
   validate(featureDocumentSchema),
   featureDocument
 );
@@ -279,24 +279,24 @@ router.post(
 /**
  * @route   POST /api/v1/library/documents/:id/restore-version/:version
  * @desc    Restaurar versión anterior de un documento
- * @access  Private (training:manage)
+ * @access  Private (training:content)
  */
 router.post(
   '/documents/:id/restore-version/:version',
   authMiddleware,
-  requirePermission('training', 'update'),
+  requirePermission('training', 'content'),
   restoreVersion
 );
 
 /**
  * @route   DELETE /api/v1/library/documents/:id
  * @desc    Eliminar documento (soft delete)
- * @access  Private (training:delete)
+ * @access  Private (training:content)
  */
 router.delete(
   '/documents/:id',
   authMiddleware,
-  requirePermission('training', 'delete'),
+  requirePermission('training', 'content'),
   deleteDocument
 );
 
@@ -315,12 +315,12 @@ router.delete(
 /**
  * @route   POST /api/v1/library/documents/:id/restore
  * @desc    Restaurar documento eliminado (vuelve como borrador)
- * @access  Private (training:update)
+ * @access  Private (training:content)
  */
 router.post(
   '/documents/:id/restore',
   authMiddleware,
-  requirePermission('training', 'update'),
+  requirePermission('training', 'content'),
   restoreDocument
 );
 

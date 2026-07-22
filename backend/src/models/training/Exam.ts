@@ -98,6 +98,7 @@ export interface IExam extends Document {
   questions: IExamQuestion[];
   passingScore: number;             // Puntaje mínimo para aprobar (%)
   maxAttempts: number;              // Intentos máximos (D5: default 1)
+  assignedTo?: Types.ObjectId[];    // ref: Employee[] (asignación a empleados específicos, D4)
   active: boolean;
   createdBy: Types.ObjectId;        // ref: Employee (quien creó el examen)
 
@@ -158,6 +159,10 @@ const ExamSchema = new Schema<IExam>({
     max: [10, 'Máximo 10 intentos'],
     default: 1 // D5: por defecto solo 1 intento
   },
+  assignedTo: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Employee'
+  }],
   active: {
     type: Boolean,
     default: true

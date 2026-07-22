@@ -21,8 +21,8 @@ const PermissionSchema = new Schema<IPermission>({
     trim: true,
     lowercase: true,
     enum: {
-      values: ['read', 'create', 'update', 'delete', 'approve', 'cancel', 'manage', 'report'],
-      message: 'La acción debe ser: read, create, update, delete, approve, cancel, manage o report'
+      values: ['read', 'create', 'update', 'delete', 'approve', 'cancel', 'manage', 'report', 'content'],
+      message: 'La acción debe ser: read, create, update, delete, approve, cancel, manage, report o content'
     }
   },
   deleted: { 

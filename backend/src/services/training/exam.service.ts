@@ -41,15 +41,35 @@ class ExamService {
 
   /**
    * Listar todos los exámenes (con filtros opcionales).
+   * Si assignedTo se pasa, filtra exámenes asignados a ese empleado.
    */
-  async getAll(filters?: { level?: string; active?: boolean }): Promise<IExam[]> {
+  async getAll(filters?: { level?: string; active?: boolean; assignedTo?: string }): Promise<IExam[]> {
     const query: any = {};
     if (filters?.level) query.level = filters.level;
     if (filters?.active !== undefined) query.active = filters.active;
+    if (filters?.assignedTo) query.assignedTo = filters.assignedTo;
 
     return Exam.find(query)
       .populate('level', 'name order')
       .populate('createdBy', 'name email')
+      .sort({ createdAt: -1 });
+  }
+
+  /**
+   * Obtener exámenes asignados a un empleado (por assignedTo o por su nivel actual).
+   */
+  async getMyExams(employeeId: string, currentLevelId?: string): Promise<IExam[]> {
+    const query: any = {
+      active: true,
+      $or: [
+        { assignedTo: employeeId },
+        ...(currentLevelId ? [{ level: currentLevelId }] : []),
+      ],
+    };
+
+    return Exam.find(query)
+      .populate('level', 'name order')
+      .select('-questions.options.isCorrect -questions.expectedAnswer')
       .sort({ createdAt: -1 });
   }
 
@@ -257,6 +277,43 @@ class ExamService {
     }
 
     await exam.softDelete();
+  }
+
+  /**
+   * Asignar examen a un empleado específico.
+   * Agrega el empleado al array assignedTo del examen.
+   */
+  async assignToEmployee(examId: string, employeeId: string): Promise<IExam> {
+    if (!Types.ObjectId.isValid(examId)) {
+      throw new AppError('ID de examen no válido', 400);
+    }
+    if (!Types.ObjectId.isValid(employeeId)) {
+      throw new AppError('ID de empleado no válido', 400);
+    }
+
+    const exam = await Exam.findById(examId);
+    if (!exam) {
+      throw new AppError('Examen no encontrado', 404);
+    }
+
+    // Verificar que el empleado no esté ya asignado
+    const alreadyAssigned = exam.assignedTo?.some(
+      (id) => id.toString() === employeeId
+    );
+    if (alreadyAssigned) {
+      throw new AppError('El empleado ya tiene asignado este examen', 409);
+    }
+
+    // Agregar al array
+    if (!exam.assignedTo) exam.assignedTo = [];
+    exam.assignedTo.push(new Types.ObjectId(employeeId));
+    await exam.save();
+
+    await exam.populate('level', 'name order');
+    await exam.populate('createdBy', 'name email');
+    await exam.populate('assignedTo', 'name email');
+
+    return exam;
   }
 }
 
