@@ -47,8 +47,8 @@
 - [x] `data-test-*` annotations en todos los elementos
 - [x] API Service frontend: métodos exams completos
 - [x] Rutas: /training/manage/exams/new y /training/manage/exams/edit/:id
-- [ ] React-dnd drag & drop (implementado con flechas ↑↓, drag pendiente como mejora futura)
-- [ ] Feedback visual al arrastrar (mejora futura)
+- [x] React-dnd drag & drop con GripVertical handle + feedback visual
+- [x] Feedback visual al arrastrar (opacity + border brand + shadow)
 
 ---
 
