@@ -33,30 +33,84 @@ interface UpdateLevelInput {
 
 class LevelService {
 
-  async getAll(filters?: { badge?: string; active?: boolean }): Promise<ILevel[]> {
+  async getAll(filters?: { badge?: string; active?: boolean }): Promise<any[]> {
     const query: any = {};
     if (filters?.badge) query.badge = filters.badge;
     if (filters?.active !== undefined) query.active = filters.active;
 
-    const levels = await Level.find(query)
-      .populate('badge', 'name icon shape color')
-      .populate('exam', 'title passingScore')
-      .sort({ badge: 1, order: 1 });
+    // Use aggregate to avoid circular reference issues with populate
+    const levels = await Level.aggregate([
+      { $match: { ...query, deleted: { $ne: true } } },
+      {
+        $lookup: {
+          from: 'badges',
+          localField: 'badge',
+          foreignField: '_id',
+          as: 'badgeInfo'
+        }
+      },
+      {
+        $lookup: {
+          from: 'exams',
+          localField: 'exam',
+          foreignField: '_id',
+          as: 'examInfo'
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          description: 1,
+          order: 1,
+          active: 1,
+          courses: 1,
+          requiredCoursesCount: 1,
+          createdAt: 1,
+          badge: { $arrayElemAt: ['$badgeInfo', 0] },
+          exam: { $arrayElemAt: ['$examInfo', 0] },
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          description: 1,
+          order: 1,
+          active: 1,
+          coursesCount: { $size: { $ifNull: ['$courses', []] } },
+          courses: 1,
+          requiredCoursesCount: 1,
+          createdAt: 1,
+          'badge._id': 1,
+          'badge.name': 1,
+          'badge.icon': 1,
+          'badge.shape': 1,
+          'badge.color': 1,
+          'exam._id': 1,
+          'exam.title': 1,
+          'exam.passingScore': 1,
+        }
+      },
+      { $sort: { order: 1 } }
+    ]);
 
-    // Return as plain objects to avoid circular serialization
-    return JSON.parse(JSON.stringify(levels));
+    return levels;
   }
 
   async getByBadge(badgeId: string): Promise<ILevel[]> {
     if (!Types.ObjectId.isValid(badgeId)) {
       throw new AppError('ID de insignia no válido', 400);
     }
-    const levels = await Level.find({ badge: badgeId })
-      .populate('courses', 'name order estimatedHours active')
+    const levels = await Level.find({ badge: badgeId, deleted: { $ne: true } })
+      .select('-__v')
       .populate('exam', 'title passingScore')
       .sort({ order: 1 });
-    
-    return JSON.parse(JSON.stringify(levels));
+
+    return levels.map(l => {
+      const obj = l.toObject();
+      return { ...obj, coursesCount: obj.courses?.length || 0 };
+    }) as any;
   }
 
   async getById(id: string): Promise<ILevel> {

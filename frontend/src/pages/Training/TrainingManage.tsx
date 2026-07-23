@@ -268,7 +268,7 @@ function LevelsTab({ levels, onDelete, onCreate, onEdit }: { levels: Level[]; on
               {levels.map(level => {
                 const badgeName = typeof level.badge === 'object' ? level.badge.name : '—';
                 const examName = typeof level.exam === 'object' ? (level.exam as any).title : (level.exam ? 'Asignado' : '—');
-                const courseCount = Array.isArray(level.courses) ? level.courses.length : 0;
+                const courseCount = (level as any).coursesCount || (Array.isArray(level.courses) ? level.courses.length : 0);
                 return (
                   <tr key={level._id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50" data-test-key={`level-${level._id}`}>
                     <td className="px-4 py-3 text-gray-500">{level.order}</td>
