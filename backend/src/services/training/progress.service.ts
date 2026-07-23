@@ -153,6 +153,178 @@ class ProgressService {
   async exists(employeeId: string): Promise<boolean> {
     return !!(await EmployeeTrainingProgress.exists({ employee: employeeId }));
   }
+
+  /**
+   * Marcar un curso como completado.
+   *
+   * Validaciones:
+   * - El curso pertenece al nivel actual del empleado
+   * - El curso no estaba ya completado
+   *
+   * Efectos:
+   * - Actualiza ICourseProgress.status = 'completed' + completedAt
+   * - Suma estimatedHours al totalStudyHours
+   * - Si todos los cursos del nivel están completados → nivel pasa a 'exam_pending'
+   * - Si el nivel no tiene examen → nivel pasa directo a 'completed' y desbloquea siguiente
+   */
+  async completeCourse(employeeId: string, courseId: string): Promise<{
+    progress: IEmployeeTrainingProgress;
+    levelStatus: string;
+    examUnlocked: boolean;
+    levelCompleted: boolean;
+  }> {
+    if (!Types.ObjectId.isValid(employeeId)) throw new AppError('ID de empleado no válido', 400);
+    if (!Types.ObjectId.isValid(courseId)) throw new AppError('ID de curso no válido', 400);
+
+    const progress = await EmployeeTrainingProgress.findOne({ employee: employeeId });
+    if (!progress) throw new AppError('Progreso no encontrado', 404);
+
+    // Buscar el curso en el progreso
+    const courseProgress = progress.courses.find(c => c.course.toString() === courseId);
+    if (!courseProgress) throw new AppError('Este curso no está asignado al empleado', 400);
+
+    // Validar que no esté ya completado
+    if (courseProgress.status === 'completed') {
+      throw new AppError('Este curso ya está completado', 400);
+    }
+
+    // Obtener el curso para saber su nivel y horas
+    const course = await Course.findById(courseId);
+    if (!course) throw new AppError('Curso no encontrado', 404);
+
+    // Validar que pertenece al nivel actual
+    const currentLevelId = progress.currentLevel?.toString();
+    if (currentLevelId && course.level.toString() !== currentLevelId) {
+      throw new AppError('Este curso no pertenece a tu nivel actual. Debes completar los cursos en orden.', 400);
+    }
+
+    // Marcar curso como completado
+    courseProgress.status = 'completed';
+    courseProgress.completedAt = new Date();
+
+    // Sumar horas estimadas al total
+    if (course.estimatedHours) {
+      progress.totalStudyHours += course.estimatedHours;
+    }
+
+    // Verificar si todos los cursos del nivel actual están completados
+    const levelCourses = progress.courses.filter(c => {
+      // Necesitamos verificar qué cursos pertenecen al nivel actual
+      return true; // Filtraremos abajo
+    });
+
+    // Obtener todos los cursos del nivel actual desde la BD
+    const allCoursesInLevel = await Course.find({ level: course.level, active: true, deleted: { $ne: true } });
+    const allCourseIds = allCoursesInLevel.map(c => c._id.toString());
+
+    const completedInLevel = progress.courses.filter(
+      c => allCourseIds.includes(c.course.toString()) && c.status === 'completed'
+    );
+
+    const allCompleted = completedInLevel.length >= allCourseIds.length;
+
+    let levelStatus = 'in_progress';
+    let examUnlocked = false;
+    let levelCompleted = false;
+
+    if (allCompleted) {
+      // Verificar si el nivel tiene examen
+      const levelDoc = await Level.findById(course.level);
+      const hasExam = levelDoc?.exam;
+
+      const levelProgress = progress.levels.find(l => l.level.toString() === course.level.toString());
+
+      if (hasExam) {
+        // Cambiar nivel a exam_pending
+        if (levelProgress) {
+          levelProgress.status = 'exam_pending';
+        }
+        levelStatus = 'exam_pending';
+        examUnlocked = true;
+
+        // Notificar que el examen está disponible
+        try {
+          const { Exam } = await import('../../models/training/Exam');
+          const exam = await Exam.findById(hasExam);
+          if (exam) {
+            const { notificationService } = await import('../../services/notification.service');
+            await notificationService.notifyExamAssigned(employeeId, exam.title, exam._id.toString());
+          }
+        } catch { /* no bloquear */ }
+      } else {
+        // Sin examen → nivel completado directamente
+        if (levelProgress) {
+          levelProgress.status = 'completed';
+          levelProgress.completedAt = new Date();
+        }
+        levelStatus = 'completed';
+        levelCompleted = true;
+
+        // Desbloquear siguiente nivel
+        await this.unlockNextLevel(progress, course.level.toString());
+      }
+    }
+
+    await progress.save();
+
+    return { progress, levelStatus, examUnlocked, levelCompleted };
+  }
+
+  /**
+   * Desbloquear el siguiente nivel en la secuencia de una insignia.
+   */
+  private async unlockNextLevel(progress: IEmployeeTrainingProgress, completedLevelId: string): Promise<void> {
+    // Obtener el nivel completado para saber su badge y orden
+    const completedLevel = await Level.findById(completedLevelId);
+    if (!completedLevel) return;
+
+    // Buscar el siguiente nivel de la misma insignia
+    const nextLevel = await Level.findOne({
+      badge: completedLevel.badge,
+      order: completedLevel.order + 1,
+      active: true,
+      deleted: { $ne: true },
+    });
+
+    if (nextLevel) {
+      // Desbloquear siguiente nivel
+      const nextLevelProgress = progress.levels.find(l => l.level.toString() === nextLevel._id.toString());
+      if (nextLevelProgress && nextLevelProgress.status === 'locked') {
+        nextLevelProgress.status = 'in_progress';
+        nextLevelProgress.startedAt = new Date();
+        progress.currentLevel = nextLevel._id as Types.ObjectId;
+
+        // Notificar
+        try {
+          const { notificationService } = await import('../../services/notification.service');
+          await notificationService.notifyLevelUnlocked(progress.employee.toString(), nextLevel.name);
+        } catch { /* no bloquear */ }
+      }
+    } else {
+      // No hay siguiente nivel en esta insignia → BADGE EARNED
+      const badgeProgress = progress.badges.find(b => {
+        return b.badge.toString() === completedLevel.badge.toString();
+      });
+      if (badgeProgress && badgeProgress.status !== 'completed') {
+        badgeProgress.status = 'completed';
+        badgeProgress.percentage = 100;
+        badgeProgress.earnedAt = new Date();
+        progress.latestBadge = completedLevel.badge as Types.ObjectId;
+
+        // Notificar
+        try {
+          const { notificationService } = await import('../../services/notification.service');
+          const badge = await Badge.findById(completedLevel.badge);
+          if (badge) {
+            await notificationService.notifyBadgeEarned(progress.employee.toString(), badge.name);
+          }
+        } catch { /* no bloquear */ }
+
+        // Desbloquear siguiente insignia (si existe)
+        // TODO: implementar lógica de siguiente insignia en un slice futuro
+      }
+    }
+  }
 }
 
 export const progressService = new ProgressService();
