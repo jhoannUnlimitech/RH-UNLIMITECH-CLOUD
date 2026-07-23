@@ -41,21 +41,22 @@ class LevelService {
     const levels = await Level.find(query)
       .populate('badge', 'name icon shape color')
       .populate('exam', 'title passingScore')
-      .sort({ badge: 1, order: 1 })
-      .lean(); // Use lean() to avoid Mongoose document serialization issues
+      .sort({ badge: 1, order: 1 });
 
-    return levels as ILevel[];
+    // Return as plain objects to avoid circular serialization
+    return JSON.parse(JSON.stringify(levels));
   }
 
   async getByBadge(badgeId: string): Promise<ILevel[]> {
     if (!Types.ObjectId.isValid(badgeId)) {
       throw new AppError('ID de insignia no válido', 400);
     }
-    return Level.find({ badge: badgeId })
+    const levels = await Level.find({ badge: badgeId })
       .populate('courses', 'name order estimatedHours active')
       .populate('exam', 'title passingScore')
-      .sort({ order: 1 })
-      .lean() as unknown as Promise<ILevel[]>;
+      .sort({ order: 1 });
+    
+    return JSON.parse(JSON.stringify(levels));
   }
 
   async getById(id: string): Promise<ILevel> {
