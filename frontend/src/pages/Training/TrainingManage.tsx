@@ -6,6 +6,9 @@ import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import Button from "../../components/ui/button/Button";
 import DeleteConfirmModal from "../../components/employees/DeleteConfirmModal";
 import BadgeIcon from "../../components/training/BadgeIcon";
+import BadgeFormModal from "../../components/training/BadgeFormModal";
+import LevelFormModal from "../../components/training/LevelFormModal";
+import CourseFormModal from "../../components/training/CourseFormModal";
 import { trainingService } from "../../api/services/training";
 import type { Badge, Level, Course, Exam } from "../../api/services/training";
 import { notify } from "../../utils/toast";
@@ -34,6 +37,14 @@ const TrainingManage = observer(() => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deletingItem, setDeletingItem] = useState<{ id: string; name: string; type: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Create/Edit modals
+  const [badgeModalOpen, setBadgeModalOpen] = useState(false);
+  const [editingBadge, setEditingBadge] = useState<Badge | null>(null);
+  const [levelModalOpen, setLevelModalOpen] = useState(false);
+  const [editingLevel, setEditingLevel] = useState<Level | null>(null);
+  const [courseModalOpen, setCourseModalOpen] = useState(false);
+  const [editingCourse, setEditingCourse] = useState<Course | null>(null);
 
   // Fetch data on tab change
   useEffect(() => {
@@ -125,9 +136,9 @@ const TrainingManage = observer(() => {
           </div>
         ) : (
           <>
-            {activeTab === 'badges' && <BadgesTab badges={badges} onDelete={handleDelete} />}
-            {activeTab === 'levels' && <LevelsTab levels={levels} onDelete={handleDelete} />}
-            {activeTab === 'courses' && <CoursesTab courses={courses} onDelete={handleDelete} />}
+            {activeTab === 'badges' && <BadgesTab badges={badges} onDelete={handleDelete} onCreate={() => { setEditingBadge(null); setBadgeModalOpen(true); }} onEdit={(b) => { setEditingBadge(b); setBadgeModalOpen(true); }} />}
+            {activeTab === 'levels' && <LevelsTab levels={levels} onDelete={handleDelete} onCreate={() => { setEditingLevel(null); setLevelModalOpen(true); }} onEdit={(l) => { setEditingLevel(l); setLevelModalOpen(true); }} />}
+            {activeTab === 'courses' && <CoursesTab courses={courses} onDelete={handleDelete} onCreate={() => { setEditingCourse(null); setCourseModalOpen(true); }} onEdit={(c) => { setEditingCourse(c); setCourseModalOpen(true); }} />}
             {activeTab === 'exams' && <ExamsTab exams={exams} onDelete={handleDelete} navigate={navigate} />}
           </>
         )}
@@ -142,17 +153,64 @@ const TrainingManage = observer(() => {
         itemType={deletingItem?.type || ''}
         isLoading={isDeleting}
       />
+
+      {/* Badge Form Modal */}
+      <BadgeFormModal
+        isOpen={badgeModalOpen}
+        onClose={() => { setBadgeModalOpen(false); setEditingBadge(null); }}
+        onSuccess={(badge) => {
+          if (editingBadge) {
+            setBadges(prev => prev.map(b => b._id === badge._id ? badge : b));
+          } else {
+            setBadges(prev => [...prev, badge]);
+          }
+        }}
+        badge={editingBadge}
+      />
+
+      {/* Level Form Modal */}
+      <LevelFormModal
+        isOpen={levelModalOpen}
+        onClose={() => { setLevelModalOpen(false); setEditingLevel(null); }}
+        onSuccess={(level) => {
+          if (editingLevel) {
+            setLevels(prev => prev.map(l => l._id === level._id ? level : l));
+          } else {
+            setLevels(prev => [...prev, level]);
+          }
+        }}
+        level={editingLevel}
+        badges={badges}
+      />
+
+      {/* Course Form Modal */}
+      <CourseFormModal
+        isOpen={courseModalOpen}
+        onClose={() => { setCourseModalOpen(false); setEditingCourse(null); }}
+        onSuccess={(course) => {
+          if (editingCourse) {
+            setCourses(prev => prev.map(c => c._id === course._id ? course : c));
+          } else {
+            setCourses(prev => [...prev, course]);
+          }
+        }}
+        course={editingCourse}
+        levels={levels}
+      />
     </>
   );
 });
 
 // ─── Tab: Insignias ─────────────────────────────────────────────────────────
 
-function BadgesTab({ badges, onDelete }: { badges: Badge[]; onDelete: (id: string, name: string, type: string) => void }) {
+function BadgesTab({ badges, onDelete, onCreate, onEdit }: { badges: Badge[]; onDelete: (id: string, name: string, type: string) => void; onCreate: () => void; onEdit: (b: Badge) => void }) {
   return (
     <div data-test-context="badges-tab">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-base font-semibold text-gray-800 dark:text-white">Insignias ({badges.length})</h3>
+        <Button onClick={onCreate} size="sm" data-test-key="create-badge-btn">
+          <Plus size={16} className="mr-1" /> Nueva Insignia
+        </Button>
       </div>
       {badges.length === 0 ? (
         <p className="py-8 text-center text-gray-400">No hay insignias creadas</p>
@@ -166,6 +224,9 @@ function BadgesTab({ badges, onDelete }: { badges: Badge[]; onDelete: (id: strin
                 <p className="text-xs text-gray-400 truncate">{badge.description}</p>
                 <p className="text-[10px] text-gray-400 mt-0.5">{badge.totalCourses} cursos · {(badge.levels as any[])?.length || 0} niveles</p>
               </div>
+              <button onClick={() => onEdit(badge)} className="rounded p-1.5 text-gray-300 hover:text-brand-500" data-test-key="edit-btn">
+                <Edit2 size={14} />
+              </button>
               <button onClick={() => onDelete(badge._id, badge.name, 'badge')} className="rounded p-1.5 text-gray-300 hover:text-red-500" data-test-key="delete-btn">
                 <Trash2 size={14} />
               </button>
@@ -179,11 +240,14 @@ function BadgesTab({ badges, onDelete }: { badges: Badge[]; onDelete: (id: strin
 
 // ─── Tab: Niveles ───────────────────────────────────────────────────────────
 
-function LevelsTab({ levels, onDelete }: { levels: Level[]; onDelete: (id: string, name: string, type: string) => void }) {
+function LevelsTab({ levels, onDelete, onCreate, onEdit }: { levels: Level[]; onDelete: (id: string, name: string, type: string) => void; onCreate: () => void; onEdit: (l: Level) => void }) {
   return (
     <div data-test-context="levels-tab">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-base font-semibold text-gray-800 dark:text-white">Niveles ({levels.length})</h3>
+        <Button onClick={onCreate} size="sm" data-test-key="create-level-btn">
+          <Plus size={16} className="mr-1" /> Nuevo Nivel
+        </Button>
       </div>
       {levels.length === 0 ? (
         <p className="py-8 text-center text-gray-400">No hay niveles creados</p>
@@ -213,6 +277,9 @@ function LevelsTab({ levels, onDelete }: { levels: Level[]; onDelete: (id: strin
                     <td className="px-4 py-3 text-gray-500">{courseCount}</td>
                     <td className="px-4 py-3 text-gray-500">{examName}</td>
                     <td className="px-4 py-3 text-right">
+                      <button onClick={() => onEdit(level)} className="rounded p-1.5 text-gray-300 hover:text-brand-500" data-test-key="edit-btn">
+                        <Edit2 size={14} />
+                      </button>
                       <button onClick={() => onDelete(level._id, level.name, 'level')} className="rounded p-1.5 text-gray-300 hover:text-red-500" data-test-key="delete-btn">
                         <Trash2 size={14} />
                       </button>
@@ -230,11 +297,14 @@ function LevelsTab({ levels, onDelete }: { levels: Level[]; onDelete: (id: strin
 
 // ─── Tab: Cursos ────────────────────────────────────────────────────────────
 
-function CoursesTab({ courses, onDelete }: { courses: Course[]; onDelete: (id: string, name: string, type: string) => void }) {
+function CoursesTab({ courses, onDelete, onCreate, onEdit }: { courses: Course[]; onDelete: (id: string, name: string, type: string) => void; onCreate: () => void; onEdit: (c: Course) => void }) {
   return (
     <div data-test-context="courses-tab">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-base font-semibold text-gray-800 dark:text-white">Cursos ({courses.length})</h3>
+        <Button onClick={onCreate} size="sm" data-test-key="create-course-btn">
+          <Plus size={16} className="mr-1" /> Nuevo Curso
+        </Button>
       </div>
       {courses.length === 0 ? (
         <p className="py-8 text-center text-gray-400">No hay cursos creados</p>
@@ -263,6 +333,9 @@ function CoursesTab({ courses, onDelete }: { courses: Course[]; onDelete: (id: s
                     <td className="px-4 py-3 text-gray-500">{levelName}</td>
                     <td className="px-4 py-3 text-gray-500">{course.estimatedHours || '—'}h</td>
                     <td className="px-4 py-3 text-right">
+                      <button onClick={() => onEdit(course)} className="rounded p-1.5 text-gray-300 hover:text-brand-500" data-test-key="edit-btn">
+                        <Edit2 size={14} />
+                      </button>
                       <button onClick={() => onDelete(course._id, course.name, 'course')} className="rounded p-1.5 text-gray-300 hover:text-red-500" data-test-key="delete-btn">
                         <Trash2 size={14} />
                       </button>
