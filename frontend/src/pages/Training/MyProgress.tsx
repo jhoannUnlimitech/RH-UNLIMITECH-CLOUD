@@ -8,6 +8,7 @@ import { Modal } from "../../components/ui/modal";
 import BadgeIcon from "../../components/training/BadgeIcon";
 import { progressApiService } from "../../api/services/progress";
 import type { EmployeeProgress, ExtraAssignment } from "../../api/services/progress";
+import { notify } from "../../utils/toast";
 
 /**
  * MyProgress — Página del empleado para ver su progreso de capacitación.
@@ -67,12 +68,14 @@ const MyProgress = observer(() => {
       const result = await progressApiService.completeCourse(hoursModalCourseId, hours);
       setProgress(result.progress);
       if (result.examUnlocked) {
-        alert('¡Todos los cursos completados! El examen del nivel está disponible.');
+        notify.success('¡Todos los cursos completados! El examen del nivel está disponible.');
       } else if (result.levelCompleted) {
-        alert('¡Nivel completado! Avanzaste al siguiente.');
+        notify.success('¡Nivel completado! Avanzaste al siguiente.');
+      } else {
+        notify.success('Curso marcado como completado.');
       }
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Error al completar curso');
+      notify.error(err.response?.data?.message || 'Error al completar curso');
     } finally { setCompletingCourse(null); }
   };
 
@@ -278,9 +281,12 @@ const MyProgress = observer(() => {
                     <p className={`text-xs ${config.color}`}>{config.label}</p>
                   </div>
                   {lp.status === 'exam_pending' && (
-                    <span className="rounded-full bg-orange-100 px-2 py-0.5 text-[10px] font-medium text-orange-600 dark:bg-orange-500/10 dark:text-orange-400">
-                      ¡Examen disponible!
-                    </span>
+                    <button
+                      onClick={() => navigate('/training/my-progress')} 
+                      className="rounded-full bg-orange-100 px-3 py-1 text-xs font-medium text-orange-600 hover:bg-orange-200 dark:bg-orange-500/10 dark:text-orange-400"
+                    >
+                      Tomar Examen
+                    </button>
                   )}
                 </div>
               );

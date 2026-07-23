@@ -40,8 +40,8 @@ class LevelService {
 
     return Level.find(query)
       .populate('badge', 'name icon shape color')
-      .populate('courses', 'name order estimatedHours')
-      .populate('exam', 'name passingScore')
+      .populate({ path: 'courses', select: 'name order estimatedHours', match: { deleted: { $ne: true } } })
+      .populate('exam', 'title passingScore')
       .sort({ badge: 1, order: 1 });
   }
 
@@ -50,8 +50,8 @@ class LevelService {
       throw new AppError('ID de insignia no válido', 400);
     }
     return Level.find({ badge: badgeId })
-      .populate('courses', 'name order estimatedHours active')
-      .populate('exam', 'name passingScore')
+      .populate({ path: 'courses', select: 'name order estimatedHours active', match: { deleted: { $ne: true } } })
+      .populate('exam', 'title passingScore')
       .sort({ order: 1 });
   }
 
