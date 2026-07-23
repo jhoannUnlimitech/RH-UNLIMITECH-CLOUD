@@ -10,6 +10,7 @@ import {
   ChevronDownIcon,
   HorizontaLDots,
 } from "../icons";
+import { Settings } from "lucide-react";
 import { useSidebar } from "../context/SidebarContext";
 import { useTheme } from "../context/ThemeContext";
 import { authStore } from "../stores/views";
@@ -90,6 +91,12 @@ const navItems: NavItem[] = [
       { name: "Pase de Lista", path: "/training/admin/attendance", resource: "training", action: "manage" },
       { name: "Dashboard", path: "/training/admin/dashboard", resource: "training", action: "manage" },
     ],
+  },
+  {
+    name: "Configuración",
+    icon: <Settings size={20} />,
+    path: "/settings",
+    resource: "roles",
   },
 ];
 

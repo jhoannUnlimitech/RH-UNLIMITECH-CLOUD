@@ -35,6 +35,7 @@ import MyProgress from "./pages/Training/MyProgress";
 import TakeExam from "./pages/Training/TakeExam";
 import StudyReport from "./pages/Training/StudyReport";
 import Attendance from "./pages/Training/Attendance";
+import SystemSettings from "./pages/Settings/SystemSettings";
 
 export default function App() {
   // Verificar autenticación al cargar la aplicación
@@ -93,6 +94,7 @@ export default function App() {
           <Route path="/training/my-progress" element={<PermissionRoute resource="training"><MyProgress /></PermissionRoute>} />
           <Route path="/training/report" element={<PermissionRoute resource="training"><StudyReport /></PermissionRoute>} />
           <Route path="/training/admin/attendance" element={<PermissionRoute resource="training" action="manage"><Attendance /></PermissionRoute>} />
+          <Route path="/settings" element={<PermissionRoute resource="roles" action="update"><SystemSettings /></PermissionRoute>} />
           <Route path="/training/honor-table" element={<PermissionRoute resource="training"><Library /></PermissionRoute>} />
           <Route path="/training/certificates" element={<PermissionRoute resource="training"><Library /></PermissionRoute>} />
           <Route path="/training/admin/dashboard" element={<PermissionRoute resource="training"><TrainingManage /></PermissionRoute>} />

@@ -1,5 +1,6 @@
 import { AttendanceRecord, IAttendanceRecord } from '../../models/training/AttendanceRecord';
 import { Employee } from '../../models/Employee';
+import { systemConfigService } from '../systemConfig.service';
 import { AppError } from '../../middleware/error';
 
 /**
@@ -47,10 +48,19 @@ class AttendanceService {
     const date = new Date(data.date + 'T12:00:00'); // Fijar al mediodía para evitar problemas de timezone
     date.setHours(0, 0, 0, 0);
 
-    // Validar que sea L/M/V (1=Lun, 3=Mié, 5=Vie)
+    // Validar que sea día obligatorio de estudio (desde config)
+    const studyDays = await systemConfigService.getStudyDays();
     const dayOfWeek = date.getDay();
-    if (![1, 3, 5].includes(dayOfWeek)) {
-      throw new AppError('El pase de lista solo se realiza Lunes, Miércoles y Viernes', 400);
+    if (!studyDays.includes(dayOfWeek)) {
+      const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+      const allowedDays = studyDays.map(d => dayNames[d]).join(', ');
+      throw new AppError(`El pase de lista solo se realiza: ${allowedDays}`, 400);
+    }
+
+    // Verificar si es festivo
+    const isHoliday = await systemConfigService.isHoliday(date);
+    if (isHoliday) {
+      throw new AppError('No se pasa lista en días festivos', 400);
     }
 
     const results: IAttendanceRecord[] = [];
@@ -80,9 +90,19 @@ class AttendanceService {
     const d = new Date(date + 'T12:00:00'); // Fijar al mediodía para evitar problemas de timezone
     d.setHours(0, 0, 0, 0);
 
+    // Validar que sea día obligatorio de estudio (desde config)
+    const studyDays = await systemConfigService.getStudyDays();
     const dayOfWeek = d.getDay();
-    if (![1, 3, 5].includes(dayOfWeek)) {
-      throw new AppError('El pase de lista solo se realiza Lunes, Miércoles y Viernes', 400);
+    if (!studyDays.includes(dayOfWeek)) {
+      const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+      const allowedDays = studyDays.map(d => dayNames[d]).join(', ');
+      throw new AppError(`El pase de lista solo se realiza: ${allowedDays}`, 400);
+    }
+
+    // Verificar si es festivo
+    const isHoliday = await systemConfigService.isHoliday(d);
+    if (isHoliday) {
+      throw new AppError('No se pasa lista en días festivos', 400);
     }
 
     // Solo validar que no sea más de 2 semanas en el futuro
@@ -125,12 +145,13 @@ class AttendanceService {
     const targetDate = weekDate ? new Date(weekDate) : new Date();
     const { weekStart, weekEnd } = getWeekBounds(targetDate);
 
-    // Calcular los días obligatorios (L/M/V) de la semana
+    // Calcular los días obligatorios de estudio de la semana (desde config)
+    const studyDays = await systemConfigService.getStudyDays();
     const obligatoryDays: Date[] = [];
     const current = new Date(weekStart);
     while (current <= weekEnd) {
       const dow = current.getDay();
-      if ([1, 3, 5].includes(dow)) { // Lun, Mié, Vie
+      if (studyDays.includes(dow)) {
         obligatoryDays.push(new Date(current));
       }
       current.setDate(current.getDate() + 1);

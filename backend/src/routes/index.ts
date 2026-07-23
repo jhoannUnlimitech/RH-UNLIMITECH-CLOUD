@@ -11,6 +11,7 @@ import projectsRoutes from './projects.routes';
 import weeklyReportRoutes from './weeklyReport.routes';
 import calendarEventRoutes from './calendarEvent.routes';
 import notificationRoutes from './notification.routes';
+import systemConfigRoutes from './systemConfig.routes';
 import { libraryRouter } from './training/index';
 import trainingRoutes from './training/index';
 
@@ -57,5 +58,8 @@ router.use('/training', trainingRoutes);
 
 // Rutas de notificaciones
 router.use('/notifications', notificationRoutes);
+
+// Rutas de configuración del sistema
+router.use('/config', systemConfigRoutes);
 
 export default router;
