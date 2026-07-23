@@ -4,6 +4,7 @@ import coursesRoutes from './courses.routes';
 import levelsRoutes from './levels.routes';
 import badgesRoutes from './badges.routes';
 import examsRoutes from './exams.routes';
+import examAttemptsRoutes from './examAttempts.routes';
 import progressRoutes from './progress.routes';
 
 /**
@@ -21,6 +22,7 @@ router.use('/courses', coursesRoutes);
 router.use('/levels', levelsRoutes);
 router.use('/badges', badgesRoutes);
 router.use('/exams', examsRoutes);
+router.use('/exam-attempts', examAttemptsRoutes);
 router.use('/progress', progressRoutes);
 
 // Rutas de la Biblioteca (categorías + documentos)
