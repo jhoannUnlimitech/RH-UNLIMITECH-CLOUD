@@ -1,4 +1,14 @@
 import { useMemo } from "react";
+import {
+  Award, Trophy, Medal, Crown, Star, Gem, Target,
+  Flame, Rocket, Zap, TrendingUp, Timer,
+  BookOpen, GraduationCap, Brain, Lightbulb, Puzzle, Code, FileText,
+  Shield, ShieldCheck, Lock, Key,
+  Sprout, TreePine, Sun, Mountain,
+  Users, Heart, ThumbsUp, MessageCircle,
+  Wrench, Settings, Compass, Flag,
+  type LucideIcon,
+} from "lucide-react";
 
 /**
  * BadgeIcon — Renderiza una insignia con forma SVG + ícono Lucide + color.
@@ -127,17 +137,19 @@ const BadgeIcon: React.FC<BadgeIconProps> = ({
         </svg>
       )}
 
-      {/* Icon placeholder (text-based until lucide-react is installed via WSL) */}
+      {/* Lucide Icon */}
       <span
-        className="relative z-10 font-medium select-none"
+        className="relative z-10 flex items-center justify-center"
         style={{
-          fontSize: dims.icon * 0.6,
           color: earned ? color : "#6B7280",
           opacity: earned ? 1 : 0.6,
         }}
-        title={icon}
       >
-        {getIconEmoji(icon)}
+        {(() => {
+          const IconComp = LUCIDE_ICON_MAP[icon];
+          if (IconComp) return <IconComp size={dims.icon} />;
+          return <Award size={dims.icon} />;
+        })()}
       </span>
 
       {/* Progress text */}
@@ -153,34 +165,23 @@ const BadgeIcon: React.FC<BadgeIconProps> = ({
   );
 };
 
-/**
- * Mapea nombres de íconos Lucide a emojis como fallback.
- * Cuando lucide-react esté instalado, reemplazar con el componente real.
- */
-function getIconEmoji(iconName: string): string {
-  const map: Record<string, string> = {
-    award: "🏅",
-    trophy: "🏆",
-    star: "⭐",
-    crown: "👑",
-    flame: "🔥",
-    rocket: "🚀",
-    shield: "🛡️",
-    "shield-check": "✅",
-    zap: "⚡",
-    heart: "❤️",
-    target: "🎯",
-    gem: "💎",
-    medal: "🎖️",
-    sprout: "🌱",
-    book: "📚",
-    graduation: "🎓",
-    "graduation-cap": "🎓",
-    lightbulb: "💡",
-    brain: "🧠",
-    puzzle: "🧩",
-  };
-  return map[iconName] || "🏅";
-}
+/** Mapa de nombre de ícono → componente Lucide */
+const LUCIDE_ICON_MAP: Record<string, LucideIcon> = {
+  award: Award, trophy: Trophy, medal: Medal, crown: Crown,
+  star: Star, gem: Gem, target: Target,
+  flame: Flame, rocket: Rocket, zap: Zap,
+  "trending-up": TrendingUp, timer: Timer,
+  "book-open": BookOpen, "graduation-cap": GraduationCap,
+  brain: Brain, lightbulb: Lightbulb, puzzle: Puzzle, code: Code,
+  "file-text": FileText,
+  shield: Shield, "shield-check": ShieldCheck, lock: Lock, key: Key,
+  sprout: Sprout, "tree-pine": TreePine, sun: Sun, mountain: Mountain,
+  users: Users, heart: Heart, "thumbs-up": ThumbsUp,
+  "message-circle": MessageCircle,
+  wrench: Wrench, settings: Settings, compass: Compass, flag: Flag,
+  // Aliases comunes
+  "code-2": Code, atom: Zap, book: BookOpen, graduation: GraduationCap,
+  tree: TreePine,
+};
 
 export default BadgeIcon;
