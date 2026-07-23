@@ -38,11 +38,13 @@ class LevelService {
     if (filters?.badge) query.badge = filters.badge;
     if (filters?.active !== undefined) query.active = filters.active;
 
-    return Level.find(query)
+    const levels = await Level.find(query)
       .populate('badge', 'name icon shape color')
-      .populate('courses', 'name order estimatedHours')
       .populate('exam', 'title passingScore')
-      .sort({ badge: 1, order: 1 });
+      .sort({ badge: 1, order: 1 })
+      .lean(); // Use lean() to avoid Mongoose document serialization issues
+
+    return levels as ILevel[];
   }
 
   async getByBadge(badgeId: string): Promise<ILevel[]> {
@@ -52,7 +54,8 @@ class LevelService {
     return Level.find({ badge: badgeId })
       .populate('courses', 'name order estimatedHours active')
       .populate('exam', 'title passingScore')
-      .sort({ order: 1 });
+      .sort({ order: 1 })
+      .lean() as unknown as Promise<ILevel[]>;
   }
 
   async getById(id: string): Promise<ILevel> {
