@@ -96,7 +96,7 @@ const navItems: NavItem[] = [
     name: "Configuración",
     icon: <Settings size={20} />,
     path: "/settings",
-    resource: "roles",
+    resource: "training",
   },
 ];
 

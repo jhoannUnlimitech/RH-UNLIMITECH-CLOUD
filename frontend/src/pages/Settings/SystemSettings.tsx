@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import {
-  Settings, Globe, Clock, GraduationCap, CalendarDays, Bell, Save, Plus, Trash2, RotateCcw,
+  Settings, Globe, Clock, GraduationCap, Bell, Save,
 } from "lucide-react";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import Button from "../../components/ui/button/Button";
@@ -13,13 +13,6 @@ import { notify } from "../../utils/toast";
  *
  * Tabs: General | Horario | Training | Festivos | Notificaciones
  */
-
-interface Holiday {
-  _id?: string;
-  date: string;
-  name: string;
-  recurring: boolean;
-}
 
 interface SystemConfig {
   general: {
@@ -40,7 +33,6 @@ interface SystemConfig {
     maxExamAttempts: number;
     studyReportMaxHoursPerDay: number;
   };
-  holidays: Holiday[];
   notifications: {
     retentionDays: number;
     emailEnabled: boolean;
@@ -52,7 +44,6 @@ const TABS = [
   { id: 'general', label: 'General', icon: Globe },
   { id: 'schedule', label: 'Horario', icon: Clock },
   { id: 'training', label: 'Training', icon: GraduationCap },
-  { id: 'holidays', label: 'Festivos', icon: CalendarDays },
   { id: 'notifications', label: 'Notificaciones', icon: Bell },
 ] as const;
 
@@ -86,8 +77,6 @@ const SystemSettings = observer(() => {
   const [schedule, setSchedule] = useState<SystemConfig['schedule']>({ workDays: [], workHoursStart: '', workHoursEnd: '', studyDays: [] });
   const [training, setTraining] = useState<SystemConfig['training']>({ minWeeklyHours: 3, examPassingScore: 80, maxExamAttempts: 3, studyReportMaxHoursPerDay: 12 });
   const [notifications, setNotifications] = useState<SystemConfig['notifications']>({ retentionDays: 90, emailEnabled: false, summaryFrequency: 'none' });
-  const [holidays, setHolidays] = useState<Holiday[]>([]);
-  const [newHoliday, setNewHoliday] = useState<Holiday>({ date: '', name: '', recurring: false });
 
   useEffect(() => { loadConfig(); }, []);
 
@@ -101,7 +90,6 @@ const SystemSettings = observer(() => {
       setSchedule(data.schedule);
       setTraining(data.training);
       setNotifications(data.notifications);
-      setHolidays(data.holidays);
     } catch (err: any) {
       notify.error(err.response?.data?.message || 'Error al cargar configuración');
     } finally { setLoading(false); }
@@ -116,32 +104,6 @@ const SystemSettings = observer(() => {
     } catch (err: any) {
       notify.error(err.response?.data?.message || 'Error al guardar');
     } finally { setSaving(false); }
-  };
-
-  const handleAddHoliday = async () => {
-    if (!newHoliday.date || !newHoliday.name.trim()) {
-      notify.error('Fecha y nombre son requeridos');
-      return;
-    }
-    setSaving(true);
-    try {
-      await apiClient.post('/config/holidays', newHoliday);
-      notify.success('Festivo agregado');
-      setNewHoliday({ date: '', name: '', recurring: false });
-      loadConfig();
-    } catch (err: any) {
-      notify.error(err.response?.data?.message || 'Error al agregar festivo');
-    } finally { setSaving(false); }
-  };
-
-  const handleRemoveHoliday = async (id: string) => {
-    try {
-      await apiClient.delete(`/config/holidays/${id}`);
-      notify.success('Festivo eliminado');
-      loadConfig();
-    } catch (err: any) {
-      notify.error(err.response?.data?.message || 'Error al eliminar');
-    }
   };
 
   const toggleDay = (days: number[], day: number, setter: (d: number[]) => void) => {
@@ -372,68 +334,6 @@ const SystemSettings = observer(() => {
                   <Button onClick={() => saveSection('training', training)} disabled={saving}>
                     <Save size={14} className="mr-1.5" /> {saving ? 'Guardando...' : 'Guardar'}
                   </Button>
-                </div>
-              </div>
-            )}
-
-            {/* Tab: Festivos */}
-            {activeTab === 'holidays' && (
-              <div className="space-y-5" data-test-context="settings-holidays">
-                <h4 className="flex items-center gap-2 text-base font-semibold text-gray-800 dark:text-white">
-                  <CalendarDays size={18} className="text-brand-500" /> Festivos
-                </h4>
-                <p className="text-xs text-gray-400">Los días festivos no se cuentan para el pase de lista. Los recurrentes se repiten cada año.</p>
-
-                {/* Formulario para agregar */}
-                <div className="flex flex-wrap items-end gap-3 rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
-                  <div>
-                    <label className="mb-1 block text-xs font-medium text-gray-500">Fecha</label>
-                    <input type="date" value={newHoliday.date}
-                      onChange={(e) => setNewHoliday(prev => ({ ...prev, date: e.target.value }))}
-                      className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-[200px]">
-                    <label className="mb-1 block text-xs font-medium text-gray-500">Nombre</label>
-                    <input type="text" value={newHoliday.name} placeholder="Ej: Día del Trabajo"
-                      onChange={(e) => setNewHoliday(prev => ({ ...prev, name: e.target.value }))}
-                      className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-                    />
-                  </div>
-                  <label className="flex items-center gap-1.5 cursor-pointer pb-1">
-                    <input type="checkbox" checked={newHoliday.recurring}
-                      onChange={(e) => setNewHoliday(prev => ({ ...prev, recurring: e.target.checked }))}
-                      className="accent-brand-500"
-                    />
-                    <span className="text-xs text-gray-600 dark:text-gray-300">Recurrente</span>
-                  </label>
-                  <Button size="sm" onClick={handleAddHoliday} disabled={saving}>
-                    <Plus size={14} className="mr-1" /> Agregar
-                  </Button>
-                </div>
-
-                {/* Lista de festivos */}
-                <div className="space-y-1">
-                  {holidays.length === 0 ? (
-                    <p className="py-6 text-center text-sm text-gray-400">No hay festivos configurados</p>
-                  ) : (
-                    holidays.map(h => (
-                      <div key={h._id} className="flex items-center justify-between rounded-lg bg-white px-4 py-2.5 border border-gray-100 dark:bg-gray-800 dark:border-gray-700">
-                        <div className="flex items-center gap-3">
-                          <span className="text-sm font-mono text-gray-600 dark:text-gray-300">{h.date}</span>
-                          <span className="text-sm text-gray-800 dark:text-white">{h.name}</span>
-                          {h.recurring && (
-                            <span className="flex items-center gap-0.5 rounded bg-blue-50 px-1.5 py-0.5 text-[10px] text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
-                              <RotateCcw size={10} /> Anual
-                            </span>
-                          )}
-                        </div>
-                        <button onClick={() => handleRemoveHoliday(h._id!)} className="text-gray-300 hover:text-red-500 p-1">
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    ))
-                  )}
                 </div>
               </div>
             )}

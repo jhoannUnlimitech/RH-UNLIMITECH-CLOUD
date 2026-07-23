@@ -144,19 +144,22 @@ class SystemConfigService {
 
   /**
    * Verificar si una fecha es festivo.
+   * Lee directamente del módulo de calendario (CalendarEvent type='holiday').
    */
   async isHoliday(date: Date): Promise<boolean> {
-    const config = await this.getConfig();
-    const dateStr = date.toISOString().split('T')[0]; // YYYY-MM-DD
-    const monthDay = dateStr.slice(5); // MM-DD
+    const { CalendarEvent } = await import('../models/CalendarEvent');
+    const dateStart = new Date(date);
+    dateStart.setHours(0, 0, 0, 0);
+    const dateEnd = new Date(date);
+    dateEnd.setHours(23, 59, 59, 999);
 
-    return config.holidays.some(h => {
-      if (h.recurring) {
-        // Comparar solo mes y día
-        return h.date.slice(5) === monthDay;
-      }
-      return h.date === dateStr;
+    const holiday = await CalendarEvent.findOne({
+      type: 'holiday',
+      startDate: { $lte: dateEnd },
+      endDate: { $gte: dateStart },
     });
+
+    return !!holiday;
   }
 
   /**

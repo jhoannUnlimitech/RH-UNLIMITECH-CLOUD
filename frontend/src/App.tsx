@@ -94,7 +94,7 @@ export default function App() {
           <Route path="/training/my-progress" element={<PermissionRoute resource="training"><MyProgress /></PermissionRoute>} />
           <Route path="/training/report" element={<PermissionRoute resource="training"><StudyReport /></PermissionRoute>} />
           <Route path="/training/admin/attendance" element={<PermissionRoute resource="training" action="manage"><Attendance /></PermissionRoute>} />
-          <Route path="/settings" element={<PermissionRoute resource="roles" action="update"><SystemSettings /></PermissionRoute>} />
+          <Route path="/settings" element={<PermissionRoute resource="training" action="manage"><SystemSettings /></PermissionRoute>} />
           <Route path="/training/honor-table" element={<PermissionRoute resource="training"><Library /></PermissionRoute>} />
           <Route path="/training/certificates" element={<PermissionRoute resource="training"><Library /></PermissionRoute>} />
           <Route path="/training/admin/dashboard" element={<PermissionRoute resource="training"><TrainingManage /></PermissionRoute>} />
