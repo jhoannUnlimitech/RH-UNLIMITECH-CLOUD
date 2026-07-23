@@ -32,6 +32,7 @@ import DocumentForm from "./pages/Training/DocumentForm";
 import TrainingManage from "./pages/Training/TrainingManage";
 import ExamForm from "./pages/Training/ExamForm";
 import MyProgress from "./pages/Training/MyProgress";
+import TakeExam from "./pages/Training/TakeExam";
 
 export default function App() {
   // Verificar autenticación al cargar la aplicación
@@ -86,6 +87,7 @@ export default function App() {
           <Route path="/training/manage" element={<PermissionRoute resource="training" action="manage"><TrainingManage /></PermissionRoute>} />
           <Route path="/training/manage/exams/new" element={<PermissionRoute resource="training" action="manage"><ExamForm /></PermissionRoute>} />
           <Route path="/training/manage/exams/edit/:id" element={<PermissionRoute resource="training" action="manage"><ExamForm /></PermissionRoute>} />
+          <Route path="/training/exam/:examId" element={<PermissionRoute resource="training"><TakeExam /></PermissionRoute>} />
           <Route path="/training/my-progress" element={<PermissionRoute resource="training"><MyProgress /></PermissionRoute>} />
           <Route path="/training/report" element={<PermissionRoute resource="training"><Library /></PermissionRoute>} />
           <Route path="/training/honor-table" element={<PermissionRoute resource="training"><Library /></PermissionRoute>} />
