@@ -22,7 +22,7 @@ interface BadgeIconProps {
   color: string;
   earned?: boolean;
   progress?: number;
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg" | "xl" | number;
   className?: string;
   "data-test-key"?: string;
 }
@@ -60,7 +60,9 @@ const BadgeIcon: React.FC<BadgeIconProps> = ({
   className = "",
   ...props
 }) => {
-  const dims = SIZES[size];
+  const dims = typeof size === 'number'
+    ? { container: size, icon: Math.round(size * 0.4), stroke: size > 60 ? 3 : 2.5 }
+    : SIZES[size];
   const fillColor = earned ? color : "#9CA3AF";
   const opacity = earned ? 1 : 0.4;
   const bgOpacity = earned ? 0.15 : 0.08;
