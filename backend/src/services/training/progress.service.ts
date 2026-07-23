@@ -87,6 +87,21 @@ class ProgressService {
     });
 
     await progress.save();
+
+    // Notificar al empleado que se le asignó su ruta de capacitación
+    if (badgesProgress.length > 0) {
+      try {
+        const { notificationService } = await import('../../services/notification.service');
+        await notificationService.create({
+          recipient: employeeId,
+          type: 'course_assigned',
+          title: 'Bienvenido a Training',
+          message: `Se te asignó tu ruta de capacitación. Tienes ${coursesProgress.length} curso(s) para comenzar.`,
+          link: '/training/my-progress',
+        });
+      } catch { /* no bloquear si falla la notificación */ }
+    }
+
     return progress;
   }
 

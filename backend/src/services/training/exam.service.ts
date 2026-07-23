@@ -309,6 +309,10 @@ class ExamService {
     exam.assignedTo.push(new Types.ObjectId(employeeId));
     await exam.save();
 
+    // Notificar al empleado
+    const { notificationService } = await import('../../services/notification.service');
+    await notificationService.notifyExamAssigned(employeeId, exam.title, examId);
+
     await exam.populate('level', 'name order');
     await exam.populate('createdBy', 'name email');
     await exam.populate('assignedTo', 'name email');

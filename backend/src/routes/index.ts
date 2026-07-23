@@ -10,6 +10,7 @@ import cswRoutes from './csw.routes';
 import projectsRoutes from './projects.routes';
 import weeklyReportRoutes from './weeklyReport.routes';
 import calendarEventRoutes from './calendarEvent.routes';
+import notificationRoutes from './notification.routes';
 import { libraryRouter } from './training/index';
 import trainingRoutes from './training/index';
 
@@ -53,5 +54,8 @@ router.use('/library', libraryRouter);
 
 // Rutas del módulo Training (cursos, niveles, insignias)
 router.use('/training', trainingRoutes);
+
+// Rutas de notificaciones
+router.use('/notifications', notificationRoutes);
 
 export default router;

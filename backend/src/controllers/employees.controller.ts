@@ -310,6 +310,12 @@ export const deleteEmployee = async (
     // Soft delete
     await employee.softDelete();
 
+    // Desactivar progreso de training (D22)
+    try {
+      const { progressService } = await import('../services/training/progress.service');
+      await progressService.deactivate(id);
+    } catch { /* no bloquear si falla */ }
+
     res.status(200).json({
       success: true,
       message: 'Empleado eliminado exitosamente'
@@ -340,6 +346,12 @@ export const restoreEmployee = async (
 
     // Restaurar
     await employee.restore();
+
+    // Reactivar progreso de training (D22)
+    try {
+      const { progressService } = await import('../services/training/progress.service');
+      await progressService.activate(id);
+    } catch { /* no bloquear si falla */ }
 
     // Obtener empleado restaurado con relaciones
     const restoredEmployee = await Employee.findById(id)
