@@ -102,6 +102,11 @@ class ProgressApiService {
 
   // --- Exam Attempts ---
 
+  async getMyExams(): Promise<any[]> {
+    const res = await apiClient.get<{ success: boolean; data: any[] }>('/training/exams/me');
+    return res.data.data;
+  }
+
   async startExam(examId: string): Promise<ExamAttempt> {
     const res = await apiClient.post<{ success: boolean; data: ExamAttempt }>(`/training/exam-attempts/${examId}/start`);
     return res.data.data;

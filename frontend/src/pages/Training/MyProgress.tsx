@@ -282,7 +282,21 @@ const MyProgress = observer(() => {
                   </div>
                   {lp.status === 'exam_pending' && (
                     <button
-                      onClick={() => navigate('/training/my-progress')} 
+                      onClick={async () => {
+                        // Obtener el examen del nivel
+                        try {
+                          const exams = await progressApiService.getMyExams();
+                          const levelId = typeof lp.level === 'object' ? lp.level._id : lp.level;
+                          const exam = exams.find((e: any) => e.level?.toString() === levelId || (typeof e.level === 'object' && e.level._id === levelId));
+                          if (exam) {
+                            navigate(`/training/exam/${exam._id}`);
+                          } else {
+                            notify.error('No se encontró examen para este nivel');
+                          }
+                        } catch {
+                          notify.error('Error al buscar examen');
+                        }
+                      }}
                       className="rounded-full bg-orange-100 px-3 py-1 text-xs font-medium text-orange-600 hover:bg-orange-200 dark:bg-orange-500/10 dark:text-orange-400"
                     >
                       Tomar Examen
