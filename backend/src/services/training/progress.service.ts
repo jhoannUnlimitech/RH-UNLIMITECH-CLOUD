@@ -271,9 +271,54 @@ class ProgressService {
       }
     }
 
+    // Recalcular porcentaje de la insignia actual
+    await this.recalculateBadgePercentage(progress, course.level.toString());
+
     await progress.save();
 
     return { progress, levelStatus, examUnlocked, levelCompleted };
+  }
+
+  /**
+   * Recalcular el porcentaje de progreso de la insignia basado en cursos completados.
+   * percentage = (cursos completados de la insignia / total cursos de la insignia) × 100
+   */
+  private async recalculateBadgePercentage(progress: IEmployeeTrainingProgress, levelId: string): Promise<void> {
+    // Obtener el nivel para saber su badge
+    const level = await Level.findById(levelId);
+    if (!level) return;
+
+    const badgeId = level.badge.toString();
+
+    // Obtener todos los niveles de esta insignia
+    const badgeLevels = await Level.find({ badge: badgeId, active: true, deleted: { $ne: true } });
+    const badgeLevelIds = badgeLevels.map(l => l._id.toString());
+
+    // Obtener todos los cursos de todos los niveles de esta insignia
+    const allBadgeCourses = await Course.find({
+      level: { $in: badgeLevelIds },
+      active: true,
+      deleted: { $ne: true },
+    });
+    const totalCourses = allBadgeCourses.length;
+    if (totalCourses === 0) return;
+
+    // Contar cuántos de esos cursos están completados en el progreso
+    const allCourseIds = allBadgeCourses.map(c => c._id.toString());
+    const completedCount = progress.courses.filter(
+      cp => allCourseIds.includes(cp.course.toString()) && cp.status === 'completed'
+    ).length;
+
+    // Actualizar porcentaje en la insignia
+    const badgeProgress = progress.badges.find(b => b.badge.toString() === badgeId);
+    if (badgeProgress) {
+      badgeProgress.percentage = Math.round((completedCount / totalCourses) * 100);
+      // Si estaba not_started y ahora tiene progreso, cambiar a in_progress
+      if (badgeProgress.status === 'not_started' && badgeProgress.percentage > 0) {
+        badgeProgress.status = 'in_progress';
+        badgeProgress.startedAt = new Date();
+      }
+    }
   }
 
   /**
