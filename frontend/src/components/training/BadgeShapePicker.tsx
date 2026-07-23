@@ -3,8 +3,8 @@ import BadgeIcon, { BadgeShape } from "./BadgeIcon";
 /**
  * BadgeShapePicker — Selector visual de forma para insignias.
  *
- * Muestra las 9 formas disponibles en un grid. El usuario hace click
- * en la forma deseada. La seleccionada se resalta con borde.
+ * Grid compacto de formas (mismo estilo que el IconPicker).
+ * La seleccionada se resalta con fondo brand.
  */
 
 interface BadgeShapePickerProps {
@@ -34,36 +34,44 @@ const BadgeShapePicker: React.FC<BadgeShapePickerProps> = ({
 }) => {
   return (
     <div data-test-context={props["data-test-context"] || "badge-shape-picker"}>
-      <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-        Forma de la insignia
-      </label>
-      <div className="grid grid-cols-3 gap-3 sm:grid-cols-5 md:grid-cols-9">
-        {SHAPES.map(({ value: shape, label }) => (
-          <button
-            key={shape}
-            type="button"
-            onClick={() => onChange(shape)}
-            className={`flex flex-col items-center gap-1 rounded-lg border-2 p-2 transition-all ${
-              value === shape
-                ? "border-brand-500 bg-brand-50 dark:border-brand-400 dark:bg-brand-500/10"
-                : "border-gray-200 bg-white hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-gray-600"
-            }`}
-            data-test-key={`shape-${shape}`}
-            title={label}
-          >
-            <BadgeIcon
-              shape={shape}
-              icon="star"
-              color={value === shape ? color : "#9CA3AF"}
-              earned={value === shape}
-              size="sm"
-            />
-            <span className="text-[10px] text-gray-500 dark:text-gray-400">
-              {label}
-            </span>
-          </button>
-        ))}
+      <div className="grid grid-cols-9 gap-2">
+        {SHAPES.map(({ value: shape, label }) => {
+          const isSelected = value === shape;
+          return (
+            <button
+              key={shape}
+              type="button"
+              onClick={() => onChange(shape)}
+              className={`flex h-10 w-10 items-center justify-center rounded-lg transition-all ${
+                isSelected
+                  ? "bg-brand-500/10 ring-2 ring-brand-500 dark:ring-brand-400"
+                  : "bg-white hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600"
+              }`}
+              data-test-key={`shape-${shape}`}
+              title={label}
+            >
+              <BadgeIcon
+                shape={shape}
+                icon="star"
+                color={isSelected ? color : "#9CA3AF"}
+                earned={isSelected}
+                size={28}
+              />
+            </button>
+          );
+        })}
       </div>
+
+      {/* Selected display */}
+      {value && (
+        <div className="mt-2 flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+          <span>Forma:</span>
+          <BadgeIcon shape={value} icon="star" color={color} earned={true} size={20} />
+          <span className="font-mono text-gray-700 dark:text-gray-200">
+            {SHAPES.find(s => s.value === value)?.label}
+          </span>
+        </div>
+      )}
     </div>
   );
 };
