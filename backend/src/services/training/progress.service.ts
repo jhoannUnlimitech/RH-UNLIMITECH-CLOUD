@@ -118,7 +118,8 @@ class ProgressService {
       .populate('currentCourse', 'name')
       .populate('latestBadge', 'name icon shape color')
       .populate('badges.badge', 'name icon shape color')
-      .populate('levels.level', 'name order');
+      .populate('levels.level', 'name order')
+      .populate('courses.course', 'name description estimatedHours level order');
 
     if (!progress) {
       throw new AppError('Progreso no encontrado. El empleado puede no tener progreso inicializado.', 404);

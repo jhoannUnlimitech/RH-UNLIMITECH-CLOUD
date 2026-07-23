@@ -159,9 +159,18 @@ const MyProgress = observer(() => {
             </span>
           </div>
 
-          {/* Lista de cursos del nivel */}
+          {/* Lista de cursos del nivel actual */}
           <div className="space-y-2" data-test-context="courses-checklist">
-            {progress.courses.map(cp => {
+            {progress.courses
+              .filter(cp => {
+                // Solo mostrar cursos del nivel actual
+                const course = typeof cp.course === 'object' ? cp.course : null;
+                if (!course || !progress.currentLevel) return false;
+                const currentLevelId = typeof progress.currentLevel === 'object' ? progress.currentLevel._id : progress.currentLevel;
+                return (course as any).level?.toString() === currentLevelId?.toString() 
+                  || (course as any).level === currentLevelId;
+              })
+              .map(cp => {
               const course = typeof cp.course === 'object' ? cp.course : null;
               const courseId = typeof cp.course === 'string' ? cp.course : cp.course?._id;
               return (
