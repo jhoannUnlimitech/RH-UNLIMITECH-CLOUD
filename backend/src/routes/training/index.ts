@@ -6,6 +6,7 @@ import badgesRoutes from './badges.routes';
 import examsRoutes from './exams.routes';
 import examAttemptsRoutes from './examAttempts.routes';
 import progressRoutes from './progress.routes';
+import assignmentsRoutes from './assignments.routes';
 
 /**
  * Training Module Routes — Barrel
@@ -24,6 +25,7 @@ router.use('/badges', badgesRoutes);
 router.use('/exams', examsRoutes);
 router.use('/exam-attempts', examAttemptsRoutes);
 router.use('/progress', progressRoutes);
+router.use('/assignments', assignmentsRoutes);
 
 // Rutas de la Biblioteca (categorías + documentos)
 // Se montan en /api/v1/library desde el index principal
