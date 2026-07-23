@@ -31,7 +31,8 @@ export const getProgressByEmployee = async (req: AuthRequest, res: Response, nex
 export const completeCourse = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { courseId } = req.params;
-    const result = await progressService.completeCourse(req.user!.id, courseId);
+    const { hoursSpent } = req.body; // Horas que el empleado reporta haber gastado
+    const result = await progressService.completeCourse(req.user!.id, courseId, hoursSpent);
 
     res.json({
       success: true,

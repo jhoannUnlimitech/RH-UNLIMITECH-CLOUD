@@ -119,7 +119,11 @@ class ProgressService {
       .populate('latestBadge', 'name icon shape color')
       .populate('badges.badge', 'name icon shape color')
       .populate('levels.level', 'name order')
-      .populate('courses.course', 'name description estimatedHours level order');
+      .populate({
+        path: 'courses.course',
+        select: 'name description estimatedHours level order libraryDocument',
+        populate: { path: 'libraryDocument', select: 'title slug' }
+      });
 
     if (!progress) {
       throw new AppError('Progreso no encontrado. El empleado puede no tener progreso inicializado.', 404);
@@ -168,7 +172,7 @@ class ProgressService {
    * - Si todos los cursos del nivel están completados → nivel pasa a 'exam_pending'
    * - Si el nivel no tiene examen → nivel pasa directo a 'completed' y desbloquea siguiente
    */
-  async completeCourse(employeeId: string, courseId: string): Promise<{
+  async completeCourse(employeeId: string, courseId: string, hoursSpent?: number): Promise<{
     progress: IEmployeeTrainingProgress;
     levelStatus: string;
     examUnlocked: boolean;
@@ -203,9 +207,10 @@ class ProgressService {
     courseProgress.status = 'completed';
     courseProgress.completedAt = new Date();
 
-    // Sumar horas estimadas al total
-    if (course.estimatedHours) {
-      progress.totalStudyHours += course.estimatedHours;
+    // Sumar horas reportadas al total (hoursSpent del empleado, o estimatedHours como fallback)
+    const hours = hoursSpent || course.estimatedHours || 0;
+    if (hours > 0) {
+      progress.totalStudyHours += hours;
     }
 
     // Verificar si todos los cursos del nivel actual están completados

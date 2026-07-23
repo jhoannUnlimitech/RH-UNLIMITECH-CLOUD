@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { BookOpen, CheckCircle2, Lock, Clock, Award, FileText, Layers, Pin, TrendingUp, AlertTriangle } from "lucide-react";
+import { useNavigate } from "react-router";
+import { BookOpen, CheckCircle2, Lock, Clock, Award, FileText, Layers, Pin, TrendingUp, AlertTriangle, ExternalLink } from "lucide-react";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
+import Button from "../../components/ui/button/Button";
+import { Modal } from "../../components/ui/modal";
 import BadgeIcon from "../../components/training/BadgeIcon";
 import { progressApiService } from "../../api/services/progress";
 import type { EmployeeProgress, ExtraAssignment } from "../../api/services/progress";
@@ -13,10 +16,17 @@ import type { EmployeeProgress, ExtraAssignment } from "../../api/services/progr
  */
 
 const MyProgress = observer(() => {
+  const navigate = useNavigate();
   const [progress, setProgress] = useState<EmployeeProgress | null>(null);
   const [assignments, setAssignments] = useState<ExtraAssignment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [completingCourse, setCompletingCourse] = useState<string | null>(null);
+
+  // Modal de horas al completar curso
+  const [hoursModalOpen, setHoursModalOpen] = useState(false);
+  const [hoursModalCourseId, setHoursModalCourseId] = useState<string | null>(null);
+  const [hoursModalCourseName, setHoursModalCourseName] = useState('');
+  const [hoursInput, setHoursInput] = useState('1');
 
   useEffect(() => {
     loadData();
@@ -35,10 +45,26 @@ const MyProgress = observer(() => {
     finally { setIsLoading(false); }
   };
 
-  const handleCompleteCourse = async (courseId: string) => {
-    setCompletingCourse(courseId);
+  const handleCompleteCourse = async (courseId: string, courseName: string) => {
+    // Abrir modal para preguntar horas
+    setHoursModalCourseId(courseId);
+    setHoursModalCourseName(courseName);
+    setHoursInput('1');
+    setHoursModalOpen(true);
+  };
+
+  const confirmCompleteCourse = async () => {
+    if (!hoursModalCourseId) return;
+    const hours = parseFloat(hoursInput);
+    if (isNaN(hours) || hours < 0.25) {
+      alert('Ingresa al menos 0.25 horas (15 minutos)');
+      return;
+    }
+
+    setCompletingCourse(hoursModalCourseId);
+    setHoursModalOpen(false);
     try {
-      const result = await progressApiService.completeCourse(courseId);
+      const result = await progressApiService.completeCourse(hoursModalCourseId, hours);
       setProgress(result.progress);
       if (result.examUnlocked) {
         alert('¡Todos los cursos completados! El examen del nivel está disponible.');
@@ -185,16 +211,27 @@ const MyProgress = observer(() => {
                   }`}
                   data-test-key={`course-${courseId}`}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
                     {cp.status === 'completed' ? (
-                      <CheckCircle2 size={20} className="text-green-500" />
+                      <CheckCircle2 size={20} className="text-green-500 shrink-0" />
                     ) : (
-                      <BookOpen size={20} className="text-gray-400" />
+                      <BookOpen size={20} className="text-gray-400 shrink-0" />
                     )}
-                    <div>
-                      <p className={`text-sm font-medium ${cp.status === 'completed' ? 'text-green-700 dark:text-green-400 line-through' : 'text-gray-800 dark:text-white'}`}>
+                    <div className="min-w-0">
+                      <button
+                        onClick={() => {
+                          // Navegar al documento asociado del curso (si tiene)
+                          const doc = (course as any)?.libraryDocument;
+                          if (doc) {
+                            const slug = typeof doc === 'object' ? doc.slug : doc;
+                            navigate(`/library/documents/${slug}`);
+                          }
+                        }}
+                        className={`text-left text-sm font-medium hover:underline ${cp.status === 'completed' ? 'text-green-700 dark:text-green-400 line-through' : 'text-brand-600 dark:text-brand-400'}`}
+                      >
                         {course?.name || courseId}
-                      </p>
+                        {(course as any)?.libraryDocument && <ExternalLink size={12} className="inline ml-1 opacity-60" />}
+                      </button>
                       {cp.completedAt && (
                         <p className="text-[10px] text-gray-400">Completado: {new Date(cp.completedAt).toLocaleDateString('es-ES')}</p>
                       )}
@@ -202,9 +239,9 @@ const MyProgress = observer(() => {
                   </div>
                   {cp.status !== 'completed' && (
                     <button
-                      onClick={() => handleCompleteCourse(courseId!)}
+                      onClick={() => handleCompleteCourse(courseId!, course?.name || 'Curso')}
                       disabled={completingCourse === courseId}
-                      className="rounded-lg bg-brand-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-brand-600 disabled:opacity-50"
+                      className="rounded-lg bg-brand-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-brand-600 disabled:opacity-50 shrink-0"
                       data-test-key="mark-complete-btn"
                     >
                       {completingCourse === courseId ? '...' : 'Marcar Completado'}
@@ -251,6 +288,43 @@ const MyProgress = observer(() => {
           </div>
         </div>
       </div>
+
+      {/* Modal: ¿Cuántas horas te tomó? */}
+      <Modal
+        isOpen={hoursModalOpen}
+        onClose={() => setHoursModalOpen(false)}
+        className="relative w-full max-w-[400px] m-5 sm:m-0 rounded-3xl bg-white p-6 lg:p-8 dark:bg-gray-900"
+      >
+        <div>
+          <h4 className="mb-2 text-lg font-semibold text-gray-800 dark:text-white">
+            Completar Curso
+          </h4>
+          <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
+            ¿Cuántas horas dedicaste a completar <span className="font-medium text-gray-700 dark:text-gray-200">"{hoursModalCourseName}"</span>?
+          </p>
+          <div className="mb-6">
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Horas dedicadas *</label>
+            <input
+              type="number"
+              value={hoursInput}
+              onChange={(e) => setHoursInput(e.target.value)}
+              className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+              min="0.25"
+              step="0.25"
+              max="12"
+              placeholder="Ej: 2.5"
+              data-test-key="hours-input"
+            />
+            <p className="mt-1 text-xs text-gray-400">Mínimo 0.25h (15 min). Esto se suma a tu reporte semanal de estudio.</p>
+          </div>
+          <div className="flex justify-end gap-3">
+            <Button variant="outline" onClick={() => setHoursModalOpen(false)}>Cancelar</Button>
+            <Button onClick={confirmCompleteCourse} data-test-key="confirm-complete-btn">
+              Confirmar
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 });

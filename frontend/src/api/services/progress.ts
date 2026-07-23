@@ -95,8 +95,8 @@ class ProgressApiService {
     return res.data.data;
   }
 
-  async completeCourse(courseId: string): Promise<{ progress: EmployeeProgress; levelStatus: string; examUnlocked: boolean; levelCompleted: boolean }> {
-    const res = await apiClient.post<{ success: boolean; data: any }>(`/training/progress/complete-course/${courseId}`);
+  async completeCourse(courseId: string, hoursSpent?: number): Promise<{ progress: EmployeeProgress; levelStatus: string; examUnlocked: boolean; levelCompleted: boolean }> {
+    const res = await apiClient.post<{ success: boolean; data: any }>(`/training/progress/complete-course/${courseId}`, { hoursSpent });
     return res.data.data;
   }
 
