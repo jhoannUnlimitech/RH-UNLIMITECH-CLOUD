@@ -16,11 +16,14 @@ export type NotificationType =
   | 'course_assigned'
   | 'exam_assigned'
   | 'exam_graded'
+  | 'exam_pending_review'
   | 'level_unlocked'
   | 'badge_earned'
   | 'assignment_new'
   | 'csw_approved'
   | 'csw_rejected'
+  | 'csw_pending'
+  | 'calendar_event'
   | 'general';
 
 export interface INotification extends Document {
@@ -45,7 +48,7 @@ const NotificationSchema = new Schema<INotification>({
   },
   type: {
     type: String,
-    enum: ['course_assigned', 'exam_assigned', 'exam_graded', 'level_unlocked', 'badge_earned', 'assignment_new', 'csw_approved', 'csw_rejected', 'general'],
+    enum: ['course_assigned', 'exam_assigned', 'exam_graded', 'exam_pending_review', 'level_unlocked', 'badge_earned', 'assignment_new', 'csw_approved', 'csw_rejected', 'csw_pending', 'calendar_event', 'general'],
     required: [true, 'El tipo es requerido'],
   },
   title: {

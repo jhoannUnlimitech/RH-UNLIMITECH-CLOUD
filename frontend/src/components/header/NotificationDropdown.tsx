@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
-import { BookOpen, FileText, Award, Layers, Bell, CheckCircle2, AlertCircle } from "lucide-react";
+import { BookOpen, FileText, Award, Layers, Bell, CheckCircle2, AlertCircle, Calendar, ClipboardList } from "lucide-react";
 import apiClient from "../../api/client";
 
 /**
@@ -26,24 +26,30 @@ const TYPE_ICONS: Record<string, React.FC<{ size?: number; className?: string }>
   course_assigned: BookOpen,
   exam_assigned: FileText,
   exam_graded: CheckCircle2,
+  exam_pending_review: ClipboardList,
   level_unlocked: Layers,
   badge_earned: Award,
   assignment_new: AlertCircle,
   general: Bell,
   csw_approved: CheckCircle2,
   csw_rejected: AlertCircle,
+  csw_pending: ClipboardList,
+  calendar_event: Calendar,
 };
 
 const TYPE_COLORS: Record<string, string> = {
   course_assigned: 'text-blue-500 bg-blue-50 dark:bg-blue-500/10',
   exam_assigned: 'text-purple-500 bg-purple-50 dark:bg-purple-500/10',
   exam_graded: 'text-green-500 bg-green-50 dark:bg-green-500/10',
+  exam_pending_review: 'text-amber-500 bg-amber-50 dark:bg-amber-500/10',
   level_unlocked: 'text-orange-500 bg-orange-50 dark:bg-orange-500/10',
   badge_earned: 'text-yellow-500 bg-yellow-50 dark:bg-yellow-500/10',
   assignment_new: 'text-red-500 bg-red-50 dark:bg-red-500/10',
   general: 'text-gray-500 bg-gray-50 dark:bg-gray-500/10',
   csw_approved: 'text-green-500 bg-green-50 dark:bg-green-500/10',
   csw_rejected: 'text-red-500 bg-red-50 dark:bg-red-500/10',
+  csw_pending: 'text-amber-500 bg-amber-50 dark:bg-amber-500/10',
+  calendar_event: 'text-cyan-500 bg-cyan-50 dark:bg-cyan-500/10',
 };
 
 function timeAgo(dateStr: string): string {

@@ -144,6 +144,82 @@ class NotificationService {
       link: '/training/my-progress',
     });
   }
+
+  // ─── Helpers para CSW ─────────────────────────────────────────────────────
+
+  /**
+   * Notificar que una CSW fue aprobada.
+   */
+  async notifyCSWApproved(employeeId: string, cswCategory: string, cswId: string): Promise<void> {
+    await this.create({
+      recipient: employeeId,
+      type: 'csw_approved',
+      title: '✅ Solicitud aprobada',
+      message: `Tu solicitud de "${cswCategory}" fue aprobada.`,
+      link: `/csw/view/${cswId}`,
+      metadata: { cswId },
+    });
+  }
+
+  /**
+   * Notificar que una CSW fue rechazada.
+   */
+  async notifyCSWRejected(employeeId: string, cswCategory: string, cswId: string, reason?: string): Promise<void> {
+    await this.create({
+      recipient: employeeId,
+      type: 'csw_rejected',
+      title: '❌ Solicitud rechazada',
+      message: reason
+        ? `Tu solicitud de "${cswCategory}" fue rechazada: "${reason}"`
+        : `Tu solicitud de "${cswCategory}" fue rechazada.`,
+      link: `/csw/view/${cswId}`,
+      metadata: { cswId },
+    });
+  }
+
+  /**
+   * Notificar que hay una CSW pendiente de aprobación.
+   */
+  async notifyCSWPending(approverId: string, requesterName: string, cswCategory: string, cswId: string): Promise<void> {
+    await this.create({
+      recipient: approverId,
+      type: 'csw_pending',
+      title: '📋 Solicitud pendiente',
+      message: `${requesterName} envió una solicitud de "${cswCategory}" que requiere tu aprobación.`,
+      link: `/csw/view/${cswId}`,
+      metadata: { cswId },
+    });
+  }
+
+  // ─── Helpers para Calendario ──────────────────────────────────────────────
+
+  /**
+   * Notificar evento del día a empleados.
+   */
+  async notifyCalendarEvent(employeeIds: string[], eventTitle: string, eventDate: string): Promise<void> {
+    await this.createBulk(employeeIds, {
+      type: 'calendar_event',
+      title: '📅 Evento hoy',
+      message: `Recuerda: "${eventTitle}" está programado para hoy (${eventDate}).`,
+      link: '/calendar',
+      metadata: { eventTitle, eventDate },
+    });
+  }
+
+  // ─── Helpers para Exámenes (admin) ────────────────────────────────────────
+
+  /**
+   * Notificar a admins de training que un examen necesita revisión manual.
+   */
+  async notifyExamPendingReview(adminIds: string[], employeeName: string, examTitle: string, attemptId: string): Promise<void> {
+    await this.createBulk(adminIds, {
+      type: 'exam_pending_review',
+      title: '📝 Examen pendiente de revisión',
+      message: `${employeeName} completó el examen "${examTitle}" y tiene preguntas abiertas que requieren evaluación manual.`,
+      link: '/training/admin/evaluations',
+      metadata: { attemptId, examTitle },
+    });
+  }
 }
 
 export const notificationService = new NotificationService();

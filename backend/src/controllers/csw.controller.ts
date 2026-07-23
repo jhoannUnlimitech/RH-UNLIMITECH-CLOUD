@@ -471,6 +471,25 @@ export const approveCSW = async (
     const message = csw.status === CSWStatus.APPROVED
       ? '¡Solicitud aprobada completamente!'
       : `Aprobado en nivel ${csw.currentLevel - 1}. Esperando nivel ${csw.currentLevel}`;
+
+    // Notificar al solicitante si fue aprobada completamente
+    try {
+      const { notificationService } = await import('../services/notification.service');
+      const categoryName = typeof csw.category === 'object' ? (csw.category as any).name : 'CSW';
+      if (csw.status === CSWStatus.APPROVED) {
+        await notificationService.notifyCSWApproved(csw.requester.toString(), categoryName, csw._id.toString());
+      } else {
+        // Notificar al siguiente aprobador
+        const nextApproval = csw.approvalChain.find((a: any) => a.level === csw.currentLevel && a.status === 'pending');
+        if (nextApproval) {
+          const nextApproverId = typeof nextApproval.approverId === 'object' ? (nextApproval.approverId as any)._id?.toString() : nextApproval.approverId?.toString();
+          if (nextApproverId) {
+            const requesterName = typeof csw.requester === 'object' ? (csw.requester as any).name : 'Un empleado';
+            await notificationService.notifyCSWPending(nextApproverId, requesterName, categoryName, csw._id.toString());
+          }
+        }
+      }
+    } catch { /* no bloquear */ }
     
     res.json({
       success: true,
@@ -537,6 +556,13 @@ export const rejectCSW = async (
     
     await csw.populate('category', 'name');
     await csw.populate('approvalChain.approverId', 'name email');
+
+    // Notificar al solicitante que fue rechazada
+    try {
+      const { notificationService } = await import('../services/notification.service');
+      const categoryName = typeof csw.category === 'object' ? (csw.category as any).name : 'CSW';
+      await notificationService.notifyCSWRejected(csw.requester.toString(), categoryName, csw._id.toString(), comments);
+    } catch { /* no bloquear */ }
     
     res.json({
       success: true,
