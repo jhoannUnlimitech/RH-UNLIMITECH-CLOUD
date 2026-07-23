@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { BookOpen, CheckCircle2, Lock, Clock, Award, FileText } from "lucide-react";
+import { BookOpen, CheckCircle2, Lock, Clock, Award, FileText, Layers, Pin, TrendingUp, AlertTriangle } from "lucide-react";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import BadgeIcon from "../../components/training/BadgeIcon";
 import { progressApiService } from "../../api/services/progress";
@@ -91,8 +91,8 @@ const MyProgress = observer(() => {
         {/* Asignaciones Extraordinarias (arriba, D4) */}
         {assignments.length > 0 && (
           <div className="rounded-xl bg-orange-50 p-4 shadow-1 dark:bg-orange-500/5 dark:shadow-card" data-test-context="assignments-section">
-            <h3 className="mb-3 text-sm font-semibold text-orange-800 dark:text-orange-300">
-              📌 Asignaciones Pendientes ({assignments.length})
+            <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-orange-800 dark:text-orange-300">
+              <Pin size={16} /> Asignaciones Pendientes ({assignments.length})
             </h3>
             <div className="space-y-2">
               {assignments.map(a => (
@@ -120,7 +120,9 @@ const MyProgress = observer(() => {
 
         {/* Insignias */}
         <div className="rounded-xl bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card" data-test-context="badges-section">
-          <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-white">🏆 Insignias</h3>
+          <h3 className="mb-4 flex items-center gap-2 text-base font-semibold text-gray-800 dark:text-white">
+            <Award size={18} className="text-yellow-500" /> Insignias
+          </h3>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {progress.badges.map(bp => {
               const badge = typeof bp.badge === 'object' ? bp.badge : null;
@@ -138,7 +140,7 @@ const MyProgress = observer(() => {
                   <div>
                     <p className="text-sm font-semibold text-gray-800 dark:text-white">{badge.name}</p>
                     <p className="text-xs text-gray-400">
-                      {bp.status === 'completed' ? '✅ Obtenida' : bp.status === 'in_progress' ? `${bp.percentage}% completado` : '🔒 Bloqueada'}
+                      {bp.status === 'completed' ? 'Obtenida' : bp.status === 'in_progress' ? `${bp.percentage}% completado` : 'Bloqueada'}
                     </p>
                     {bp.earnedAt && <p className="text-[10px] text-gray-400">Obtenida: {new Date(bp.earnedAt).toLocaleDateString('es-ES')}</p>}
                   </div>
@@ -151,8 +153,8 @@ const MyProgress = observer(() => {
         {/* Nivel Actual + Cursos */}
         <div className="rounded-xl bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card" data-test-context="current-level-section">
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-base font-semibold text-gray-800 dark:text-white">
-              📊 Nivel Actual: {currentLevelName || 'Sin nivel asignado'}
+            <h3 className="flex items-center gap-2 text-base font-semibold text-gray-800 dark:text-white">
+              <Layers size={18} className="text-brand-500" /> Nivel Actual: {currentLevelName || 'Sin nivel asignado'}
             </h3>
             <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
               {progress.totalStudyHours}h totales
@@ -216,7 +218,9 @@ const MyProgress = observer(() => {
 
         {/* Niveles Timeline */}
         <div className="rounded-xl bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card" data-test-context="levels-timeline">
-          <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-white">📈 Todos los Niveles</h3>
+          <h3 className="mb-4 flex items-center gap-2 text-base font-semibold text-gray-800 dark:text-white">
+            <TrendingUp size={18} className="text-brand-500" /> Todos los Niveles
+          </h3>
           <div className="space-y-3">
             {progress.levels.map(lp => {
               const level = typeof lp.level === 'object' ? lp.level : null;
