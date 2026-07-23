@@ -8,6 +8,7 @@ import examAttemptsRoutes from './examAttempts.routes';
 import progressRoutes from './progress.routes';
 import assignmentsRoutes from './assignments.routes';
 import studyReportsRoutes from './studyReports.routes';
+import attendanceRoutes from './attendance.routes';
 
 /**
  * Training Module Routes — Barrel
@@ -28,6 +29,7 @@ router.use('/exam-attempts', examAttemptsRoutes);
 router.use('/progress', progressRoutes);
 router.use('/assignments', assignmentsRoutes);
 router.use('/study-reports', studyReportsRoutes);
+router.use('/attendance', attendanceRoutes);
 
 // Rutas de la Biblioteca (categorías + documentos)
 // Se montan en /api/v1/library desde el index principal

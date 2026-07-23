@@ -47,7 +47,7 @@ const ToastContainer: React.FC = () => {
   }, []);
 
   return (
-    <div className="fixed top-5 right-5 z-[99999] flex flex-col gap-3 pointer-events-none">
+    <div className="fixed top-5 right-5 z-[99999] flex flex-col gap-3 pointer-events-none max-w-[90vw] sm:max-w-[400px]">
       {items.map((item) => (
         <div key={item.id} className="pointer-events-auto">
           <Toast

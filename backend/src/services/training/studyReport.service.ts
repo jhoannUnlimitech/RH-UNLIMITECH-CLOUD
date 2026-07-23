@@ -1,6 +1,7 @@
 import { Types } from 'mongoose';
 import { StudyReport, IStudyReport } from '../../models/training/StudyReport';
 import { Course } from '../../models/training/Course';
+import { Employee } from '../../models/Employee';
 import { AppError } from '../../middleware/error';
 
 /**
@@ -114,42 +115,47 @@ class StudyReportService {
   /**
    * Obtener resumen semanal de todos los empleados (pase de lista admin).
    * Retorna: por empleado, qué días reportó y total horas.
+   * Incluye TODOS los empleados activos (no solo los que reportaron).
    */
   async getWeeklyAttendance(weekDate?: string): Promise<any[]> {
     const targetDate = weekDate ? new Date(weekDate) : new Date();
     const { weekStart, weekEnd } = getWeekBounds(targetDate);
 
-    // Traer todos los reportes de la semana
+    // 1. Traer TODOS los empleados activos (el campo deleted tiene select:false, basta con status)
+    const allEmployees = await Employee.find({ status: 'active' })
+      .select('name email')
+      .sort({ name: 1 });
+
+    // 2. Traer todos los reportes de la semana
     const reports = await StudyReport.find({
       date: { $gte: weekStart, $lte: weekEnd },
-    })
-      .populate('employee', 'name email')
-      .sort({ 'employee': 1, date: 1 });
+    }).sort({ date: 1 });
 
-    // Agrupar por empleado
-    const grouped: Record<string, {
-      employee: { _id: string; name: string; email: string };
-      reports: Array<{ date: string; totalHours: number }>;
-      totalWeekHours: number;
-    }> = {};
-
+    // 3. Indexar reportes por empleado
+    const reportsByEmployee: Record<string, Array<{ date: string; totalHours: number }>> = {};
     for (const report of reports) {
-      const empId = (report.employee as any)._id.toString();
-      if (!grouped[empId]) {
-        grouped[empId] = {
-          employee: report.employee as any,
-          reports: [],
-          totalWeekHours: 0,
-        };
+      const empId = report.employee.toString();
+      if (!reportsByEmployee[empId]) {
+        reportsByEmployee[empId] = [];
       }
-      grouped[empId].reports.push({
+      reportsByEmployee[empId].push({
         date: report.date.toISOString().split('T')[0],
         totalHours: report.totalHours,
       });
-      grouped[empId].totalWeekHours += report.totalHours;
     }
 
-    return Object.values(grouped);
+    // 4. Construir resultado con TODOS los empleados
+    return allEmployees.map(emp => {
+      const empId = emp._id.toString();
+      const empReports = reportsByEmployee[empId] || [];
+      const totalWeekHours = empReports.reduce((sum, r) => sum + r.totalHours, 0);
+
+      return {
+        employee: { _id: empId, name: emp.name, email: emp.email },
+        reports: empReports,
+        totalWeekHours,
+      };
+    });
   }
 
   /**

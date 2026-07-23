@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { observer } from "mobx-react-lite";
-import { Plus, Trash2, Clock, CheckCircle2, BookOpen } from "lucide-react";
+import { Plus, Trash2, Clock, CheckCircle2, BookOpen, Search } from "lucide-react";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import Button from "../../components/ui/button/Button";
 import apiClient from "../../api/client";
@@ -13,6 +13,7 @@ import { notify } from "../../utils/toast";
  *
  * Formulario: fecha, cursos estudiados, horas por curso, ¿terminó?, observaciones.
  * Mínimo 3h/semana en L/M/V.
+ * Solo muestra cursos del nivel actual del empleado con dropdown searchable.
  */
 
 interface ReportEntry {
@@ -34,9 +35,36 @@ const StudyReport = observer(() => {
   const [observations, setObservations] = useState('');
 
   useEffect(() => {
-    trainingService.getCourses({ active: 'true' }).then(setCourses);
+    loadMyCourses();
     loadWeekReports();
   }, []);
+
+  const loadMyCourses = async () => {
+    try {
+      const res = await apiClient.get<{ success: boolean; data: any }>('/training/progress/me');
+      const progress = res.data.data;
+      if (progress && progress.courses) {
+        // Obtener el level actual del empleado
+        const currentLevelId = typeof progress.currentLevel === 'object'
+          ? progress.currentLevel?._id
+          : progress.currentLevel;
+
+        // Filtrar cursos que pertenecen al nivel actual
+        const myCourses = progress.courses
+          .map((cp: any) => cp.course)
+          .filter((c: any) => c && typeof c === 'object')
+          .filter((c: any) => {
+            if (!currentLevelId) return true;
+            const courseLevelId = typeof c.level === 'object' ? c.level?._id : c.level;
+            return courseLevelId === currentLevelId;
+          });
+        setCourses(myCourses);
+      }
+    } catch {
+      // Fallback: cargar todos los cursos activos
+      trainingService.getCourses({ active: 'true' }).then(setCourses);
+    }
+  };
 
   const loadWeekReports = async () => {
     try {
@@ -123,18 +151,14 @@ const StudyReport = observer(() => {
                 <div key={idx} className="rounded-lg border border-gray-100 p-4 dark:border-gray-700" data-test-key={`entry-${idx}`}>
                   <div className="flex items-start gap-3">
                     <div className="flex-1 space-y-3">
-                      {/* Curso */}
+                      {/* Curso (Searchable Dropdown) */}
                       <div>
                         <label className="mb-1 block text-xs font-medium text-gray-500">Curso *</label>
-                        <select
+                        <SearchableCourseSelect
+                          courses={courses}
                           value={entry.course}
-                          onChange={(e) => updateEntry(idx, 'course', e.target.value)}
-                          className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-                          data-test-key="course-select"
-                        >
-                          <option value="">Seleccionar curso...</option>
-                          {courses.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
-                        </select>
+                          onChange={(courseId) => updateEntry(idx, 'course', courseId)}
+                        />
                       </div>
 
                       <div className="grid grid-cols-2 gap-3">
@@ -264,3 +288,84 @@ const StudyReport = observer(() => {
 });
 
 export default StudyReport;
+
+
+// ─── Componente: Dropdown con búsqueda para cursos ──────────────────────────
+
+function SearchableCourseSelect({ courses, value, onChange }: {
+  courses: Course[];
+  value: string;
+  onChange: (courseId: string) => void;
+}) {
+  const [search, setSearch] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const filtered = courses.filter(course =>
+    !search || course.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const selectedCourse = courses.find(c => c._id === value);
+
+  return (
+    <div className="relative" ref={containerRef} data-test-key="course-select">
+      {/* Input que muestra el seleccionado y permite buscar */}
+      <div className="relative">
+        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+        <input
+          type="text"
+          value={isOpen ? search : (selectedCourse?.name || '')}
+          onChange={(e) => { setSearch(e.target.value); setIsOpen(true); }}
+          onFocus={() => setIsOpen(true)}
+          placeholder="Buscar curso..."
+          className="w-full rounded-lg border border-gray-200 pl-8 pr-8 py-2 text-sm focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+          data-test-key="course-search-input"
+        />
+
+        {/* Botón limpiar */}
+        {value && !isOpen && (
+          <button
+            type="button"
+            onClick={() => { onChange(''); setSearch(''); }}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500"
+          >
+            ×
+          </button>
+        )}
+      </div>
+
+      {/* Dropdown */}
+      {isOpen && (
+        <div className="absolute z-50 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800">
+          {filtered.map(course => (
+            <button
+              key={course._id}
+              type="button"
+              onClick={() => { onChange(course._id); setIsOpen(false); setSearch(''); }}
+              className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 ${
+                value === course._id ? 'bg-brand-50 text-brand-600 dark:bg-brand-500/10' : 'text-gray-700 dark:text-gray-200'
+              }`}
+              data-test-key={`course-option-${course._id}`}
+            >
+              <span className="font-medium">{course.name}</span>
+              {course.estimatedHours && (
+                <span className="ml-2 text-xs text-gray-400">({course.estimatedHours}h estimadas)</span>
+              )}
+            </button>
+          ))}
+
+          {filtered.length === 0 && (
+            <p className="px-4 py-3 text-center text-sm text-gray-400">
+              {courses.length === 0 ? 'No tienes cursos asignados en tu nivel actual' : 'No se encontraron cursos'}
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Overlay para cerrar */}
+      {isOpen && (
+        <div className="fixed inset-0 z-40" onClick={() => { setIsOpen(false); setSearch(''); }} />
+      )}
+    </div>
+  );
+}

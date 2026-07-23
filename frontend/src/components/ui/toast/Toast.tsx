@@ -66,7 +66,7 @@ const Toast: React.FC<ToastProps> = ({
 
   return (
     <div
-      className={`flex items-center justify-between gap-3 w-full sm:max-w-[380px] rounded-md border-b-4 p-3 shadow-theme-sm bg-white dark:bg-[#1E2634] ${borderColor} transition-all duration-300 ${
+      className={`flex items-center justify-between gap-3 w-full max-w-[380px] rounded-md border-b-4 p-3 shadow-theme-sm bg-white dark:bg-[#1E2634] ${borderColor} transition-all duration-300 ${
         isExiting ? "opacity-0 translate-x-4" : "opacity-100 translate-x-0"
       }`}
     >
@@ -74,12 +74,12 @@ const Toast: React.FC<ToastProps> = ({
         <div className={`flex items-center justify-center w-10 h-10 rounded-lg shrink-0 ${iconBg}`}>
           {icon}
         </div>
-        <div className="min-w-0">
-          <h4 className="text-sm font-medium text-gray-800 dark:text-white/90 truncate">
+        <div className="min-w-0 flex-1">
+          <h4 className="text-sm font-medium text-gray-800 dark:text-white/90 break-words">
             {title}
           </h4>
           {description && (
-            <p className="mt-0.5 text-xs text-gray-500 dark:text-white/60 truncate">
+            <p className="mt-0.5 text-xs text-gray-500 dark:text-white/60 break-words">
               {description}
             </p>
           )}

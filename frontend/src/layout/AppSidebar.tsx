@@ -87,6 +87,7 @@ const navItems: NavItem[] = [
       { name: "Mis Certificados", path: "/training/certificates", resource: "training" },
       { name: "Gestión Contenido", path: "/training/manage", resource: "training", action: "manage" },
       { name: "Gestión Biblioteca", path: "/library/manage", resource: "training", action: "content" },
+      { name: "Pase de Lista", path: "/training/admin/attendance", resource: "training", action: "manage" },
       { name: "Dashboard", path: "/training/admin/dashboard", resource: "training", action: "manage" },
     ],
   },
