@@ -94,7 +94,7 @@ const BadgeFormModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, badge }) 
         </div>
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Ícono</label>
-          <BadgeIconPicker selected={formData.icon} onChange={(icon) => setFormData(prev => ({ ...prev, icon }))} />
+          <BadgeIconPicker value={formData.icon} onChange={(icon) => setFormData(prev => ({ ...prev, icon }))} />
         </div>
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Forma</label>

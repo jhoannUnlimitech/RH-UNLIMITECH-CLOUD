@@ -22,7 +22,6 @@ const LevelFormModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, level, ba
     name: "",
     description: "",
     badge: "",
-    order: 0,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -32,10 +31,9 @@ const LevelFormModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, level, ba
         name: level.name,
         description: level.description || "",
         badge: typeof level.badge === 'object' ? level.badge._id : level.badge,
-        order: level.order,
       });
     } else if (isOpen) {
-      setFormData({ name: "", description: "", badge: "", order: 0 });
+      setFormData({ name: "", description: "", badge: "" });
     }
   }, [isOpen, level]);
 

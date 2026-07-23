@@ -136,17 +136,11 @@ const CourseFormModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, course, 
         </div>
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Documento asociado (Biblioteca)</label>
-          <select
+          <SearchableDocumentSelect
+            documents={documents}
             value={formData.libraryDocument}
-            onChange={(e) => setFormData(prev => ({ ...prev, libraryDocument: e.target.value }))}
-            className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-            data-test-key="course-document-select"
-          >
-            <option value="">— Sin documento asociado —</option>
-            {documents.map(doc => (
-              <option key={doc._id} value={doc._id}>{doc.title}</option>
-            ))}
-          </select>
+            onChange={(docId) => setFormData(prev => ({ ...prev, libraryDocument: docId }))}
+          />
           <p className="mt-1 text-xs text-gray-400">El documento de la Biblioteca que el empleado debe leer para este curso.</p>
         </div>
         <div>
@@ -197,3 +191,84 @@ const CourseFormModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, course, 
 };
 
 export default CourseFormModal;
+
+// ─── Componente: Dropdown con búsqueda para documentos ──────────────────────
+
+function SearchableDocumentSelect({ documents, value, onChange }: {
+  documents: LibraryDocument[];
+  value: string;
+  onChange: (docId: string) => void;
+}) {
+  const [search, setSearch] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+
+  const filtered = documents.filter(doc =>
+    !search || doc.title.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const selectedDoc = documents.find(d => d._id === value);
+
+  return (
+    <div className="relative" data-test-key="course-document-select">
+      {/* Input que muestra el seleccionado y permite buscar */}
+      <input
+        type="text"
+        value={isOpen ? search : (selectedDoc?.title || '')}
+        onChange={(e) => { setSearch(e.target.value); setIsOpen(true); }}
+        onFocus={() => setIsOpen(true)}
+        placeholder="Buscar documento..."
+        className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+        data-test-key="document-search-input"
+      />
+
+      {/* Botón limpiar */}
+      {value && !isOpen && (
+        <button
+          type="button"
+          onClick={() => { onChange(''); setSearch(''); }}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500"
+        >
+          ×
+        </button>
+      )}
+
+      {/* Dropdown */}
+      {isOpen && (
+        <div className="absolute z-50 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800">
+          {/* Opción "Sin documento" */}
+          <button
+            type="button"
+            onClick={() => { onChange(''); setIsOpen(false); setSearch(''); }}
+            className="w-full px-4 py-2 text-left text-sm text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+          >
+            — Sin documento asociado —
+          </button>
+
+          {filtered.map(doc => (
+            <button
+              key={doc._id}
+              type="button"
+              onClick={() => { onChange(doc._id); setIsOpen(false); setSearch(''); }}
+              className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 ${
+                value === doc._id ? 'bg-brand-50 text-brand-600 dark:bg-brand-500/10' : 'text-gray-700 dark:text-gray-200'
+              }`}
+              data-test-key={`doc-option-${doc._id}`}
+            >
+              <span className="font-medium">{doc.title}</span>
+              {doc.description && <span className="ml-2 text-xs text-gray-400">— {doc.description.slice(0, 40)}</span>}
+            </button>
+          ))}
+
+          {filtered.length === 0 && (
+            <p className="px-4 py-3 text-center text-sm text-gray-400">No se encontraron documentos</p>
+          )}
+        </div>
+      )}
+
+      {/* Overlay para cerrar */}
+      {isOpen && (
+        <div className="fixed inset-0 z-40" onClick={() => { setIsOpen(false); setSearch(''); }} />
+      )}
+    </div>
+  );
+}

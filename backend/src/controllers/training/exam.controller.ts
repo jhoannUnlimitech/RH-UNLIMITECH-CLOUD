@@ -45,8 +45,9 @@ export const getExamById = async (req: AuthRequest, res: Response, next: NextFun
   try {
     const id = req.params.id as string;
     // Si el usuario no tiene training:manage, ocultar respuestas correctas
-    const permissions = req.user?.role?.permissions || [];
-    const hasManage = permissions.some((p: any) => p.resource === 'training' && p.action === 'manage');
+    const { Role } = await import('../../models/Role');
+    const role = await Role.findById(req.user!.roleId).populate('permissions');
+    const hasManage = role ? (role.permissions as any[]).some((p: any) => p.resource === 'training' && p.action === 'manage') : false;
     const stripAnswers = !hasManage;
 
     const exam = await examService.getById(id, stripAnswers);

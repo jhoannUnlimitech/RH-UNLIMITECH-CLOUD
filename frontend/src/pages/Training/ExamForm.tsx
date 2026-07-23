@@ -55,10 +55,21 @@ const ExamForm = observer(() => {
   useEffect(() => {
     if (isEditing && id) {
       trainingService.getExamById(id).then(exam => {
+        const levelId = typeof exam.level === 'object' ? exam.level?._id : exam.level;
+        const courseId = (exam as any).course ? (typeof (exam as any).course === 'object' ? (exam as any).course._id : (exam as any).course) : '';
+        const docId = (exam as any).libraryDocument || '';
+
+        let associationType: 'level' | 'course' | 'document' = 'level';
+        if (courseId) associationType = 'course';
+        else if (docId) associationType = 'document';
+
         setFormData({
           title: exam.title,
           description: exam.description || "",
-          level: typeof exam.level === 'object' ? exam.level._id : exam.level,
+          associationType,
+          level: levelId || "",
+          course: courseId,
+          libraryDocument: docId,
           passingScore: exam.passingScore,
           maxAttempts: exam.maxAttempts,
         });
