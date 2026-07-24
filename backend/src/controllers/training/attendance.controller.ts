@@ -31,3 +31,12 @@ export const markOne = async (req: AuthRequest, res: Response, next: NextFunctio
     res.status(200).json({ success: true, data: record });
   } catch (error) { next(error); }
 };
+
+/** POST /api/v1/training/attendance/exempt — Marcar exención (vacaciones, permiso, etc.) */
+export const markExempt = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { employee, date, reason } = req.body;
+    const record = await attendanceService.markExempt(req.user!.id, employee, date, reason);
+    res.status(200).json({ success: true, data: record, message: 'Exención registrada' });
+  } catch (error) { next(error); }
+};

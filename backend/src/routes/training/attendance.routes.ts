@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authMiddleware } from '../../middleware/auth';
 import { requirePermission } from '../../middleware/permission';
-import { getWeeklyAttendance, markBulk, markOne } from '../../controllers/training/attendance.controller';
+import { getWeeklyAttendance, markBulk, markOne, markExempt } from '../../controllers/training/attendance.controller';
 
 const router = Router();
 
@@ -13,5 +13,8 @@ router.post('/bulk', authMiddleware, requirePermission('training', 'manage'), ma
 
 // Admin: marcar asistencia individual (toggle un empleado)
 router.post('/mark', authMiddleware, requirePermission('training', 'manage'), markOne);
+
+// Admin: marcar exención (vacaciones, permiso, CSW)
+router.post('/exempt', authMiddleware, requirePermission('training', 'manage'), markExempt);
 
 export default router;

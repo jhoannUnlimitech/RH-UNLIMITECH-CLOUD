@@ -128,6 +128,29 @@ class AttendanceService {
   }
 
   /**
+   * Marcar un empleado como exento para una fecha (vacaciones, permiso, CSW aprobado).
+   */
+  async markExempt(markedById: string, employeeId: string, date: string, reason?: string): Promise<IAttendanceRecord> {
+    const d = new Date(date + 'T12:00:00');
+    d.setHours(0, 0, 0, 0);
+
+    const record = await AttendanceRecord.findOneAndUpdate(
+      { employee: employeeId, date: d },
+      {
+        employee: employeeId,
+        date: d,
+        present: false,
+        exempt: true,
+        exemptReason: reason || 'Exento',
+        markedBy: markedById,
+      },
+      { upsert: true, new: true }
+    );
+
+    return record!;
+  }
+
+  /**
    * Obtener asistencia semanal para todos los empleados activos.
    * Retorna la lista de empleados con su estado por cada día L/M/V de la semana.
    */
@@ -137,7 +160,7 @@ class AttendanceService {
     obligatoryDays: string[];
     employees: Array<{
       employee: { _id: string; name: string; email: string };
-      days: Record<string, { present: boolean; notes?: string } | null>;
+      days: Record<string, { present: boolean; exempt?: boolean; exemptReason?: string; notes?: string } | null>;
       totalPresent: number;
       totalAbsent: number;
     }>;
@@ -177,7 +200,7 @@ class AttendanceService {
     // Construir resultado
     const employees = allEmployees.map(emp => {
       const empId = emp._id.toString();
-      const days: Record<string, { present: boolean; notes?: string } | null> = {};
+      const days: Record<string, { present: boolean; exempt?: boolean; exemptReason?: string; notes?: string } | null> = {};
       let totalPresent = 0;
       let totalAbsent = 0;
 
@@ -187,8 +210,9 @@ class AttendanceService {
         const rec = recordsMap[key];
 
         if (rec) {
-          days[dateStr] = { present: rec.present, notes: rec.notes };
-          if (rec.present) totalPresent++;
+          days[dateStr] = { present: rec.present, exempt: rec.exempt || false, exemptReason: rec.exemptReason, notes: rec.notes };
+          if (rec.exempt) { /* no cuenta ni como presente ni como ausente */ }
+          else if (rec.present) totalPresent++;
           else totalAbsent++;
         } else {
           days[dateStr] = null; // No marcado aún

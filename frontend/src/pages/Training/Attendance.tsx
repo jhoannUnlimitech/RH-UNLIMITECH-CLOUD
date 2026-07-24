@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import {
-  ClipboardList, ChevronLeft, ChevronRight, Check, X, Minus, Save, Users,
+  ClipboardList, ChevronLeft, ChevronRight, Check, X, Minus, Save, Users, ShieldOff,
 } from "lucide-react";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import Button from "../../components/ui/button/Button";
@@ -17,6 +17,8 @@ import { notify } from "../../utils/toast";
 
 interface EmployeeDay {
   present: boolean;
+  exempt?: boolean;
+  exemptReason?: string;
   notes?: string;
 }
 
@@ -42,8 +44,8 @@ const Attendance = observer(() => {
   const [saving, setSaving] = useState<string | null>(null); // dateStr que se está guardando
   const [currentWeekDate, setCurrentWeekDate] = useState(new Date());
 
-  // Estado local editable: { empId_dateStr → present }
-  const [localState, setLocalState] = useState<Record<string, boolean>>({});
+  // Estado local editable: { empId_dateStr → 'present' | 'absent' | 'exempt' | undefined }
+  const [localState, setLocalState] = useState<Record<string, 'present' | 'absent' | 'exempt'>>({});
 
   useEffect(() => {
     loadAttendance();
@@ -59,12 +61,14 @@ const Attendance = observer(() => {
       setData(res.data.data);
 
       // Inicializar estado local con los datos existentes
-      const state: Record<string, boolean> = {};
+      const state: Record<string, 'present' | 'absent' | 'exempt'> = {};
       for (const emp of res.data.data.employees) {
         for (const [dateStr, dayData] of Object.entries(emp.days)) {
           const key = `${emp.employee._id}_${dateStr}`;
           if (dayData !== null) {
-            state[key] = dayData.present;
+            if (dayData.exempt) state[key] = 'exempt';
+            else if (dayData.present) state[key] = 'present';
+            else state[key] = 'absent';
           }
         }
       }
@@ -80,23 +84,31 @@ const Attendance = observer(() => {
     setCurrentWeekDate(newDate);
   };
 
-  // Toggle individual: marca ✅ → ❌ → sin marcar (ciclo)
+  // Toggle individual: cicla ✅ → ❌ → ⬜(exento) → sin marcar → ✅ ...
   const toggleEmployee = async (empId: string, dateStr: string) => {
     const key = `${empId}_${dateStr}`;
     const current = localState[key];
 
-    // Ciclo: undefined → true → false → true → ...
-    const newValue = current === undefined ? true : !current;
+    // Ciclo: undefined → present → absent → exempt → present → ...
+    let newValue: 'present' | 'absent' | 'exempt';
+    if (current === undefined) newValue = 'present';
+    else if (current === 'present') newValue = 'absent';
+    else if (current === 'absent') newValue = 'exempt';
+    else newValue = 'present'; // exempt → present
 
     setLocalState(prev => ({ ...prev, [key]: newValue }));
 
-    // Guardar inmediatamente al servidor
+    // Guardar al servidor
     try {
-      await apiClient.post('/training/attendance/mark', {
-        employee: empId,
-        date: dateStr,
-        present: newValue,
-      });
+      if (newValue === 'exempt') {
+        await apiClient.post('/training/attendance/exempt', {
+          employee: empId, date: dateStr, reason: 'Exento',
+        });
+      } else {
+        await apiClient.post('/training/attendance/mark', {
+          employee: empId, date: dateStr, present: newValue === 'present',
+        });
+      }
     } catch (err: any) {
       notify.error(err.response?.data?.message || 'Error al marcar asistencia');
       // Revertir
@@ -117,20 +129,21 @@ const Attendance = observer(() => {
     try {
       const records = data.employees.map(emp => {
         const key = `${emp.employee._id}_${dateStr}`;
+        const state = localState[key];
         return {
           employee: emp.employee._id,
-          present: localState[key] ?? false, // Si no marcó, ausente por defecto
+          present: state === 'present', // Si no marcó o exempt, ausente por defecto
         };
       });
 
       await apiClient.post('/training/attendance/bulk', { date: dateStr, records });
       notify.success('Asistencia guardada');
 
-      // Actualizar estado local: todos los no marcados ahora son false
+      // Actualizar estado local: todos los no marcados ahora son absent
       const newState = { ...localState };
       for (const emp of data.employees) {
         const key = `${emp.employee._id}_${dateStr}`;
-        if (newState[key] === undefined) newState[key] = false;
+        if (newState[key] === undefined) newState[key] = 'absent';
       }
       setLocalState(newState);
     } catch (err: any) {
@@ -197,6 +210,9 @@ const Attendance = observer(() => {
               <span className="inline-flex h-5 w-5 items-center justify-center rounded bg-red-100 text-red-500"><X size={12} /></span> Ausente
             </span>
             <span className="flex items-center gap-1">
+              <span className="inline-flex h-5 w-5 items-center justify-center rounded bg-blue-100 text-blue-500"><ShieldOff size={12} /></span> Exento (vacaciones/permiso)
+            </span>
+            <span className="flex items-center gap-1">
               <span className="inline-flex h-5 w-5 items-center justify-center rounded bg-gray-100 text-gray-400"><Minus size={12} /></span> Sin marcar
             </span>
           </div>
@@ -253,10 +269,12 @@ const Attendance = observer(() => {
                     // Contar presentes/ausentes del estado local
                     let presents = 0;
                     let absents = 0;
+                    let exempts = 0;
                     for (const dateStr of data.obligatoryDays) {
                       const key = `${emp.employee._id}_${dateStr}`;
-                      if (localState[key] === true) presents++;
-                      else if (localState[key] === false) absents++;
+                      if (localState[key] === 'present') presents++;
+                      else if (localState[key] === 'absent') absents++;
+                      else if (localState[key] === 'exempt') exempts++;
                     }
 
                     return (
@@ -271,7 +289,7 @@ const Attendance = observer(() => {
                         </td>
                         {data.obligatoryDays.map((dateStr) => {
                           const key = `${emp.employee._id}_${dateStr}`;
-                          const state = localState[key]; // true=present, false=absent, undefined=no marcado
+                          const state = localState[key]; // 'present' | 'absent' | 'exempt' | undefined
                           const today = isToday(dateStr);
 
                           return (
@@ -279,15 +297,17 @@ const Attendance = observer(() => {
                               <button
                                 onClick={() => toggleEmployee(emp.employee._id, dateStr)}
                                 className={`inline-flex h-8 w-8 items-center justify-center rounded-lg transition-all ${
-                                  state === true
+                                  state === 'present'
                                     ? 'bg-green-100 text-green-600 hover:bg-green-200 dark:bg-green-500/20 dark:text-green-400'
-                                    : state === false
+                                    : state === 'absent'
                                     ? 'bg-red-100 text-red-500 hover:bg-red-200 dark:bg-red-500/20 dark:text-red-400'
+                                    : state === 'exempt'
+                                    ? 'bg-blue-100 text-blue-500 hover:bg-blue-200 dark:bg-blue-500/20 dark:text-blue-400'
                                     : 'bg-gray-100 text-gray-400 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-500'
                                 }`}
-                                title={state === true ? 'Presente — click para ausente' : state === false ? 'Ausente — click para presente' : 'Sin marcar — click para presente'}
+                                title={state === 'present' ? 'Presente → click: ausente' : state === 'absent' ? 'Ausente → click: exento' : state === 'exempt' ? 'Exento → click: presente' : 'Sin marcar → click: presente'}
                               >
-                                {state === true ? <Check size={14} /> : state === false ? <X size={14} /> : <Minus size={14} />}
+                                {state === 'present' ? <Check size={14} /> : state === 'absent' ? <X size={14} /> : state === 'exempt' ? <ShieldOff size={14} /> : <Minus size={14} />}
                               </button>
                             </td>
                           );

@@ -4,14 +4,17 @@ import mongoose, { Schema, Document } from 'mongoose';
  * AttendanceRecord — Registro manual de asistencia a estudio.
  *
  * El encargado de Training pasa lista L/M/V y marca si cada empleado asistió.
- * Un registro = un empleado + una fecha + presente/ausente.
+ * Un registro = un empleado + una fecha + presente/ausente/exento.
+ * Exento = festivo, vacaciones, permiso (CSW aprobado), etc.
  */
 
 export interface IAttendanceRecord extends Document {
   employee: mongoose.Types.ObjectId;
   date: Date;
   present: boolean;
-  markedBy: mongoose.Types.ObjectId; // Quién pasó lista
+  exempt: boolean;               // Exento (festivo, vacaciones, permiso)
+  exemptReason?: string;         // Razón de exención
+  markedBy: mongoose.Types.ObjectId;
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -31,6 +34,15 @@ const AttendanceRecordSchema = new Schema<IAttendanceRecord>({
     type: Boolean,
     required: true,
     default: false,
+  },
+  exempt: {
+    type: Boolean,
+    default: false,
+  },
+  exemptReason: {
+    type: String,
+    trim: true,
+    maxlength: 200,
   },
   markedBy: {
     type: Schema.Types.ObjectId,
