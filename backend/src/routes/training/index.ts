@@ -9,6 +9,7 @@ import progressRoutes from './progress.routes';
 import assignmentsRoutes from './assignments.routes';
 import studyReportsRoutes from './studyReports.routes';
 import attendanceRoutes from './attendance.routes';
+import honorTableRoutes from './honorTable.routes';
 
 /**
  * Training Module Routes — Barrel
@@ -30,6 +31,7 @@ router.use('/progress', progressRoutes);
 router.use('/assignments', assignmentsRoutes);
 router.use('/study-reports', studyReportsRoutes);
 router.use('/attendance', attendanceRoutes);
+router.use('/honor-table', honorTableRoutes);
 
 // Rutas de la Biblioteca (categorías + documentos)
 // Se montan en /api/v1/library desde el index principal
