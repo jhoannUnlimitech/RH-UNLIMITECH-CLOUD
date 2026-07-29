@@ -205,7 +205,7 @@ const TrainingManage = observer(() => {
 
 function BadgesTab({ badges, onDelete, onCreate, onEdit }: { badges: Badge[]; onDelete: (id: string, name: string, type: string) => void; onCreate: () => void; onEdit: (b: Badge) => void }) {
   return (
-    <div data-test-context="badges-tab">
+    <div data-test-context="badges-tab" data-test-state={badges.length > 0 ? 'loaded' : 'empty'}>
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-base font-semibold text-gray-800 dark:text-white">Insignias ({badges.length})</h3>
         <Button onClick={onCreate} size="sm" data-test-key="create-badge-btn">
@@ -242,7 +242,7 @@ function BadgesTab({ badges, onDelete, onCreate, onEdit }: { badges: Badge[]; on
 
 function LevelsTab({ levels, onDelete, onCreate, onEdit }: { levels: Level[]; onDelete: (id: string, name: string, type: string) => void; onCreate: () => void; onEdit: (l: Level) => void }) {
   return (
-    <div data-test-context="levels-tab">
+    <div data-test-context="levels-tab" data-test-state={levels.length > 0 ? 'loaded' : 'empty'}>
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-base font-semibold text-gray-800 dark:text-white">Niveles ({levels.length})</h3>
         <Button onClick={onCreate} size="sm" data-test-key="create-level-btn">
@@ -299,7 +299,7 @@ function LevelsTab({ levels, onDelete, onCreate, onEdit }: { levels: Level[]; on
 
 function CoursesTab({ courses, onDelete, onCreate, onEdit }: { courses: Course[]; onDelete: (id: string, name: string, type: string) => void; onCreate: () => void; onEdit: (c: Course) => void }) {
   return (
-    <div data-test-context="courses-tab">
+    <div data-test-context="courses-tab" data-test-state={courses.length > 0 ? 'loaded' : 'empty'}>
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-base font-semibold text-gray-800 dark:text-white">Cursos ({courses.length})</h3>
         <Button onClick={onCreate} size="sm" data-test-key="create-course-btn">
@@ -355,7 +355,7 @@ function CoursesTab({ courses, onDelete, onCreate, onEdit }: { courses: Course[]
 
 function ExamsTab({ exams, onDelete, navigate }: { exams: Exam[]; onDelete: (id: string, name: string, type: string) => void; navigate: any }) {
   return (
-    <div data-test-context="exams-tab">
+    <div data-test-context="exams-tab" data-test-state={exams.length > 0 ? 'loaded' : 'empty'}>
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-base font-semibold text-gray-800 dark:text-white">Exámenes ({exams.length})</h3>
         <Button onClick={() => navigate('/training/manage/exams/new')} size="sm" data-test-key="create-exam-btn">

@@ -13,7 +13,7 @@
 import { expect } from '@playwright/test';
 import { createSerialFlow } from '../../fixtures/base';
 import { navigateToSignIn, fillLoginForm, submitLoginForm, verifyDashboardRedirect } from '../../factories/login.factory';
-import { apiExec } from '../../factories/training.factory';
+import { apiExec } from '../../factories/training-api.factory';
 import { LOGIN_MANUEL } from '../../fixtures/test-data';
 import { execSync } from 'child_process';
 

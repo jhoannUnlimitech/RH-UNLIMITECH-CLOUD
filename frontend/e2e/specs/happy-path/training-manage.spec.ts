@@ -12,12 +12,26 @@
 import { expect } from '@playwright/test';
 import { createSerialFlow } from '../../fixtures/base';
 import { navigateToSignIn, fillLoginForm, submitLoginForm, verifyDashboardRedirect } from '../../factories/login.factory';
-import { navigateToTrainingManage, switchTab } from '../../factories/training.factory';
+import { navigateToTrainingManage, switchTab, createBadge, createCourse } from '../../factories/training-manage.factory';
 import { LOGIN_MANUEL } from '../../fixtures/test-data';
 import { execSync } from 'child_process';
+import { pom } from '../../pom/training-manage.pom';
 
 const { e2e, getPage } = createSerialFlow();
 const BASE_URL = process.env.BASE_URL || 'http://localhost:5173';
+
+// ─── Selectors (derived from POM) ──────────────────────────────────────────
+const sel = {
+  createBadgeBtn: pom.training_manage_page._.badges_grid._.create_badge_btn.$(),
+  badgeNameInput: pom.badge_form_modal._.badge_name_input.$(),
+  badgeDescInput: pom.badge_form_modal._.badge_description_input.$(),
+  createLevelBtn: pom.training_manage_page._.levels_table._.create_level_btn.$(),
+  createCourseBtn: pom.training_manage_page._.courses_table._.create_course_btn.$(),
+  courseNameInput: pom.course_form_modal._.course_name_input.$(),
+  courseDescInput: pom.course_form_modal._.course_description_input.$(),
+  courseLevelSelect: pom.course_form_modal._.course_level_select.$(),
+  courseHoursInput: pom.course_form_modal._.course_hours_input.$(),
+};
 
 e2e.describe.serial('Training Manage — Badges/Levels/Courses UI (AC-01 to AC-16)', () => {
 
@@ -63,22 +77,16 @@ e2e.describe.serial('Training Manage — Badges/Levels/Courses UI (AC-01 to AC-1
 
   e2e('AC-02: admin creates new badge', async () => {
     const page = getPage();
-    await page.click('[data-test-key="create-badge-btn"]');
+    await page.locator(sel.createBadgeBtn).click();
     await page.waitForTimeout(800);
 
-    // Fill modal form
     const modal = page.locator('.modal').last();
     await expect(modal).toBeVisible({ timeout: 5_000 });
 
-    // Fill name
-    await modal.locator('[data-test-key="badge-name-input"]').fill('E2E Test Badge');
+    await modal.locator(sel.badgeNameInput).fill('E2E Test Badge');
+    await modal.locator(sel.badgeDescInput).fill('Badge created by E2E test');
 
-    // Fill description
-    await modal.locator('[data-test-key="badge-description-input"]').fill('Badge created by E2E test');
-
-    // Submit form via the "Crear" button
     await modal.locator('button:has-text("Crear")').click();
-    // Wait for modal to close (success)
     await expect(modal).not.toBeVisible({ timeout: 10_000 });
   });
 
