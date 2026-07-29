@@ -74,7 +74,7 @@ e2e.describe.serial('Training Permissions + Notifications (AC-67 to AC-80)', () 
   e2e('AC-70: mark all as read button exists', async () => {
     const page = getPage();
     // Look for "Marcar todas como leídas" or similar
-    const markAllBtn = page.locator('button:has-text("Marcar"), button:has-text("leídas"), text=Marcar todas');
+    const markAllBtn = page.locator('button:has-text("Marcar todas")');
     // May not be visible if no notifications, that's ok
     const count = await markAllBtn.count();
     expect(count).toBeGreaterThanOrEqual(0); // Just verify no crash

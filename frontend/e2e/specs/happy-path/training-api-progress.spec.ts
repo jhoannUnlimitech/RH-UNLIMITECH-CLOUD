@@ -15,6 +15,7 @@ import { createSerialFlow } from '../../fixtures/base';
 import { navigateToSignIn, fillLoginForm, submitLoginForm, verifyDashboardRedirect } from '../../factories/login.factory';
 import { apiExec } from '../../factories/training.factory';
 import { LOGIN_MANUEL } from '../../fixtures/test-data';
+import { execSync } from 'child_process';
 
 const { e2e, getPage } = createSerialFlow();
 const API_URL = process.env.API_URL || 'http://localhost:9050/api/v1';
@@ -29,6 +30,21 @@ let testEmployeeId: string;
 let testAttemptId: string;
 
 e2e.describe.serial('Training API — Progress + Exams (AC-44 to AC-66)', () => {
+
+  // ─── Step 0: Hard-delete E2E data from DB ───────────────────────────────────
+
+  e2e('step 0: cleanup E2E test data from database', async () => {
+    const cwd = process.cwd().replace('/frontend', '/backend');
+    try {
+      execSync('npx ts-node --transpile-only src/scripts/cleanup-e2e-badges.ts', {
+        cwd,
+        timeout: 15_000,
+        stdio: 'pipe',
+      });
+    } catch (err: any) {
+      console.log('Cleanup:', err.stdout?.toString() || err.message);
+    }
+  });
 
   // ─── Setup ──────────────────────────────────────────────────────────────────
 
@@ -47,6 +63,43 @@ e2e.describe.serial('Training API — Progress + Exams (AC-44 to AC-66)', () => 
     expect(testEmployeeId).toBeTruthy();
   });
 
+  e2e('setup: cleanup previous E2E data', async () => {
+    const page = getPage();
+    // Delete any existing E2E badges/levels/courses/exams from previous runs
+    const badges = await apiExec(page, 'GET', '/training/badges');
+    if (badges?.data) {
+      for (const badge of badges.data) {
+        if (badge.name.startsWith('E2E ')) {
+          await apiExec(page, 'DELETE', `/training/badges/${badge._id}`);
+        }
+      }
+    }
+    const exams = await apiExec(page, 'GET', '/training/exams');
+    if (exams?.data) {
+      for (const exam of exams.data) {
+        if (exam.title.startsWith('E2E ')) {
+          await apiExec(page, 'DELETE', `/training/exams/${exam._id}`);
+        }
+      }
+    }
+    const courses = await apiExec(page, 'GET', '/training/courses');
+    if (courses?.data) {
+      for (const course of courses.data) {
+        if (course.name.startsWith('E2E ')) {
+          await apiExec(page, 'DELETE', `/training/courses/${course._id}`);
+        }
+      }
+    }
+    const levels = await apiExec(page, 'GET', '/training/levels');
+    if (levels?.data) {
+      for (const level of levels.data) {
+        if (level.name.startsWith('E2E ')) {
+          await apiExec(page, 'DELETE', `/training/levels/${level._id}`);
+        }
+      }
+    }
+  });
+
   e2e('setup: create test badge', async () => {
     const page = getPage();
     const res = await apiExec(page, 'POST', '/training/badges', {
@@ -56,6 +109,15 @@ e2e.describe.serial('Training API — Progress + Exams (AC-44 to AC-66)', () => 
       shape: 'circle',
       color: '#3b82f6',
     });
+    if (!res.success) {
+      // If it already exists, try to find it
+      const list = await apiExec(page, 'GET', '/training/badges');
+      const existing = list?.data?.find((b: any) => b.name === 'E2E Progress Badge');
+      if (existing) {
+        testBadgeId = existing._id;
+        return;
+      }
+    }
     expect(res.success).toBe(true);
     testBadgeId = res.data._id;
   });
@@ -103,8 +165,7 @@ e2e.describe.serial('Training API — Progress + Exams (AC-44 to AC-66)', () => 
     const res = await apiExec(page, 'POST', '/training/exams', {
       title: 'E2E Exam Level 1',
       description: 'Exam for testing',
-      associationType: 'level',
-      associationId: testLevelId,
+      level: testLevelId,
       passingScore: 80,
       maxAttempts: 3,
       timeLimit: 30,
@@ -133,6 +194,9 @@ e2e.describe.serial('Training API — Progress + Exams (AC-44 to AC-66)', () => 
         },
       ],
     });
+    if (!res.success) {
+      console.log('Exam creation failed:', res.message, 'levelId:', testLevelId);
+    }
     expect(res.success).toBe(true);
     testExamId = res.data._id;
   });
