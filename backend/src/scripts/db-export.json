@@ -1,0 +1,2949 @@
+{
+  "permissions": [
+    {
+      "_id": "6a3c5b8da76b542dddcef146",
+      "resource": "employees",
+      "action": "update",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef14a",
+      "resource": "csw",
+      "action": "update",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef147",
+      "resource": "employees",
+      "action": "delete",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef14b",
+      "resource": "csw",
+      "action": "approve",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef14e",
+      "resource": "csw_categories",
+      "action": "read",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef149",
+      "resource": "csw",
+      "action": "create",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef14f",
+      "resource": "csw_categories",
+      "action": "create",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef150",
+      "resource": "csw_categories",
+      "action": "update",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef151",
+      "resource": "csw_categories",
+      "action": "delete",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef152",
+      "resource": "approval_flows",
+      "action": "read",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef148",
+      "resource": "csw",
+      "action": "read",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef144",
+      "resource": "employees",
+      "action": "read",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef14c",
+      "resource": "csw",
+      "action": "cancel",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef145",
+      "resource": "employees",
+      "action": "create",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef154",
+      "resource": "approval_flows",
+      "action": "update",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef155",
+      "resource": "approval_flows",
+      "action": "delete",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef156",
+      "resource": "training",
+      "action": "read",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef157",
+      "resource": "training",
+      "action": "create",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef158",
+      "resource": "training",
+      "action": "update",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef159",
+      "resource": "training",
+      "action": "delete",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef15a",
+      "resource": "divisions",
+      "action": "read",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef15b",
+      "resource": "divisions",
+      "action": "create",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef15c",
+      "resource": "divisions",
+      "action": "update",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef15d",
+      "resource": "divisions",
+      "action": "delete",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef15e",
+      "resource": "roles",
+      "action": "read",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef15f",
+      "resource": "roles",
+      "action": "create",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef160",
+      "resource": "roles",
+      "action": "update",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef161",
+      "resource": "roles",
+      "action": "delete",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef162",
+      "resource": "permissions",
+      "action": "read",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef163",
+      "resource": "permissions",
+      "action": "create",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef164",
+      "resource": "permissions",
+      "action": "update",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef165",
+      "resource": "permissions",
+      "action": "delete",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef14d",
+      "resource": "csw",
+      "action": "delete",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef153",
+      "resource": "approval_flows",
+      "action": "create",
+      "createdAt": "2026-06-24T22:34:53.736Z",
+      "updatedAt": "2026-06-24T22:34:53.736Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c8e86913e84de31b8ecc2",
+      "resource": "projects",
+      "action": "read",
+      "createdAt": "2026-06-25T02:12:22.433Z",
+      "updatedAt": "2026-06-25T02:12:22.433Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c8e86913e84de31b8ecc5",
+      "resource": "projects",
+      "action": "create",
+      "createdAt": "2026-06-25T02:12:22.439Z",
+      "updatedAt": "2026-06-25T02:12:22.439Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c8e86913e84de31b8ecc8",
+      "resource": "projects",
+      "action": "update",
+      "createdAt": "2026-06-25T02:12:22.442Z",
+      "updatedAt": "2026-06-25T02:12:22.442Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c8e86913e84de31b8eccb",
+      "resource": "projects",
+      "action": "delete",
+      "createdAt": "2026-06-25T02:12:22.445Z",
+      "updatedAt": "2026-06-25T02:12:22.445Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a613abfdecdf0ba1209c2a1",
+      "resource": "training",
+      "action": "content",
+      "createdAt": "2026-07-22T21:48:47.521Z",
+      "updatedAt": "2026-07-22T21:48:47.521Z"
+    },
+    {
+      "_id": "6a613abfdecdf0ba1209c2a2",
+      "resource": "training",
+      "action": "manage",
+      "createdAt": "2026-07-22T21:48:47.525Z",
+      "updatedAt": "2026-07-22T21:48:47.525Z"
+    },
+    {
+      "_id": "6a613abfdecdf0ba1209c2a3",
+      "resource": "training",
+      "action": "report",
+      "createdAt": "2026-07-22T21:48:47.528Z",
+      "updatedAt": "2026-07-22T21:48:47.528Z"
+    }
+  ],
+  "roles": [
+    {
+      "_id": "6a3c5b8da76b542dddcef188",
+      "name": "CHIEF EXECUTIVE OFFICER",
+      "permissions": [
+        {
+          "_id": "6a3c5b8da76b542dddcef146",
+          "resource": "employees",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14a",
+          "resource": "csw",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef147",
+          "resource": "employees",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14b",
+          "resource": "csw",
+          "action": "approve"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14e",
+          "resource": "csw_categories",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef149",
+          "resource": "csw",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14f",
+          "resource": "csw_categories",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef150",
+          "resource": "csw_categories",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef151",
+          "resource": "csw_categories",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef152",
+          "resource": "approval_flows",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef148",
+          "resource": "csw",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef144",
+          "resource": "employees",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14c",
+          "resource": "csw",
+          "action": "cancel"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef145",
+          "resource": "employees",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef154",
+          "resource": "approval_flows",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef155",
+          "resource": "approval_flows",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef156",
+          "resource": "training",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef157",
+          "resource": "training",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef158",
+          "resource": "training",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef159",
+          "resource": "training",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15a",
+          "resource": "divisions",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15b",
+          "resource": "divisions",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15c",
+          "resource": "divisions",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15d",
+          "resource": "divisions",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15e",
+          "resource": "roles",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15f",
+          "resource": "roles",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef160",
+          "resource": "roles",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef161",
+          "resource": "roles",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef162",
+          "resource": "permissions",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef163",
+          "resource": "permissions",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef164",
+          "resource": "permissions",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef165",
+          "resource": "permissions",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14d",
+          "resource": "csw",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef153",
+          "resource": "approval_flows",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c8e86913e84de31b8ecc2",
+          "resource": "projects",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c8e86913e84de31b8ecc5",
+          "resource": "projects",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c8e86913e84de31b8ecc8",
+          "resource": "projects",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c8e86913e84de31b8eccb",
+          "resource": "projects",
+          "action": "delete"
+        },
+        {
+          "_id": "6a613abfdecdf0ba1209c2a3",
+          "resource": "training",
+          "action": "report"
+        },
+        {
+          "_id": "6a613abfdecdf0ba1209c2a1",
+          "resource": "training",
+          "action": "content"
+        }
+      ],
+      "createdAt": "2026-06-24T22:34:53.755Z",
+      "updatedAt": "2026-06-24T22:34:53.755Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef18a",
+      "name": "EXECUTIVE VICE PRESIDENT",
+      "permissions": [
+        {
+          "_id": "6a3c5b8da76b542dddcef144",
+          "resource": "employees",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef145",
+          "resource": "employees",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef146",
+          "resource": "employees",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef147",
+          "resource": "employees",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef148",
+          "resource": "csw",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef149",
+          "resource": "csw",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14a",
+          "resource": "csw",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14b",
+          "resource": "csw",
+          "action": "approve"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14c",
+          "resource": "csw",
+          "action": "cancel"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14d",
+          "resource": "csw",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14e",
+          "resource": "csw_categories",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14f",
+          "resource": "csw_categories",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef150",
+          "resource": "csw_categories",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef151",
+          "resource": "csw_categories",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef152",
+          "resource": "approval_flows",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef153",
+          "resource": "approval_flows",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef154",
+          "resource": "approval_flows",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef155",
+          "resource": "approval_flows",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef156",
+          "resource": "training",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef157",
+          "resource": "training",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef158",
+          "resource": "training",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef159",
+          "resource": "training",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15a",
+          "resource": "divisions",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15b",
+          "resource": "divisions",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15c",
+          "resource": "divisions",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15d",
+          "resource": "divisions",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15e",
+          "resource": "roles",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15f",
+          "resource": "roles",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef160",
+          "resource": "roles",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef161",
+          "resource": "roles",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef162",
+          "resource": "permissions",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef163",
+          "resource": "permissions",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef164",
+          "resource": "permissions",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef165",
+          "resource": "permissions",
+          "action": "delete"
+        },
+        {
+          "_id": "6a613abfdecdf0ba1209c2a3",
+          "resource": "training",
+          "action": "report"
+        },
+        {
+          "_id": "6a613abfdecdf0ba1209c2a1",
+          "resource": "training",
+          "action": "content"
+        }
+      ],
+      "createdAt": "2026-06-24T22:34:53.756Z",
+      "updatedAt": "2026-07-01T21:07:08.033Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef18c",
+      "name": "FOUNDER & SOLUTIONS ARCHITECT",
+      "permissions": [
+        {
+          "_id": "6a3c5b8da76b542dddcef146",
+          "resource": "employees",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14a",
+          "resource": "csw",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef147",
+          "resource": "employees",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14b",
+          "resource": "csw",
+          "action": "approve"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14e",
+          "resource": "csw_categories",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef149",
+          "resource": "csw",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14f",
+          "resource": "csw_categories",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef150",
+          "resource": "csw_categories",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef151",
+          "resource": "csw_categories",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef152",
+          "resource": "approval_flows",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef148",
+          "resource": "csw",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef144",
+          "resource": "employees",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14c",
+          "resource": "csw",
+          "action": "cancel"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef145",
+          "resource": "employees",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef154",
+          "resource": "approval_flows",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef155",
+          "resource": "approval_flows",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef156",
+          "resource": "training",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef157",
+          "resource": "training",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef158",
+          "resource": "training",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef159",
+          "resource": "training",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15a",
+          "resource": "divisions",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15b",
+          "resource": "divisions",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15c",
+          "resource": "divisions",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15d",
+          "resource": "divisions",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15e",
+          "resource": "roles",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15f",
+          "resource": "roles",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef160",
+          "resource": "roles",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef161",
+          "resource": "roles",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef162",
+          "resource": "permissions",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef163",
+          "resource": "permissions",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef164",
+          "resource": "permissions",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef165",
+          "resource": "permissions",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14d",
+          "resource": "csw",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef153",
+          "resource": "approval_flows",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c8e86913e84de31b8ecc2",
+          "resource": "projects",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c8e86913e84de31b8ecc5",
+          "resource": "projects",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c8e86913e84de31b8ecc8",
+          "resource": "projects",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c8e86913e84de31b8eccb",
+          "resource": "projects",
+          "action": "delete"
+        },
+        {
+          "_id": "6a613abfdecdf0ba1209c2a3",
+          "resource": "training",
+          "action": "report"
+        },
+        {
+          "_id": "6a613abfdecdf0ba1209c2a1",
+          "resource": "training",
+          "action": "content"
+        },
+        {
+          "_id": "6a613abfdecdf0ba1209c2a2",
+          "resource": "training",
+          "action": "manage"
+        }
+      ],
+      "createdAt": "2026-06-24T22:34:53.757Z",
+      "updatedAt": "2026-06-24T22:34:53.757Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef18e",
+      "name": "HUMAN TALENT MANAGER",
+      "permissions": [
+        {
+          "_id": "6a3c5b8da76b542dddcef144",
+          "resource": "employees",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef145",
+          "resource": "employees",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef146",
+          "resource": "employees",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef147",
+          "resource": "employees",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef148",
+          "resource": "csw",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef149",
+          "resource": "csw",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14a",
+          "resource": "csw",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14b",
+          "resource": "csw",
+          "action": "approve"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14c",
+          "resource": "csw",
+          "action": "cancel"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14d",
+          "resource": "csw",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14e",
+          "resource": "csw_categories",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14f",
+          "resource": "csw_categories",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef150",
+          "resource": "csw_categories",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef151",
+          "resource": "csw_categories",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef156",
+          "resource": "training",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef157",
+          "resource": "training",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef158",
+          "resource": "training",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef159",
+          "resource": "training",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15a",
+          "resource": "divisions",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15b",
+          "resource": "divisions",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15c",
+          "resource": "divisions",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15d",
+          "resource": "divisions",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15e",
+          "resource": "roles",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15f",
+          "resource": "roles",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef160",
+          "resource": "roles",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef161",
+          "resource": "roles",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef162",
+          "resource": "permissions",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef163",
+          "resource": "permissions",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef164",
+          "resource": "permissions",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef165",
+          "resource": "permissions",
+          "action": "delete"
+        },
+        {
+          "_id": "6a613abfdecdf0ba1209c2a3",
+          "resource": "training",
+          "action": "report"
+        },
+        {
+          "_id": "6a613abfdecdf0ba1209c2a1",
+          "resource": "training",
+          "action": "content"
+        },
+        {
+          "_id": "6a613abfdecdf0ba1209c2a2",
+          "resource": "training",
+          "action": "manage"
+        }
+      ],
+      "createdAt": "2026-06-24T22:34:53.758Z",
+      "updatedAt": "2026-07-01T21:07:07.903Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef190",
+      "name": "TECHNICAL ARCHITECT MANAGER",
+      "permissions": [
+        {
+          "_id": "6a3c5b8da76b542dddcef144",
+          "resource": "employees",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef145",
+          "resource": "employees",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef146",
+          "resource": "employees",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef148",
+          "resource": "csw",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef149",
+          "resource": "csw",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14a",
+          "resource": "csw",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14b",
+          "resource": "csw",
+          "action": "approve"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef152",
+          "resource": "approval_flows",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef153",
+          "resource": "approval_flows",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef154",
+          "resource": "approval_flows",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef156",
+          "resource": "training",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef157",
+          "resource": "training",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef158",
+          "resource": "training",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15a",
+          "resource": "divisions",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15b",
+          "resource": "divisions",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15c",
+          "resource": "divisions",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c8e86913e84de31b8ecc2",
+          "resource": "projects",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14e",
+          "resource": "csw_categories",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14f",
+          "resource": "csw_categories",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef150",
+          "resource": "csw_categories",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef151",
+          "resource": "csw_categories",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef15e",
+          "resource": "roles",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef162",
+          "resource": "permissions",
+          "action": "read"
+        },
+        {
+          "_id": "6a613abfdecdf0ba1209c2a3",
+          "resource": "training",
+          "action": "report"
+        },
+        {
+          "_id": "6a613abfdecdf0ba1209c2a1",
+          "resource": "training",
+          "action": "content"
+        }
+      ],
+      "createdAt": "2026-06-24T22:34:53.759Z",
+      "updatedAt": "2026-07-01T22:58:17.962Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef192",
+      "name": "TECHNICAL LEADER",
+      "permissions": [
+        {
+          "_id": "6a3c5b8da76b542dddcef144",
+          "resource": "employees",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef145",
+          "resource": "employees",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef146",
+          "resource": "employees",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef148",
+          "resource": "csw",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef149",
+          "resource": "csw",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14a",
+          "resource": "csw",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14b",
+          "resource": "csw",
+          "action": "approve"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef156",
+          "resource": "training",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef157",
+          "resource": "training",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef158",
+          "resource": "training",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c8e86913e84de31b8ecc2",
+          "resource": "projects",
+          "action": "read"
+        },
+        {
+          "_id": "6a613abfdecdf0ba1209c2a3",
+          "resource": "training",
+          "action": "report"
+        },
+        {
+          "_id": "6a613abfdecdf0ba1209c2a1",
+          "resource": "training",
+          "action": "content"
+        }
+      ],
+      "createdAt": "2026-06-24T22:34:53.759Z",
+      "updatedAt": "2026-06-24T22:34:53.759Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef194",
+      "name": "PROJECT MANAGER",
+      "permissions": [
+        {
+          "_id": "6a3c5b8da76b542dddcef144",
+          "resource": "employees",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef145",
+          "resource": "employees",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef146",
+          "resource": "employees",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef148",
+          "resource": "csw",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef149",
+          "resource": "csw",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14a",
+          "resource": "csw",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef156",
+          "resource": "training",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef157",
+          "resource": "training",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef158",
+          "resource": "training",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c8e86913e84de31b8ecc2",
+          "resource": "projects",
+          "action": "read"
+        },
+        {
+          "_id": "6a613abfdecdf0ba1209c2a3",
+          "resource": "training",
+          "action": "report"
+        },
+        {
+          "_id": "6a613abfdecdf0ba1209c2a1",
+          "resource": "training",
+          "action": "content"
+        }
+      ],
+      "createdAt": "2026-06-24T22:34:53.760Z",
+      "updatedAt": "2026-06-24T22:34:53.760Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef196",
+      "name": "DEVELOPER",
+      "permissions": [
+        {
+          "_id": "6a3c5b8da76b542dddcef148",
+          "resource": "csw",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef149",
+          "resource": "csw",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef156",
+          "resource": "training",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14a",
+          "resource": "csw",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14c",
+          "resource": "csw",
+          "action": "cancel"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14d",
+          "resource": "csw",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14e",
+          "resource": "csw_categories",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c8e86913e84de31b8ecc2",
+          "resource": "projects",
+          "action": "read"
+        },
+        {
+          "_id": "6a613abfdecdf0ba1209c2a3",
+          "resource": "training",
+          "action": "report"
+        }
+      ],
+      "createdAt": "2026-06-24T22:34:53.760Z",
+      "updatedAt": "2026-06-25T00:08:21.022Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef198",
+      "name": "QA ANALYST",
+      "permissions": [
+        {
+          "_id": "6a3c5b8da76b542dddcef148",
+          "resource": "csw",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef149",
+          "resource": "csw",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14a",
+          "resource": "csw",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14d",
+          "resource": "csw",
+          "action": "delete"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14c",
+          "resource": "csw",
+          "action": "cancel"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14e",
+          "resource": "csw_categories",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c8e86913e84de31b8ecc2",
+          "resource": "projects",
+          "action": "read"
+        },
+        {
+          "_id": "6a613abfdecdf0ba1209c2a3",
+          "resource": "training",
+          "action": "report"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef156",
+          "resource": "training",
+          "action": "read"
+        }
+      ],
+      "createdAt": "2026-06-24T22:34:53.762Z",
+      "updatedAt": "2026-06-25T01:25:14.126Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef19a",
+      "name": "UI/UX DESIGNER",
+      "permissions": [
+        {
+          "_id": "6a3c5b8da76b542dddcef144",
+          "resource": "employees",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef145",
+          "resource": "employees",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef148",
+          "resource": "csw",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef149",
+          "resource": "csw",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef156",
+          "resource": "training",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef157",
+          "resource": "training",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c8e86913e84de31b8ecc2",
+          "resource": "projects",
+          "action": "read"
+        },
+        {
+          "_id": "6a613abfdecdf0ba1209c2a3",
+          "resource": "training",
+          "action": "report"
+        },
+        {
+          "_id": "6a613abfdecdf0ba1209c2a1",
+          "resource": "training",
+          "action": "content"
+        }
+      ],
+      "createdAt": "2026-06-24T22:34:53.762Z",
+      "updatedAt": "2026-06-24T22:34:53.762Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef19c",
+      "name": "SALES REPRESENTATIVE",
+      "permissions": [
+        {
+          "_id": "6a3c5b8da76b542dddcef144",
+          "resource": "employees",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef145",
+          "resource": "employees",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef148",
+          "resource": "csw",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef149",
+          "resource": "csw",
+          "action": "create"
+        },
+        {
+          "_id": "6a613abfdecdf0ba1209c2a3",
+          "resource": "training",
+          "action": "report"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef156",
+          "resource": "training",
+          "action": "read"
+        }
+      ],
+      "createdAt": "2026-06-24T22:34:53.763Z",
+      "updatedAt": "2026-06-24T22:34:53.763Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef19e",
+      "name": "ETHICS OFFICER",
+      "permissions": [
+        {
+          "_id": "6a3c5b8da76b542dddcef144",
+          "resource": "employees",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef148",
+          "resource": "csw",
+          "action": "read"
+        },
+        {
+          "_id": "6a613abfdecdf0ba1209c2a3",
+          "resource": "training",
+          "action": "report"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef156",
+          "resource": "training",
+          "action": "read"
+        }
+      ],
+      "createdAt": "2026-06-24T22:34:53.764Z",
+      "updatedAt": "2026-06-24T22:34:53.764Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef1a0",
+      "name": "QUALITY & TRAINING OFFICER",
+      "permissions": [
+        {
+          "_id": "6a3c5b8da76b542dddcef144",
+          "resource": "employees",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef145",
+          "resource": "employees",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef146",
+          "resource": "employees",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef148",
+          "resource": "csw",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef149",
+          "resource": "csw",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14a",
+          "resource": "csw",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef156",
+          "resource": "training",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef157",
+          "resource": "training",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef158",
+          "resource": "training",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14b",
+          "resource": "csw",
+          "action": "approve"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14e",
+          "resource": "csw_categories",
+          "action": "read"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef14f",
+          "resource": "csw_categories",
+          "action": "create"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef150",
+          "resource": "csw_categories",
+          "action": "update"
+        },
+        {
+          "_id": "6a3c5b8da76b542dddcef151",
+          "resource": "csw_categories",
+          "action": "delete"
+        },
+        {
+          "_id": "6a613abfdecdf0ba1209c2a3",
+          "resource": "training",
+          "action": "report"
+        },
+        {
+          "_id": "6a613abfdecdf0ba1209c2a1",
+          "resource": "training",
+          "action": "content"
+        },
+        {
+          "_id": "6a613abfdecdf0ba1209c2a2",
+          "resource": "training",
+          "action": "manage"
+        }
+      ],
+      "createdAt": "2026-06-24T22:34:53.764Z",
+      "updatedAt": "2026-07-01T21:07:07.764Z",
+      "__v": 0
+    }
+  ],
+  "divisions": [
+    {
+      "_id": "6a3c5b8da76b542dddcef1a5",
+      "name": "División 1 — Talento Humano",
+      "code": "DIV01",
+      "description": "Contrata, forma personal y mantiene comunicaciones y ética",
+      "managerId": "6a3c65231cc21853352528a8",
+      "status": "active",
+      "approvalFlow": [],
+      "createdAt": "2026-06-24T22:34:53.818Z",
+      "updatedAt": "2026-06-24T23:28:45.217Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef1a7",
+      "name": "División 3 — Finanzas",
+      "code": "DIV03",
+      "description": "Ingreso, pagos, activos y materiales",
+      "managerId": "6a3c5b8da76b542dddcef1b4",
+      "status": "active",
+      "approvalFlow": [],
+      "createdAt": "2026-06-24T22:34:53.818Z",
+      "updatedAt": "2026-06-24T23:28:54.995Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef1a6",
+      "name": "División 2 — Diseminación",
+      "code": "DIV02",
+      "description": "Marketing, publicaciones y ventas",
+      "managerId": "6a3c5b8da76b542dddcef1a3",
+      "status": "active",
+      "approvalFlow": [],
+      "createdAt": "2026-06-24T22:34:53.818Z",
+      "updatedAt": "2026-06-24T22:34:53.818Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef1a8",
+      "name": "División 4 — Infraestructura",
+      "code": "DIV04",
+      "description": "Planeación, Cloud Services y Desarrollo de Software",
+      "managerId": "6a3c5b8da76b542dddcef1b9",
+      "status": "active",
+      "approvalFlow": [
+        {
+          "order": 1,
+          "employeeId": "6a3c5b8da76b542dddcef1b9",
+          "employeeName": "Moises Gonzalez",
+          "employeePosition": "TECHNICAL ARCHITECT MANAGER",
+          "_id": "6a3cbbac560c9f15a269a164"
+        },
+        {
+          "order": 2,
+          "employeeId": "6a3c5b8da76b542dddcef1a3",
+          "employeeName": "Manuel Lara",
+          "employeePosition": "FOUNDER & SOLUTIONS ARCHITECT",
+          "_id": "6a3cbbac560c9f15a269a165"
+        },
+        {
+          "order": 3,
+          "employeeId": "6a3c65231cc21853352528a8",
+          "employeeName": "Laura Hernandez",
+          "employeePosition": "HUMAN TALENT MANAGER",
+          "_id": "6a3cbbac560c9f15a269a166"
+        }
+      ],
+      "createdAt": "2026-06-24T22:34:53.818Z",
+      "updatedAt": "2026-06-25T05:25:00.014Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef1a9",
+      "name": "División 5 — Calidad",
+      "code": "DIV05",
+      "description": "Exámenes, revisión, certificaciones y premios",
+      "managerId": "6a3c655f1cc21853352528de",
+      "status": "active",
+      "approvalFlow": [],
+      "createdAt": "2026-06-24T22:34:53.818Z",
+      "updatedAt": "2026-06-24T23:29:02.392Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef1ab",
+      "name": "División 7 — Ejecutiva",
+      "code": "DIV07",
+      "description": "Oficina del CEO, Asuntos Especiales y Fundador",
+      "managerId": "6a3c661b1cc2185335252914",
+      "status": "active",
+      "approvalFlow": [],
+      "createdAt": "2026-06-24T22:34:53.818Z",
+      "updatedAt": "2026-06-24T23:29:14.235Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef1aa",
+      "name": "División 6 — Relaciones Públicas",
+      "code": "DIV06",
+      "description": "Información al público, servicios y éxito",
+      "managerId": "6a3c5b8da76b542dddcef1a3",
+      "status": "active",
+      "approvalFlow": [],
+      "createdAt": "2026-06-24T22:34:53.818Z",
+      "updatedAt": "2026-06-24T22:34:53.818Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a4ea06d56dbf97c4279984c",
+      "name": "Test Division 767565",
+      "code": "TD767565",
+      "description": "Descripción actualizada por e2e",
+      "managerId": "6a3c5b8da76b542dddcef1b9",
+      "status": "active",
+      "approvalFlow": [],
+      "createdAt": "2026-07-08T19:09:33.147Z",
+      "updatedAt": "2026-07-08T19:09:37.378Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a4ea36449bd0a7a5d471c82",
+      "name": "Test Division 530751",
+      "code": "TD530751",
+      "description": "Descripción actualizada por e2e",
+      "managerId": "6a3c5b8da76b542dddcef1b9",
+      "status": "active",
+      "approvalFlow": [],
+      "createdAt": "2026-07-08T19:22:12.870Z",
+      "updatedAt": "2026-07-08T19:22:15.454Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a4eac9d49bd0a7a5d471cf6",
+      "name": "Test Division 891565",
+      "code": "TD891565",
+      "description": "Descripción actualizada por e2e",
+      "managerId": "6a3c5b8da76b542dddcef1b9",
+      "status": "active",
+      "approvalFlow": [],
+      "createdAt": "2026-07-08T20:01:33.959Z",
+      "updatedAt": "2026-07-08T20:01:36.666Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a4ead0549bd0a7a5d471d70",
+      "name": "Test Division 995412",
+      "code": "TD995412",
+      "description": "Descripción actualizada por e2e",
+      "managerId": "6a3c5b8da76b542dddcef1b9",
+      "status": "active",
+      "approvalFlow": [],
+      "createdAt": "2026-07-08T20:03:17.562Z",
+      "updatedAt": "2026-07-08T20:03:20.179Z",
+      "__v": 0
+    }
+  ],
+  "employees": [
+    {
+      "_id": "6a3c5b8da76b542dddcef1a3",
+      "name": "Manuel Lara",
+      "email": "admin@unlimitech.cloud",
+      "password": "$2b$10$GrCeLdkPWxRDF.BIzXVohOCjXCkPQoRWB.PTmWphY6FIaWaRDATLu",
+      "role": "6a3c5b8da76b542dddcef18c",
+      "division": "6a3c5b8da76b542dddcef1ab",
+      "birthDate": "1985-01-15T00:00:00.000Z",
+      "nationalId": "FOUNDER001",
+      "phone": "+573001000001",
+      "nationality": "Colombia",
+      "status": "active",
+      "forcePasswordChange": false,
+      "approve_csw": true,
+      "deleted": false,
+      "createdAt": "2026-06-24T22:34:53.766Z",
+      "updatedAt": "2026-06-24T23:14:40.434Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef1b4",
+      "name": "Catherine Quiñonez",
+      "email": "catherine@unlimitech.cloud",
+      "password": "$2b$10$GrCeLdkPWxRDF.BIzXVohOCjXCkPQoRWB.PTmWphY6FIaWaRDATLu",
+      "role": "6a3c5b8da76b542dddcef188",
+      "division": "6a3c5b8da76b542dddcef1ab",
+      "birthDate": "1988-05-20T00:00:00.000Z",
+      "nationalId": "CEO001",
+      "phone": "+573001000002",
+      "nationality": "Colombia",
+      "status": "active",
+      "forcePasswordChange": false,
+      "approve_csw": true,
+      "deleted": false,
+      "createdAt": "2026-06-24T22:34:53.832Z",
+      "updatedAt": "2026-06-24T23:14:29.181Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef1b9",
+      "name": "Moises Gonzalez",
+      "email": "moises@unlimitech.cloud",
+      "password": "$2b$10$GrCeLdkPWxRDF.BIzXVohOCjXCkPQoRWB.PTmWphY6FIaWaRDATLu",
+      "role": "6a3c5b8da76b542dddcef190",
+      "division": "6a3c5b8da76b542dddcef1a8",
+      "birthDate": "1987-09-25T00:00:00.000Z",
+      "nationalId": "TAM001",
+      "phone": "+573001000007",
+      "nationality": "Colombia",
+      "status": "active",
+      "forcePasswordChange": false,
+      "approve_csw": true,
+      "deleted": false,
+      "createdAt": "2026-06-24T22:34:53.833Z",
+      "updatedAt": "2026-06-24T23:14:17.014Z",
+      "__v": 0,
+      "techLeadId": "6a3c5b8da76b542dddcef1a3"
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef1be",
+      "name": "Wenser Olmos",
+      "email": "wenser@unlimitech.cloud",
+      "password": "$2b$10$GrCeLdkPWxRDF.BIzXVohOCjXCkPQoRWB.PTmWphY6FIaWaRDATLu",
+      "role": "6a3c5b8da76b542dddcef19a",
+      "division": "6a3c5b8da76b542dddcef1a8",
+      "birthDate": "1993-10-15T00:00:00.000Z",
+      "nationalId": "DES001",
+      "phone": "+573001000012",
+      "nationality": "Colombia",
+      "status": "active",
+      "forcePasswordChange": false,
+      "approve_csw": false,
+      "deleted": false,
+      "createdAt": "2026-06-24T22:34:53.833Z",
+      "updatedAt": "2026-06-24T23:14:23.906Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef1c5",
+      "name": "Jair Zea",
+      "email": "jair@unlimitech.cloud",
+      "password": "$2b$10$GrCeLdkPWxRDF.BIzXVohOCjXCkPQoRWB.PTmWphY6FIaWaRDATLu",
+      "role": "6a3c5b8da76b542dddcef196",
+      "division": "6a3c5b8da76b542dddcef1a8",
+      "birthDate": "1992-09-16T00:00:00.000Z",
+      "nationalId": "QA001",
+      "phone": "+573001000019",
+      "nationality": "Colombia",
+      "status": "active",
+      "forcePasswordChange": false,
+      "approve_csw": false,
+      "deleted": false,
+      "createdAt": "2026-06-24T22:34:53.834Z",
+      "updatedAt": "2026-06-24T23:14:03.289Z",
+      "__v": 0,
+      "managerId": "6a3c5b8da76b542dddcef1b9",
+      "techLeadId": "6a3c5b8da76b542dddcef1a3"
+    },
+    {
+      "_id": "6a3c5b8da76b542dddcef1c6",
+      "name": "Jhoann Acosta",
+      "email": "jhoann@unlimitech.cloud",
+      "password": "$2b$10$GrCeLdkPWxRDF.BIzXVohOCjXCkPQoRWB.PTmWphY6FIaWaRDATLu",
+      "role": "6a3c5b8da76b542dddcef198",
+      "division": "6a3c5b8da76b542dddcef1a8",
+      "birthDate": "1993-06-30T00:00:00.000Z",
+      "nationalId": "QA002",
+      "phone": "+573001000020",
+      "nationality": "Colombia",
+      "status": "active",
+      "forcePasswordChange": false,
+      "approve_csw": false,
+      "deleted": false,
+      "createdAt": "2026-06-24T22:34:53.834Z",
+      "updatedAt": "2026-06-25T05:53:16.602Z",
+      "__v": 0,
+      "managerId": "6a3c5b8da76b542dddcef1b9",
+      "techLeadId": "6a3c5b8da76b542dddcef1b9"
+    },
+    {
+      "_id": "6a3c647b1cc21853352525fe",
+      "name": "Jorge Jimenez",
+      "email": "jorge@unlimitech.cloud",
+      "password": "$2b$10$Kqf/If3idv9w7UyB/YeYouiIIjOa6aJ662lcCF3UN2OfXa6pWyA7.",
+      "role": "6a3c5b8da76b542dddcef196",
+      "division": "6a3c5b8da76b542dddcef1a8",
+      "birthDate": "1998-06-01T00:00:00.000Z",
+      "nationalId": "1245364758697089",
+      "phone": "+573020000",
+      "nationality": "CO",
+      "managerId": "6a3c5b8da76b542dddcef1b9",
+      "status": "active",
+      "forcePasswordChange": true,
+      "approve_csw": false,
+      "deleted": false,
+      "createdAt": "2026-06-24T23:12:59.124Z",
+      "updatedAt": "2026-06-24T23:12:59.124Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c65231cc21853352528a8",
+      "name": "Laura Hernandez",
+      "email": "talent@unlimitech.cloud",
+      "password": "$2b$10$01727LckUTVwnfnhLdMUt.b5NO.RKaMayUFm/3eRTQO3aUqn.Hf1i",
+      "role": "6a3c5b8da76b542dddcef18e",
+      "division": "6a3c5b8da76b542dddcef1a5",
+      "birthDate": "1998-06-01T00:00:00.000Z",
+      "nationalId": "1245364758697081",
+      "phone": "+573020000",
+      "nationality": "CO",
+      "status": "active",
+      "forcePasswordChange": false,
+      "approve_csw": true,
+      "deleted": false,
+      "createdAt": "2026-06-24T23:15:47.029Z",
+      "updatedAt": "2026-07-23T16:35:27.200Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c655f1cc21853352528de",
+      "name": "Oscar Hernandez",
+      "email": "training@unlimitech.cloud",
+      "password": "$2b$10$xDJtjoHUCPn9aSF3ULiVrObUmkti0CzQkhepboYrqitQsVrnxiE.2",
+      "role": "6a3c5b8da76b542dddcef1a0",
+      "division": "6a3c5b8da76b542dddcef1a9",
+      "birthDate": "1998-06-01T00:00:00.000Z",
+      "nationalId": "12453647586970812",
+      "phone": "+573020000",
+      "nationality": "CO",
+      "status": "active",
+      "forcePasswordChange": false,
+      "approve_csw": true,
+      "deleted": false,
+      "createdAt": "2026-06-24T23:16:47.784Z",
+      "updatedAt": "2026-07-22T21:50:12.401Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a3c661b1cc2185335252914",
+      "name": "Andres Quintero",
+      "email": "coo@unlimitech.cloud",
+      "password": "$2b$10$OoKNsqr46VDh.cSSRvj5lesPiaCLyKL7szarYVjeNiuEfNK0pqjq6",
+      "role": "6a3c5b8da76b542dddcef188",
+      "division": "6a3c5b8da76b542dddcef1ab",
+      "birthDate": "1998-06-01T00:00:00.000Z",
+      "nationalId": "3456789012",
+      "phone": "+573020000",
+      "nationality": "CO",
+      "status": "active",
+      "forcePasswordChange": true,
+      "approve_csw": true,
+      "deleted": false,
+      "createdAt": "2026-06-24T23:19:55.071Z",
+      "updatedAt": "2026-07-01T16:46:52.948Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a456032dadf7b779efa2654",
+      "name": "E2E Test Developer",
+      "email": "greatly-hide@emxeecta.mailosaur.net",
+      "password": "$2b$10$Bog9B/JQgGC2lSOJDQ5fK.X85RluL738iEvhVJVhxCuvh8Hv0Ma5G",
+      "role": "6a3c5b8da76b542dddcef196",
+      "division": "6a3c5b8da76b542dddcef1a8",
+      "birthDate": "1995-08-22T00:00:00.000Z",
+      "nationalId": "9999888877",
+      "phone": "+573001234567",
+      "nationality": "Colombia",
+      "status": "active",
+      "forcePasswordChange": false,
+      "approve_csw": false,
+      "deleted": false,
+      "createdAt": "2026-07-01T18:45:06.409Z",
+      "updatedAt": "2026-07-01T21:57:28.591Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a459b93439c02f88b2952bd",
+      "name": "QA Test Employee",
+      "email": "qa-employee-46697165@emxeecta.mailosaur.net",
+      "password": "$2b$10$eFTzDkxmw86zeY9T2EPZHOrqQIu9TxRJGHDvbf/a45YDWqMwA3JIy",
+      "role": "6a3c5b8da76b542dddcef196",
+      "division": "6a3c5b8da76b542dddcef1a8",
+      "birthDate": "1990-05-15T00:00:00.000Z",
+      "nationalId": "2946697165",
+      "phone": "+573109876543",
+      "nationality": "CO",
+      "status": "active",
+      "forcePasswordChange": true,
+      "approve_csw": false,
+      "deleted": false,
+      "createdAt": "2026-07-01T22:58:27.535Z",
+      "updatedAt": "2026-07-01T22:58:27.535Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a459bb9439c02f88b2952dd",
+      "name": "QA Test Employee",
+      "email": "qa-employee-46735641@emxeecta.mailosaur.net",
+      "password": "$2b$10$n0ybUlk/XIJpHjtRzp4oCuRTJRq6lCbY1NijRreTV61QqkKXVVoPW",
+      "role": "6a3c5b8da76b542dddcef196",
+      "division": "6a3c5b8da76b542dddcef1a8",
+      "birthDate": "1990-05-15T00:00:00.000Z",
+      "nationalId": "2946735641",
+      "phone": "+573109876543",
+      "nationality": "CO",
+      "status": "active",
+      "forcePasswordChange": true,
+      "approve_csw": false,
+      "deleted": false,
+      "createdAt": "2026-07-01T22:59:05.553Z",
+      "updatedAt": "2026-07-01T23:01:57.104Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a459c78439c02f88b295359",
+      "name": "Login Test 926580",
+      "email": "login-test-926580@emxeecta.mailosaur.net",
+      "password": "$2b$10$u7GvXK6y69JEoX6sS5wpruYAeo.1EP1eaBdNpTeo56/V/8V1lx1YG",
+      "role": "6a3c5b8da76b542dddcef196",
+      "division": "6a3c5b8da76b542dddcef1a8",
+      "birthDate": "1992-03-20T00:00:00.000Z",
+      "nationalId": "LT926580",
+      "phone": "+573001110000",
+      "nationality": "CO",
+      "status": "active",
+      "forcePasswordChange": false,
+      "approve_csw": false,
+      "deleted": false,
+      "createdAt": "2026-07-01T23:02:16.334Z",
+      "updatedAt": "2026-07-01T23:02:21.837Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a459c97439c02f88b295379",
+      "name": "QA Test Employee",
+      "email": "qa-employee-46957677@emxeecta.mailosaur.net",
+      "password": "$2b$10$xwp49tsB6CSRkAPXlKZnbemFoAksJkW8MdrInBO/IyNBG6MO6vu/C",
+      "role": "6a3c5b8da76b542dddcef196",
+      "division": "6a3c5b8da76b542dddcef1a8",
+      "birthDate": "1990-05-15T00:00:00.000Z",
+      "nationalId": "2946957677",
+      "phone": "+573005559999",
+      "nationality": "CO",
+      "status": "active",
+      "forcePasswordChange": true,
+      "approve_csw": false,
+      "deleted": false,
+      "createdAt": "2026-07-01T23:02:47.542Z",
+      "updatedAt": "2026-07-08T18:47:34.741Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a459cb8439c02f88b2953c7",
+      "name": "Login Test 990482",
+      "email": "login-test-990482@emxeecta.mailosaur.net",
+      "password": "$2b$10$doWonl/v5e345THwDYQOm.QxHe9WsdxFW84nSF5aHPfN/Q30Cf23q",
+      "role": "6a3c5b8da76b542dddcef196",
+      "division": "6a3c5b8da76b542dddcef1a8",
+      "birthDate": "1992-03-20T00:00:00.000Z",
+      "nationalId": "LT990482",
+      "phone": "+573001110000",
+      "nationality": "CO",
+      "status": "active",
+      "forcePasswordChange": false,
+      "approve_csw": false,
+      "deleted": false,
+      "createdAt": "2026-07-01T23:03:20.009Z",
+      "updatedAt": "2026-07-03T20:52:32.712Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a4e9cb4e151b314257d4ab7",
+      "name": "Lifecycle 809125",
+      "email": "lifecycle-809125@emxeecta.mailosaur.net",
+      "password": "$2b$10$7ysSaH5aaErbufIXzSrPc.04/RY.uBiErU5Gl3AZb9IzfA0IWrXn2",
+      "role": "6a3c5b8da76b542dddcef196",
+      "division": "6a3c5b8da76b542dddcef1a8",
+      "birthDate": "1993-07-15T00:00:00.000Z",
+      "nationalId": "LC809125",
+      "phone": "+573009998888",
+      "nationality": "CO",
+      "status": "active",
+      "forcePasswordChange": true,
+      "approve_csw": false,
+      "deleted": false,
+      "createdAt": "2026-07-08T18:53:40.838Z",
+      "updatedAt": "2026-07-08T18:53:55.636Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a6a6eb3e71e621f9f7427ae",
+      "name": "E2E Test Employee",
+      "email": "e2e-test@unlimitech.cloud",
+      "password": "$2b$10$uxnW2SS0BclZMrH4XvVj0ek8PJ5Hc0dNBMMgHfFD/eiUdY3DVpHNG",
+      "role": "6a3c5b8da76b542dddcef188",
+      "division": "6a3c5b8da76b542dddcef1a5",
+      "birthDate": "1990-01-01T00:00:00.000Z",
+      "nationalId": "E2E000001",
+      "phone": "3001234567",
+      "nationality": "Colombiana",
+      "status": "active",
+      "forcePasswordChange": false,
+      "approve_csw": false,
+      "deleted": false,
+      "createdAt": "2026-07-29T21:20:51.476Z",
+      "updatedAt": "2026-07-29T21:20:51.476Z",
+      "__v": 0
+    }
+  ],
+  "badges": [
+    {
+      "_id": "6a6168f3f8210f6f263750f2",
+      "name": "[SEED] Fullstack Developer",
+      "description": "Dominio de frontend y backend con TypeScript, React y Node.js",
+      "icon": "code-2",
+      "shape": "hexagon",
+      "color": "#8B5CF6",
+      "levels": [
+        "6a6168f3f8210f6f263750f4",
+        "6a6168f3f8210f6f263750f5"
+      ],
+      "totalCourses": 0,
+      "active": true,
+      "deleted": false,
+      "createdAt": "2026-07-23T01:05:55.860Z",
+      "updatedAt": "2026-07-23T01:05:55.875Z",
+      "__v": 1
+    },
+    {
+      "_id": "6a6168f3f8210f6f263750f3",
+      "name": "[SEED] React Specialist",
+      "description": "Especialización en React: hooks, state management y patterns",
+      "icon": "brain",
+      "shape": "medal",
+      "color": "#d56307",
+      "levels": [
+        "6a6168f3f8210f6f263750f6"
+      ],
+      "totalCourses": 0,
+      "active": true,
+      "deleted": false,
+      "createdAt": "2026-07-23T01:05:55.864Z",
+      "updatedAt": "2026-07-23T13:47:11.160Z",
+      "__v": 1
+    },
+    {
+      "_id": "6a6231c2685283cfd02d88fc",
+      "name": "test",
+      "description": "test",
+      "icon": "gem",
+      "shape": "star",
+      "color": "#3bf751",
+      "levels": [],
+      "totalCourses": 0,
+      "active": true,
+      "deleted": false,
+      "createdAt": "2026-07-23T15:22:42.621Z",
+      "updatedAt": "2026-07-23T15:22:42.621Z",
+      "__v": 0
+    }
+  ],
+  "levels": [
+    {
+      "_id": "6a6168f3f8210f6f263750f4",
+      "name": "[SEED] TypeScript Básico",
+      "description": "Fundamentos del lenguaje TypeScript",
+      "order": 0,
+      "badge": "6a6168f3f8210f6f263750f2",
+      "courses": [
+        "6a6168f3f8210f6f263750f7",
+        "6a6168f3f8210f6f263750fc"
+      ],
+      "requiredCoursesCount": 0,
+      "active": true,
+      "deleted": false,
+      "createdAt": "2026-07-23T01:05:55.867Z",
+      "updatedAt": "2026-07-23T01:05:55.938Z",
+      "__v": 1,
+      "exam": "6a6168f3f8210f6f263750fd"
+    },
+    {
+      "_id": "6a6168f3f8210f6f263750f5",
+      "name": "[SEED] TypeScript Avanzado",
+      "description": "Patterns avanzados: generics, utility types, decorators",
+      "order": 1,
+      "badge": "6a6168f3f8210f6f263750f2",
+      "courses": [
+        "6a6168f3f8210f6f263750f8",
+        "6a6168f3f8210f6f263750fb"
+      ],
+      "requiredCoursesCount": 0,
+      "active": true,
+      "deleted": false,
+      "createdAt": "2026-07-23T01:05:55.869Z",
+      "updatedAt": "2026-07-23T01:05:55.910Z",
+      "__v": 1
+    },
+    {
+      "_id": "6a6168f3f8210f6f263750f6",
+      "name": "[SEED] React Fundamentals",
+      "description": "Hooks, componentes y lifecycle en React",
+      "order": 2,
+      "badge": "6a6168f3f8210f6f263750f3",
+      "courses": [
+        "6a6168f3f8210f6f263750f9",
+        "6a6168f3f8210f6f263750fa"
+      ],
+      "requiredCoursesCount": 0,
+      "active": true,
+      "deleted": false,
+      "createdAt": "2026-07-23T01:05:55.870Z",
+      "updatedAt": "2026-07-23T14:32:49.175Z",
+      "__v": 1,
+      "exam": "6a6168f3f8210f6f26375102"
+    }
+  ],
+  "courses": [
+    {
+      "_id": "6a6168f3f8210f6f263750f7",
+      "name": "[SEED] Intro a TypeScript",
+      "description": "Tipos básicos y interfaces",
+      "libraryDocument": "6a6168f3f8210f6f263750ec",
+      "order": 0,
+      "level": "6a6168f3f8210f6f263750f4",
+      "estimatedHours": 2,
+      "active": true,
+      "deleted": false,
+      "createdAt": "2026-07-23T01:05:55.900Z",
+      "updatedAt": "2026-07-23T01:05:55.900Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a6168f3f8210f6f263750f8",
+      "name": "[SEED] TypeScript Generics",
+      "description": "Generics y utility types",
+      "libraryDocument": "6a6168f3f8210f6f263750ed",
+      "order": 0,
+      "level": "6a6168f3f8210f6f263750f5",
+      "estimatedHours": 3,
+      "active": true,
+      "deleted": false,
+      "createdAt": "2026-07-23T01:05:55.902Z",
+      "updatedAt": "2026-07-23T01:05:55.902Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a6168f3f8210f6f263750f9",
+      "name": "[SEED] React Hooks",
+      "description": "useState, useEffect, custom hooks",
+      "libraryDocument": "6a6168f3f8210f6f263750ee",
+      "order": 0,
+      "level": "6a6168f3f8210f6f263750f6",
+      "estimatedHours": 2.5,
+      "active": true,
+      "deleted": false,
+      "createdAt": "2026-07-23T01:05:55.903Z",
+      "updatedAt": "2026-07-23T01:05:55.903Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a6168f3f8210f6f263750fa",
+      "name": "[SEED] React + MobX",
+      "description": "State management con MobX",
+      "libraryDocument": "6a6168f3f8210f6f263750ef",
+      "order": 1,
+      "level": "6a6168f3f8210f6f263750f6",
+      "estimatedHours": 3,
+      "active": true,
+      "deleted": false,
+      "createdAt": "2026-07-23T01:05:55.904Z",
+      "updatedAt": "2026-07-23T01:05:55.904Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a6168f3f8210f6f263750fb",
+      "name": "[SEED] Node.js Express API",
+      "description": "Construcción de APIs REST",
+      "libraryDocument": "6a6168f3f8210f6f263750f0",
+      "order": 1,
+      "level": "6a6168f3f8210f6f263750f5",
+      "estimatedHours": 4,
+      "active": true,
+      "deleted": false,
+      "createdAt": "2026-07-23T01:05:55.906Z",
+      "updatedAt": "2026-07-23T01:05:55.906Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a6168f3f8210f6f263750fc",
+      "name": "[SEED] MongoDB Mongoose",
+      "description": "Modelado y queries",
+      "libraryDocument": "6a6168f3f8210f6f263750f1",
+      "order": 2,
+      "level": "6a6168f3f8210f6f263750f4",
+      "estimatedHours": 2.5,
+      "active": true,
+      "deleted": false,
+      "createdAt": "2026-07-23T01:05:55.907Z",
+      "updatedAt": "2026-07-23T03:24:33.553Z",
+      "__v": 0
+    }
+  ],
+  "exams": [
+    {
+      "_id": "6a6168f3f8210f6f263750fd",
+      "title": "[SEED] Examen TypeScript Básico",
+      "description": "Evaluación de fundamentos de TypeScript",
+      "level": "6a6168f3f8210f6f263750f4",
+      "questions": [
+        {
+          "question": "¿Cuál es el tipo de dato para números en TypeScript?",
+          "type": "multiple_choice",
+          "options": [
+            {
+              "text": "int",
+              "isCorrect": false
+            },
+            {
+              "text": "number",
+              "isCorrect": true
+            },
+            {
+              "text": "float",
+              "isCorrect": false
+            },
+            {
+              "text": "integer",
+              "isCorrect": false
+            }
+          ],
+          "points": 10,
+          "order": 0,
+          "_id": "6a621b787137493c3f521b7c"
+        },
+        {
+          "question": "¿Qué keyword se usa para definir una interfaz?",
+          "type": "multiple_choice",
+          "options": [
+            {
+              "text": "type",
+              "isCorrect": false
+            },
+            {
+              "text": "interface",
+              "isCorrect": true
+            },
+            {
+              "text": "class",
+              "isCorrect": false
+            },
+            {
+              "text": "struct",
+              "isCorrect": false
+            }
+          ],
+          "points": 10,
+          "order": 1,
+          "_id": "6a621b787137493c3f521b7d"
+        },
+        {
+          "question": "Explique la diferencia entre type e interface en TypeScript.",
+          "type": "open_text",
+          "expectedAnswer": "Las interfaces se pueden extender y fusionar (declaration merging). Los types son más flexibles: soportan unions, intersections y mapped types. Interfaces son mejores para objetos que se extienden; types para uniones y tipos complejos.",
+          "points": 20,
+          "order": 2,
+          "_id": "6a621b787137493c3f521b7e"
+        },
+        {
+          "question": "¿TypeScript se ejecuta directamente en el navegador?",
+          "type": "multiple_choice",
+          "options": [
+            {
+              "text": "Sí, directamente",
+              "isCorrect": false
+            },
+            {
+              "text": "No, se transpila a JavaScript primero",
+              "isCorrect": false
+            },
+            {
+              "text": "Solo con Deno",
+              "isCorrect": true
+            }
+          ],
+          "points": 10,
+          "order": 3,
+          "_id": "6a621b787137493c3f521b7f"
+        }
+      ],
+      "passingScore": 80,
+      "maxAttempts": 2,
+      "assignedTo": [],
+      "active": true,
+      "createdBy": "6a3c5b8da76b542dddcef1a3",
+      "deleted": false,
+      "createdAt": "2026-07-23T01:05:55.919Z",
+      "updatedAt": "2026-07-23T13:47:36.431Z",
+      "__v": 1
+    },
+    {
+      "_id": "6a6168f3f8210f6f26375102",
+      "title": "[SEED] Examen React Fundamentals",
+      "description": "Evaluación de hooks y componentes React",
+      "level": "6a6168f3f8210f6f263750f6",
+      "questions": [
+        {
+          "question": "Describa cuándo usaría un custom hook vs un componente wrapper.",
+          "type": "open_text",
+          "points": 20,
+          "order": 0,
+          "_id": "6a618b4637504dce315d6a66"
+        },
+        {
+          "question": "¿Qué hook se usa para manejar estado local en un componente?",
+          "type": "multiple_choice",
+          "options": [
+            {
+              "text": "useEffect",
+              "isCorrect": false
+            },
+            {
+              "text": "useState",
+              "isCorrect": true
+            },
+            {
+              "text": "useContext",
+              "isCorrect": false
+            },
+            {
+              "text": "useRef",
+              "isCorrect": false
+            }
+          ],
+          "points": 10,
+          "order": 1,
+          "_id": "6a618b4637504dce315d6a67"
+        },
+        {
+          "question": "¿Cuándo se ejecuta useEffect con un array de dependencias vacío []?",
+          "type": "multiple_choice",
+          "options": [
+            {
+              "text": "En cada render",
+              "isCorrect": true
+            },
+            {
+              "text": "Solo al montar el componente",
+              "isCorrect": false
+            },
+            {
+              "text": "Solo al desmontar",
+              "isCorrect": false
+            },
+            {
+              "text": "Nunca",
+              "isCorrect": false
+            }
+          ],
+          "points": 10,
+          "order": 2,
+          "_id": "6a618b4637504dce315d6a68"
+        }
+      ],
+      "passingScore": 80,
+      "maxAttempts": 1,
+      "assignedTo": [],
+      "active": true,
+      "createdBy": "6a3c5b8da76b542dddcef1a3",
+      "deleted": false,
+      "createdAt": "2026-07-23T01:05:55.929Z",
+      "updatedAt": "2026-07-23T03:32:22.084Z",
+      "__v": 2
+    }
+  ],
+  "calendarEvents": [
+    {
+      "_id": "6a3ca79dfa8e4b41753eac50",
+      "title": "Reunión semanal de equipo",
+      "description": "Standup semanal con todo el equipo de Infraestructura",
+      "startDate": "2026-06-26T00:00:00.000Z",
+      "endDate": "2026-06-26T00:00:00.000Z",
+      "color": "success",
+      "type": "meeting",
+      "allDay": true,
+      "createdBy": "6a3c5b8da76b542dddcef1a3",
+      "createdAt": "2026-06-25T03:59:25.880Z",
+      "updatedAt": "2026-06-25T03:59:25.880Z",
+      "__v": 0,
+      "link": "https://meet.google.com/abc-defg-hij"
+    },
+    {
+      "_id": "6a3ca79dfa8e4b41753eac52",
+      "title": "Entrega Sprint 12",
+      "description": "Deadline de entrega del sprint 12 - proyectos MasterTech y Pacific",
+      "startDate": "2026-06-30T00:00:00.000Z",
+      "endDate": "2026-06-30T00:00:00.000Z",
+      "color": "danger",
+      "type": "deadline",
+      "allDay": true,
+      "createdBy": "6a3c5b8da76b542dddcef1a3",
+      "createdAt": "2026-06-25T03:59:25.884Z",
+      "updatedAt": "2026-06-25T03:59:25.884Z",
+      "__v": 0,
+      "link": "https://github.com/jhoannUnlimitech/RH-UNLIMITECH-CLOUD/milestone/12"
+    },
+    {
+      "_id": "6a3ca79dfa8e4b41753eac54",
+      "title": "Capacitación AWS",
+      "description": "Sesión de formación en servicios AWS para el equipo",
+      "startDate": "2026-07-02T00:00:00.000Z",
+      "endDate": "2026-07-02T00:00:00.000Z",
+      "color": "primary",
+      "type": "training",
+      "allDay": false,
+      "createdBy": "6a3c5b8da76b542dddcef1a3",
+      "createdAt": "2026-06-25T03:59:25.886Z",
+      "updatedAt": "2026-06-25T04:38:20.467Z",
+      "__v": 0,
+      "link": "https://docs.google.com/presentation/d/example",
+      "endTime": "14:00",
+      "notifyBefore": 0,
+      "startTime": "01:22"
+    },
+    {
+      "_id": "6a62413fa39a8051488d3e71",
+      "title": "Año Nuevo",
+      "description": "Festivo Colombia — Año Nuevo",
+      "startDate": "2026-01-01T05:00:00.000Z",
+      "endDate": "2026-01-02T04:59:59.000Z",
+      "color": "danger",
+      "type": "holiday",
+      "allDay": true,
+      "createdBy": "6a3c5b8da76b542dddcef1a3",
+      "notifyBefore": 0,
+      "createdAt": "2026-07-23T16:28:47.402Z",
+      "updatedAt": "2026-07-23T16:28:47.402Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a62413fa39a8051488d3e72",
+      "title": "Día de los Reyes Magos",
+      "description": "Festivo Colombia — Día de los Reyes Magos",
+      "startDate": "2026-01-12T05:00:00.000Z",
+      "endDate": "2026-01-13T04:59:59.000Z",
+      "color": "danger",
+      "type": "holiday",
+      "allDay": true,
+      "createdBy": "6a3c5b8da76b542dddcef1a3",
+      "notifyBefore": 0,
+      "createdAt": "2026-07-23T16:28:47.413Z",
+      "updatedAt": "2026-07-23T16:28:47.413Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a62413fa39a8051488d3e73",
+      "title": "Día de San José",
+      "description": "Festivo Colombia — Día de San José",
+      "startDate": "2026-03-23T05:00:00.000Z",
+      "endDate": "2026-03-24T04:59:59.000Z",
+      "color": "danger",
+      "type": "holiday",
+      "allDay": true,
+      "createdBy": "6a3c5b8da76b542dddcef1a3",
+      "notifyBefore": 0,
+      "createdAt": "2026-07-23T16:28:47.417Z",
+      "updatedAt": "2026-07-23T16:28:47.417Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a62413fa39a8051488d3e74",
+      "title": "Jueves Santo",
+      "description": "Festivo Colombia — Jueves Santo",
+      "startDate": "2026-04-02T05:00:00.000Z",
+      "endDate": "2026-04-03T04:59:59.000Z",
+      "color": "danger",
+      "type": "holiday",
+      "allDay": true,
+      "createdBy": "6a3c5b8da76b542dddcef1a3",
+      "notifyBefore": 0,
+      "createdAt": "2026-07-23T16:28:47.420Z",
+      "updatedAt": "2026-07-23T16:28:47.420Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a62413fa39a8051488d3e75",
+      "title": "Viernes Santo",
+      "description": "Festivo Colombia — Viernes Santo",
+      "startDate": "2026-04-03T05:00:00.000Z",
+      "endDate": "2026-04-04T04:59:59.000Z",
+      "color": "danger",
+      "type": "holiday",
+      "allDay": true,
+      "createdBy": "6a3c5b8da76b542dddcef1a3",
+      "notifyBefore": 0,
+      "createdAt": "2026-07-23T16:28:47.424Z",
+      "updatedAt": "2026-07-23T16:28:47.424Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a62413fa39a8051488d3e76",
+      "title": "Día del Trabajo",
+      "description": "Festivo Colombia — Día del Trabajo",
+      "startDate": "2026-05-01T05:00:00.000Z",
+      "endDate": "2026-05-02T04:59:59.000Z",
+      "color": "danger",
+      "type": "holiday",
+      "allDay": true,
+      "createdBy": "6a3c5b8da76b542dddcef1a3",
+      "notifyBefore": 0,
+      "createdAt": "2026-07-23T16:28:47.430Z",
+      "updatedAt": "2026-07-23T16:28:47.430Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a62413fa39a8051488d3e77",
+      "title": "Ascensión del Señor",
+      "description": "Festivo Colombia — Ascensión del Señor",
+      "startDate": "2026-05-18T05:00:00.000Z",
+      "endDate": "2026-05-19T04:59:59.000Z",
+      "color": "danger",
+      "type": "holiday",
+      "allDay": true,
+      "createdBy": "6a3c5b8da76b542dddcef1a3",
+      "notifyBefore": 0,
+      "createdAt": "2026-07-23T16:28:47.434Z",
+      "updatedAt": "2026-07-23T16:28:47.434Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a62413fa39a8051488d3e78",
+      "title": "Corpus Christi",
+      "description": "Festivo Colombia — Corpus Christi",
+      "startDate": "2026-06-08T05:00:00.000Z",
+      "endDate": "2026-06-09T04:59:59.000Z",
+      "color": "danger",
+      "type": "holiday",
+      "allDay": true,
+      "createdBy": "6a3c5b8da76b542dddcef1a3",
+      "notifyBefore": 0,
+      "createdAt": "2026-07-23T16:28:47.437Z",
+      "updatedAt": "2026-07-23T16:28:47.437Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a62413fa39a8051488d3e79",
+      "title": "Sagrado Corazón de Jesús",
+      "description": "Festivo Colombia — Sagrado Corazón de Jesús",
+      "startDate": "2026-06-15T05:00:00.000Z",
+      "endDate": "2026-06-16T04:59:59.000Z",
+      "color": "danger",
+      "type": "holiday",
+      "allDay": true,
+      "createdBy": "6a3c5b8da76b542dddcef1a3",
+      "notifyBefore": 0,
+      "createdAt": "2026-07-23T16:28:47.440Z",
+      "updatedAt": "2026-07-23T16:28:47.440Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a62413fa39a8051488d3e7a",
+      "title": "San Pedro y San Pablo",
+      "description": "Festivo Colombia — San Pedro y San Pablo",
+      "startDate": "2026-06-29T05:00:00.000Z",
+      "endDate": "2026-06-30T04:59:59.000Z",
+      "color": "danger",
+      "type": "holiday",
+      "allDay": true,
+      "createdBy": "6a3c5b8da76b542dddcef1a3",
+      "notifyBefore": 0,
+      "createdAt": "2026-07-23T16:28:47.442Z",
+      "updatedAt": "2026-07-23T16:28:47.442Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a62413fa39a8051488d3e7b",
+      "title": "Día de la Independencia",
+      "description": "Festivo Colombia — Día de la Independencia",
+      "startDate": "2026-07-20T05:00:00.000Z",
+      "endDate": "2026-07-21T04:59:59.000Z",
+      "color": "danger",
+      "type": "holiday",
+      "allDay": true,
+      "createdBy": "6a3c5b8da76b542dddcef1a3",
+      "notifyBefore": 0,
+      "createdAt": "2026-07-23T16:28:47.444Z",
+      "updatedAt": "2026-07-23T16:28:47.444Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a62413fa39a8051488d3e7c",
+      "title": "Batalla de Boyacá",
+      "description": "Festivo Colombia — Batalla de Boyacá",
+      "startDate": "2026-08-07T05:00:00.000Z",
+      "endDate": "2026-08-08T04:59:59.000Z",
+      "color": "danger",
+      "type": "holiday",
+      "allDay": true,
+      "createdBy": "6a3c5b8da76b542dddcef1a3",
+      "notifyBefore": 0,
+      "createdAt": "2026-07-23T16:28:47.450Z",
+      "updatedAt": "2026-07-23T16:28:47.450Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a62413fa39a8051488d3e7d",
+      "title": "Asunción de la Virgen",
+      "description": "Festivo Colombia — Asunción de la Virgen",
+      "startDate": "2026-08-17T05:00:00.000Z",
+      "endDate": "2026-08-18T04:59:59.000Z",
+      "color": "danger",
+      "type": "holiday",
+      "allDay": true,
+      "createdBy": "6a3c5b8da76b542dddcef1a3",
+      "notifyBefore": 0,
+      "createdAt": "2026-07-23T16:28:47.453Z",
+      "updatedAt": "2026-07-23T16:28:47.453Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a62413fa39a8051488d3e7e",
+      "title": "Día de la Raza",
+      "description": "Festivo Colombia — Día de la Raza",
+      "startDate": "2026-10-12T05:00:00.000Z",
+      "endDate": "2026-10-13T04:59:59.000Z",
+      "color": "danger",
+      "type": "holiday",
+      "allDay": true,
+      "createdBy": "6a3c5b8da76b542dddcef1a3",
+      "notifyBefore": 0,
+      "createdAt": "2026-07-23T16:28:47.455Z",
+      "updatedAt": "2026-07-23T16:28:47.455Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a62413fa39a8051488d3e7f",
+      "title": "Todos los Santos",
+      "description": "Festivo Colombia — Todos los Santos",
+      "startDate": "2026-11-02T05:00:00.000Z",
+      "endDate": "2026-11-03T04:59:59.000Z",
+      "color": "danger",
+      "type": "holiday",
+      "allDay": true,
+      "createdBy": "6a3c5b8da76b542dddcef1a3",
+      "notifyBefore": 0,
+      "createdAt": "2026-07-23T16:28:47.457Z",
+      "updatedAt": "2026-07-23T16:28:47.457Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a62413fa39a8051488d3e80",
+      "title": "Independencia de Cartagena",
+      "description": "Festivo Colombia — Independencia de Cartagena",
+      "startDate": "2026-11-16T05:00:00.000Z",
+      "endDate": "2026-11-17T04:59:59.000Z",
+      "color": "danger",
+      "type": "holiday",
+      "allDay": true,
+      "createdBy": "6a3c5b8da76b542dddcef1a3",
+      "notifyBefore": 0,
+      "createdAt": "2026-07-23T16:28:47.459Z",
+      "updatedAt": "2026-07-23T16:28:47.459Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a62413fa39a8051488d3e81",
+      "title": "Inmaculada Concepción",
+      "description": "Festivo Colombia — Inmaculada Concepción",
+      "startDate": "2026-12-08T05:00:00.000Z",
+      "endDate": "2026-12-09T04:59:59.000Z",
+      "color": "danger",
+      "type": "holiday",
+      "allDay": true,
+      "createdBy": "6a3c5b8da76b542dddcef1a3",
+      "notifyBefore": 0,
+      "createdAt": "2026-07-23T16:28:47.462Z",
+      "updatedAt": "2026-07-23T16:28:47.462Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a62413fa39a8051488d3e82",
+      "title": "Navidad",
+      "description": "Festivo Colombia — Navidad",
+      "startDate": "2026-12-25T05:00:00.000Z",
+      "endDate": "2026-12-26T04:59:59.000Z",
+      "color": "danger",
+      "type": "holiday",
+      "allDay": true,
+      "createdBy": "6a3c5b8da76b542dddcef1a3",
+      "notifyBefore": 0,
+      "createdAt": "2026-07-23T16:28:47.464Z",
+      "updatedAt": "2026-07-23T16:28:47.464Z",
+      "__v": 0
+    }
+  ],
+  "systemConfig": {
+    "_id": "6a623b3a24fd2eb17e021207",
+    "general": {
+      "companyName": "Unlimitech Cloud",
+      "timezone": "America/Bogota",
+      "locale": "es-CO",
+      "dateFormat": "DD/MM/YYYY"
+    },
+    "schedule": {
+      "workDays": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "workHoursStart": "08:00",
+      "workHoursEnd": "18:00",
+      "studyDays": [
+        1,
+        3,
+        5
+      ]
+    },
+    "training": {
+      "minWeeklyHours": 3,
+      "examPassingScore": 80,
+      "maxExamAttempts": 3,
+      "studyReportMaxHoursPerDay": 12
+    },
+    "notifications": {
+      "retentionDays": 90,
+      "emailEnabled": false,
+      "summaryFrequency": "none"
+    },
+    "holidays": [],
+    "createdAt": "2026-07-23T16:03:06.712Z",
+    "updatedAt": "2026-07-23T16:28:47.372Z",
+    "__v": 0
+  }
+}
