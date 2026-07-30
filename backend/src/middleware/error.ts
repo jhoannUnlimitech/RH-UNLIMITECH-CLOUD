@@ -46,9 +46,19 @@ export const errorHandler = (
   // Error de duplicado de Mongoose
   if ((err as any).code === 11000) {
     const field = Object.keys((err as any).keyPattern)[0];
+    const fieldTranslations: Record<string, string> = {
+      name: 'nombre',
+      email: 'email',
+      title: 'título',
+      slug: 'slug',
+      nationalId: 'número de identificación',
+      order: 'orden',
+      date: 'fecha',
+    };
+    const translatedField = fieldTranslations[field] || field;
     res.status(409).json({
       success: false,
-      message: `Ya existe un registro con ese ${field}`
+      message: `Ya existe un registro con ese ${translatedField}`
     });
     return;
   }
