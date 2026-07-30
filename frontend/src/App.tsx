@@ -30,6 +30,7 @@ import LibraryCategories from "./pages/Training/LibraryCategories";
 import DocumentView from "./pages/Training/DocumentView";
 import DocumentForm from "./pages/Training/DocumentForm";
 import TrainingManage from "./pages/Training/TrainingManage";
+import MyCertificates from "./pages/Training/MyCertificates";
 import TrainingDashboard from "./pages/Training/TrainingDashboard";
 import ExamForm from "./pages/Training/ExamForm";
 import MyProgress from "./pages/Training/MyProgress";
@@ -100,7 +101,7 @@ export default function App() {
           <Route path="/training/admin/bonuses" element={<PermissionRoute resource="training" action="manage"><BonusManagement /></PermissionRoute>} />
           <Route path="/settings" element={<PermissionRoute resource="training" action="manage"><SystemSettings /></PermissionRoute>} />
           <Route path="/training/honor-table" element={<PermissionRoute resource="training"><HonorTable /></PermissionRoute>} />
-          <Route path="/training/certificates" element={<PermissionRoute resource="training"><Library /></PermissionRoute>} />
+          <Route path="/training/certificates" element={<PermissionRoute resource="training"><MyCertificates /></PermissionRoute>} />
           <Route path="/training/admin/dashboard" element={<PermissionRoute resource="training" action="manage"><TrainingDashboard /></PermissionRoute>} />
         </Route>
 
@@ -111,3 +112,4 @@ export default function App() {
     </ErrorBoundary>
   );
 }
+

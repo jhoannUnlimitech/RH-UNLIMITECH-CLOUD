@@ -12,6 +12,7 @@ import attendanceRoutes from './attendance.routes';
 import honorTableRoutes from './honorTable.routes';
 import bonusesRoutes from './bonuses.routes';
 import dashboardRoutes from './dashboard.routes';
+import certificatesRoutes from './certificates.routes';
 
 /**
  * Training Module Routes — Barrel
@@ -36,6 +37,7 @@ router.use('/attendance', attendanceRoutes);
 router.use('/honor-table', honorTableRoutes);
 router.use('/bonuses', bonusesRoutes);
 router.use('/dashboard', dashboardRoutes);
+router.use('/certificates', certificatesRoutes);
 
 // Rutas de la Biblioteca (categorías + documentos)
 // Se montan en /api/v1/library desde el index principal
