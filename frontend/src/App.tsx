@@ -30,6 +30,7 @@ import LibraryCategories from "./pages/Training/LibraryCategories";
 import DocumentView from "./pages/Training/DocumentView";
 import DocumentForm from "./pages/Training/DocumentForm";
 import TrainingManage from "./pages/Training/TrainingManage";
+import TrainingDashboard from "./pages/Training/TrainingDashboard";
 import ExamForm from "./pages/Training/ExamForm";
 import MyProgress from "./pages/Training/MyProgress";
 import TakeExam from "./pages/Training/TakeExam";
@@ -100,7 +101,7 @@ export default function App() {
           <Route path="/settings" element={<PermissionRoute resource="training" action="manage"><SystemSettings /></PermissionRoute>} />
           <Route path="/training/honor-table" element={<PermissionRoute resource="training"><HonorTable /></PermissionRoute>} />
           <Route path="/training/certificates" element={<PermissionRoute resource="training"><Library /></PermissionRoute>} />
-          <Route path="/training/admin/dashboard" element={<PermissionRoute resource="training"><TrainingManage /></PermissionRoute>} />
+          <Route path="/training/admin/dashboard" element={<PermissionRoute resource="training" action="manage"><TrainingDashboard /></PermissionRoute>} />
         </Route>
 
         {/* 404 */}
