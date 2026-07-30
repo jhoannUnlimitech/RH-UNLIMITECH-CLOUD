@@ -22,15 +22,15 @@ const BASE_URL = process.env.BASE_URL || 'http://localhost:5173';
 
 // ─── Selectors (derived from POM) ──────────────────────────────────────────
 const sel = {
-  createBadgeBtn: pom.training_manage_page._.badges_grid._.create_badge_btn.$(),
-  badgeNameInput: pom.badge_form_modal._.badge_name_input.$(),
-  badgeDescInput: pom.badge_form_modal._.badge_description_input.$(),
-  createLevelBtn: pom.training_manage_page._.levels_table._.create_level_btn.$(),
-  createCourseBtn: pom.training_manage_page._.courses_table._.create_course_btn.$(),
-  courseNameInput: pom.course_form_modal._.course_name_input.$(),
-  courseDescInput: pom.course_form_modal._.course_description_input.$(),
-  courseLevelSelect: pom.course_form_modal._.course_level_select.$(),
-  courseHoursInput: pom.course_form_modal._.course_hours_input.$(),
+  createBadgeBtn: '[data-test-key="create-badge-btn"]',
+  badgeNameInput: '[data-test-key="badge-name-input"]',
+  badgeDescInput: '[data-test-key="badge-description-input"]',
+  createLevelBtn: '[data-test-key="create-level-btn"]',
+  createCourseBtn: '[data-test-key="create-course-btn"]',
+  courseNameInput: '[data-test-key="course-name-input"]',
+  courseDescInput: '[data-test-key="course-description-input"]',
+  courseLevelSelect: '[data-test-key="course-level-select"]',
+  courseHoursInput: '[data-test-key="course-hours-input"]',
 };
 
 e2e.describe.serial('Training Manage — Badges/Levels/Courses UI (AC-01 to AC-16)', () => {

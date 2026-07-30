@@ -14,9 +14,9 @@ const BASE_URL = process.env.BASE_URL || 'http://localhost:5173';
 
 const sel = {
   page: pom.training_manage_page.$(),
-  createBadgeBtn: pom.training_manage_page._.badges_grid._.create_badge_btn.$(),
-  createLevelBtn: pom.training_manage_page._.levels_table._.create_level_btn.$(),
-  createCourseBtn: pom.training_manage_page._.courses_table._.create_course_btn.$(),
+  createBadgeBtn: pom.training_manage_page._.badges_tab._.create_badge_btn.$(),
+  createLevelBtn: pom.training_manage_page._.levels_tab._.create_level_btn.$(),
+  createCourseBtn: pom.training_manage_page._.courses_tab._.create_course_btn.$(),
 
   // Badge modal
   badgeNameInput: pom.badge_form_modal._.badge_name_input.$(),

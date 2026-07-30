@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcrypt';
 import { connectDB } from '../config/database';
 import { Employee } from '../models/Employee';
 import { Role } from '../models/Role';
@@ -256,10 +255,10 @@ async function seed() {
 
   // 3. Create admin employee first (needed for divisions)
   console.log('👤 Creando empleado admin (para managers)...');
-  const hashedPassword = await bcrypt.hash(DEFAULT_PASSWORD, 10);
   const adminEmp = await Employee.create({
     name: 'Manuel Lara', email: 'admin@unlimitech.cloud',
-    password: hashedPassword, role: roleMap['FOUNDER & SOLUTIONS ARCHITECT'],
+    password: DEFAULT_PASSWORD, // Pre-save hook will hash it
+    role: roleMap['FOUNDER & SOLUTIONS ARCHITECT'],
     division: new mongoose.Types.ObjectId(), // Temporal, se actualiza después
     approve_csw: true, nationalId: '1234567890', phone: '3001234567',
     nationality: 'Colombiana', birthDate: new Date('1990-01-15'),
@@ -287,7 +286,8 @@ async function seed() {
   for (const empData of EMPLOYEES.filter(e => e.email !== 'admin@unlimitech.cloud')) {
     const emp = await Employee.create({
       name: empData.name, email: empData.email,
-      password: hashedPassword, role: roleMap[empData.role],
+      password: DEFAULT_PASSWORD, // Pre-save hook will hash it
+      role: roleMap[empData.role],
       division: divMap[empData.division], approve_csw: empData.approve_csw,
       nationalId: empData.nationalId, phone: empData.phone,
       nationality: empData.nationality, birthDate: new Date(empData.birthDate),

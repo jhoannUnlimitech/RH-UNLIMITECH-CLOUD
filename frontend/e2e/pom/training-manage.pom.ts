@@ -15,23 +15,23 @@ export const pom = createPom({
     tab_courses: key(),
     tab_exams: key(),
 
-    // Badges section
-    badges_grid: context({
+    // Badges tab
+    badges_tab: context({
       create_badge_btn: key(),
     }),
 
-    // Levels section
-    levels_table: context({
+    // Levels tab
+    levels_tab: context({
       create_level_btn: key(),
     }),
 
-    // Courses section
-    courses_table: context({
+    // Courses tab
+    courses_tab: context({
       create_course_btn: key(),
     }),
 
-    // Exams section
-    exams_list: context({
+    // Exams tab
+    exams_tab: context({
       create_exam_btn: key(),
     }),
   }),
